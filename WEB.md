@@ -277,8 +277,9 @@ non-persistence of answers. Live smoke tests should use only a few preset calls.
 ## Public configuration downloads and repository
 
 The production website is **https://www.f24-sales.com/**. Its footer offers the
-current `/litellm-config.json`, a `/litellm.env.example` template, and a GitHub
-button linking to https://github.com/f24sales/litellm-free#import. The GitHub
+current `/litellm-config.json` and a GitHub button linking to
+https://github.com/f24sales/litellm-free#import. The environment template is linked
+in the repository documentation. The GitHub
 Invertocat is the original black SVG from GitHub's official brand archive.
 
 The JSON export is derived from passing, researched chat routes in the same
