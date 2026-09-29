@@ -1,0 +1,8 @@
+Adwaita Sans, GNOME, installiertes Paket 50.0 laut beigefügter Projektbeschreibung.
+Datei: AdwaitaSans-Italic.ttf (variabel, enthält Black Italic).
+Projekt: https://gitlab.gnome.org/GNOME/adwaita-fonts
+Grundlage: Inter von Rasmus Andersson, https://rsms.me/inter/
+Lizenz: SIL Open Font License 1.1; siehe LICENSE.txt.
+Logo: Gewicht 900 / kursiv, horizontal 112 %, ursprünglich 64 px mit -1,4 px Laufweite.
+SVG-Normalisierung stellt diese Werte teilweise als äquivalente Transformationen dar.
+Die mitgelieferten Einsatz-SVGs sind in Pfade umgewandelt und benötigen keine Schriftinstallation.

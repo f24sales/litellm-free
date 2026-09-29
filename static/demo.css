@@ -1,0 +1,25 @@
+.demo-panel{margin-inline:var(--card-space);border-top:1px solid #d9e2eb}
+.demo-panel>summary{display:flex;justify-content:space-between;align-items:center;min-height:46px;padding-block:13px;list-style:none;color:var(--blue-dark);font-size:12px;font-weight:600}
+.demo-panel>summary::-webkit-details-marker{display:none}
+.demo-form{min-width:0;padding:5px 0 20px}
+.demo-form label{display:block;margin-bottom:12px;font-size:11px;color:var(--muted)}
+.demo-form select{display:block;width:100%;min-width:0;max-width:100%;margin-top:6px;padding:10px 8px;border:1px solid #bacfe2;border-radius:5px;color:var(--ink);background:#edf4fb;font-size:12px}
+.demo-controls{display:flex;align-items:end;gap:12px}.demo-controls label{min-width:0;flex:1;margin:0}.demo-controls select{height:46px;font-size:19px}
+.fire-button{display:flex;align-items:center;justify-content:center;gap:25px;min-width:105px;height:46px;border:1px solid var(--blue);border-radius:6px;background:var(--blue);color:white;font-size:13px;font-weight:600;transition:box-shadow .18s}
+.fire-button:hover{box-shadow:0 4px 12px #1975d11f}
+.fire-button[data-state=green]{color:#185838;background:#d5eedf;border-color:#6caa87}
+.fire-button[data-state=yellow]{color:#715113;background:#f6e8bc;border-color:#c9a450}
+.fire-running,.fire-spinner{display:none}
+.fire-spinner{position:relative;flex:none;width:20px;height:20px;border:2px solid #000;border-radius:50%;overflow:hidden;background:#fff}
+.fire-spinner::before,.fire-spinner::after{content:"";position:absolute;inset:0;display:block;border-radius:50%}
+.fire-spinner::before{background:conic-gradient(var(--blue) 0deg 90deg,#fff 90deg 180deg,var(--blue) 180deg 270deg,#fff 270deg 360deg)}
+.fire-spinner::after{background:conic-gradient(#fff 0deg 90deg,var(--blue) 90deg 180deg,#fff 180deg 270deg,var(--blue) 270deg 360deg);opacity:0}
+.fire-button[aria-busy=true]{color:var(--blue);background:var(--blue-light);border-color:var(--blue);cursor:wait}
+.fire-button[aria-busy=true] .fire-idle,.fire-button[aria-busy=true] .fire-arrow{display:none}
+.fire-button[aria-busy=true] .fire-running,.fire-button[aria-busy=true] .fire-spinner{display:block}
+.fire-button[aria-busy=true] .fire-spinner::before{animation:fire-spin 4s ease-in-out infinite}
+.fire-button[aria-busy=true] .fire-spinner::after{animation:fire-spin 4s ease-in-out infinite,fire-alternate 4s ease-in-out infinite}
+@keyframes fire-spin{0%{transform:rotate(0deg)}40%,100%{transform:rotate(360deg)}}
+@keyframes fire-alternate{0%,40%,100%{opacity:0}70%{opacity:1}}
+.last-fire{display:block;margin-top:12px;font:10px/1.5 var(--mono);color:var(--muted)}
+.demo-answer{margin-top:14px;padding:15px;border:1px solid #b8d4c2;border-radius:5px;background:#e8f4ed;color:#254c33;font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}.demo-answer[hidden]{display:none}

@@ -1,0 +1,11 @@
+{% set thinking = gateway.reasoning %}
+<dl class="gateway-thinking">
+  <dt>Thinking</dt><dd>{% if thinking.supported is sameas true %}<span class="thinking-supported">Supported</span>{% elif thinking.supported is sameas false %}<span class="thinking-unknown">Not advertised by this API</span>{% else %}<span class="thinking-unknown">Not documented</span>{% endif %}</dd>
+  {% if thinking.supported is not sameas false %}
+    {% if thinking.effort_levels %}<dt>Effort levels</dt><dd>{{ thinking.effort_levels|join(' · ') }}</dd>{% elif thinking.effort_range %}<dt>Effort range</dt><dd>{{ thinking.effort_range.min }}–{{ thinking.effort_range.max }}</dd>{% endif %}
+    {% if thinking.mandatory is sameas true %}<dt>Control</dt><dd>Always enabled</dd>{% elif thinking.mandatory is sameas false %}<dt>Control</dt><dd>Can be toggled</dd>{% endif %}
+    {% if thinking.default_enabled is sameas true %}<dt>Default</dt><dd>Enabled</dd>{% elif thinking.default_enabled is sameas false %}<dt>Default</dt><dd>Disabled</dd>{% endif %}
+    {% if thinking.default_effort %}<dt>Default effort</dt><dd>{{ thinking.default_effort }}</dd>{% endif %}
+    {% if thinking.budget_supported is sameas true %}<dt>Token budget</dt><dd>Supported</dd>{% elif thinking.budget_supported is sameas false %}<dt>Token budget</dt><dd>Not advertised</dd>{% endif %}
+  {% endif %}
+</dl>

@@ -1,0 +1,20 @@
+[Unit]
+Description=f24-sales free model directory (FastAPI)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/safrano9999/litellm-free
+RuntimeDirectory=litellm-free
+RuntimeDirectoryMode=0750
+ExecStart=/usr/bin/python3 -m uvicorn web:app --uds %t/litellm-free/litellm-free.sock --no-access-log --no-server-header
+Restart=on-failure
+RestartSec=3
+Environment=PYTHONUNBUFFERED=1
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target

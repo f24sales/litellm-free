@@ -1,0 +1,31 @@
+{% for key, a in data.aggregators|dictsort %}
+<dialog class="aggregator-dialog" id="aggregator-{{ key }}" aria-labelledby="aggregator-{{ key }}-title">
+  <div class="aggregator-dialog-header">
+    <div class="aggregator-dialog-mark">{% if a.logo %}<img src="{{ a.logo }}?v=brand-v20" alt="" width="48" height="48">{% else %}<span aria-hidden="true">{{ a.initials }}</span>{% endif %}</div>
+    <div><p class="aggregator-dialog-eyebrow">Aggregator guide</p><h2 id="aggregator-{{ key }}-title">{{ a.name }}</h2></div>
+    <button class="aggregator-dialog-close" type="button" data-dialog-close aria-label="Close {{ a.name }} information" autofocus hidden><span aria-hidden="true">×</span></button>
+  </div>
+  <div class="aggregator-dialog-body">
+    {% if a.description %}<p class="aggregator-description">{{ a.description }}</p>{% endif %}
+    <div class="aggregator-start">
+      {% if a.signup %}<a class="aggregator-primary" href="{{ a.signup }}" target="_blank" rel="noopener noreferrer">Create account <span aria-hidden="true">↗</span></a>{% endif %}
+      {% if a.docs %}<a class="aggregator-secondary" href="{{ a.docs }}" target="_blank" rel="noopener noreferrer">API documentation <span aria-hidden="true">↗</span></a>{% endif %}
+    </div>
+    <section class="aggregator-access"><h3>Access &amp; limits</h3>
+      {% if a.id == 'opencode' %}<p class="software-warning"><span role="img" aria-label="Warning">⚠️</span> <em>Some free routes require the OpenCode app or CLI.</em></p>{% endif %}
+      {% if a.access_note %}<p>{{ a.access_note }}</p>{% endif %}
+    </section>
+    {% if a.api_base %}<section class="aggregator-connection"><h3>API connection</h3>
+      <span class="api-endpoint-label">Base URL</span>
+      <code class="api-endpoint">{{ a.api_base }}</code>
+      <p>Use your {{ a.name }} API key and the <strong>Model ID</strong> shown under {{ a.name }} in the model details. Keep the ID exactly as listed.</p>
+      <p>Do not add a gateway prefix or a local <code>-fast</code> / <code>-think</code> suffix. Thinking settings are listed separately for each model and aggregator.</p>
+    </section>{% endif %}
+    {% if a.website or a.sources %}<section class="aggregator-references"><h3>Sources &amp; references</h3>
+      <ul>{% if a.website %}<li><a href="{{ a.website }}" target="_blank" rel="noopener noreferrer"><span>Official website</span><span aria-hidden="true">↗</span></a></li>{% endif %}
+      {% for source in a.sources|default([])|unique(attribute='url') %}<li><a href="{{ source.url }}" target="_blank" rel="noopener noreferrer"><span>{{ source.label }}</span><span aria-hidden="true">↗</span></a></li>{% endfor %}</ul>
+    </section>{% endif %}
+    <a class="aggregator-dialog-back" href="#aggregators-title">Back to the directory ↑</a>
+  </div>
+</dialog>
+{% endfor %}

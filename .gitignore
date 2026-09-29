@@ -14,3 +14,12 @@ config.local.yaml
 runs.log
 news.md
 *.log
+model_registry.json
+.pytest_cache/
+test-results/
+fire_state.json
+fire_events.jsonl
+/model_probe_results*.json
+/web_guardrails.json
+/litellm-free.json
+/model_reviews/

@@ -1,0 +1,3852 @@
+{
+  "schema_version": 1,
+  "source_type": "model_probe",
+  "generated_at": "2026-09-29T08:18:29Z",
+  "description": "Example snapshot from 2026-09-29 for local previews. Historical observations only; run your own probe before enabling inference.",
+  "models": {
+    "groq/allam-2-7b": {
+      "model": "groq/allam-2-7b",
+      "aggregator": "groq",
+      "status": "green",
+      "checked_at": "2026-09-29T08:08:51+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "edd63dd3-1e3e-5917-927a-9a6ab959b108",
+        "upstream_id": "allam-2-7b",
+        "alias": "groq/allam-2-7b",
+        "variant": "base",
+        "author": null,
+        "reported_provider": "SDAIA",
+        "reported_providers": [],
+        "parameters": [],
+        "context_tokens": 4096,
+        "max_output_tokens": 4096,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [],
+        "output_modalities": [],
+        "created_at": "2026-09-21T21:27:04+00:00",
+        "updated_at": "2026-09-21T21:27:04+00:00"
+      }
+    },
+    "groq/openai/gpt-oss-120b": {
+      "model": "groq/openai/gpt-oss-120b",
+      "aggregator": "groq",
+      "status": "green",
+      "checked_at": "2026-09-29T08:09:01+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "35d0c1cf-9bc1-5c6c-95ca-49b0a901fda1",
+        "upstream_id": "openai/gpt-oss-120b",
+        "alias": "groq/openai/gpt-oss-120b",
+        "variant": "base",
+        "author": "openai",
+        "reported_provider": "OpenAI",
+        "reported_providers": [],
+        "parameters": [],
+        "context_tokens": 131072,
+        "max_output_tokens": 65536,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [],
+        "output_modalities": [],
+        "created_at": "2026-09-21T21:27:04+00:00",
+        "updated_at": "2026-09-21T21:27:04+00:00"
+      }
+    },
+    "groq/openai/gpt-oss-20b": {
+      "model": "groq/openai/gpt-oss-20b",
+      "aggregator": "groq",
+      "status": "green",
+      "checked_at": "2026-09-29T08:09:12+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "d9efff22-28bd-550a-a640-a4ac97db3752",
+        "upstream_id": "openai/gpt-oss-20b",
+        "alias": "groq/openai/gpt-oss-20b",
+        "variant": "base",
+        "author": "openai",
+        "reported_provider": "OpenAI",
+        "reported_providers": [],
+        "parameters": [],
+        "context_tokens": 131072,
+        "max_output_tokens": 65536,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [],
+        "output_modalities": [],
+        "created_at": "2026-09-21T21:27:04+00:00",
+        "updated_at": "2026-09-21T21:27:04+00:00"
+      }
+    },
+    "groq/qwen/qwen3.8-27b": {
+      "model": "groq/qwen/qwen3.8-27b",
+      "aggregator": "groq",
+      "status": "green",
+      "checked_at": "2026-09-29T08:09:22+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "226bc63b-428d-557b-93b7-10fa543c5f81",
+        "upstream_id": "qwen/qwen3.8-27b",
+        "alias": "groq/qwen/qwen3.8-27b",
+        "variant": "base",
+        "author": "qwen",
+        "reported_provider": "Alibaba Cloud",
+        "reported_providers": [],
+        "parameters": [],
+        "context_tokens": 131072,
+        "max_output_tokens": 16384,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [],
+        "output_modalities": [],
+        "created_at": "2026-09-21T21:27:04+00:00",
+        "updated_at": "2026-09-26T23:50:08+00:00"
+      }
+    },
+    "kilo/cohere/north-mini-code:free": {
+      "model": "kilo/cohere/north-mini-code:free",
+      "aggregator": "kilo",
+      "status": "green",
+      "checked_at": "2026-09-29T08:08:51+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "2ee2fdb1-cf8a-5ae0-a7f9-aeb24310c86c",
+        "upstream_id": "cohere/north-mini-code:free",
+        "alias": "kilo/cohere/north-mini-code:free",
+        "variant": "base",
+        "author": "cohere",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "max_tokens",
+          "presence_penalty",
+          "reasoning",
+          "seed",
+          "stop",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_k",
+          "top_p"
+        ],
+        "context_tokens": 256000,
+        "max_output_tokens": 64000,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:06+00:00",
+        "updated_at": "2026-09-21T21:27:06+00:00"
+      }
+    },
+    "kilo/dots-studio/dots-3-note-preview:free": {
+      "model": "kilo/dots-studio/dots-3-note-preview:free",
+      "aggregator": "kilo",
+      "status": "green",
+      "checked_at": "2026-09-29T08:09:04+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "c6f276ab-3627-5e90-9a67-116e2f69b438",
+        "upstream_id": "dots-studio/dots-3-note-preview:free",
+        "alias": "kilo/dots-studio/dots-3-note-preview:free",
+        "variant": "base",
+        "author": "dots-studio",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "response_format",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 512000,
+        "max_output_tokens": 460800,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:06+00:00",
+        "updated_at": "2026-09-21T21:27:06+00:00"
+      }
+    },
+    "kilo/google/lyria-3-clip-preview": {
+      "model": "kilo/google/lyria-3-clip-preview",
+      "aggregator": "kilo",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:09:21+00:00",
+      "assessment": "transient",
+      "http_status": 502,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "e60b81c6-e277-53c1-86eb-bd564a8524b9",
+        "upstream_id": "google/lyria-3-clip-preview",
+        "alias": "kilo/google/lyria-3-clip-preview",
+        "variant": "base",
+        "author": "google",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "max_tokens",
+          "response_format",
+          "seed",
+          "temperature",
+          "top_p"
+        ],
+        "context_tokens": 1048576,
+        "max_output_tokens": 65536,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text",
+          "audio"
+        ],
+        "created_at": "2026-09-21T21:27:06+00:00",
+        "updated_at": "2026-09-21T21:27:06+00:00"
+      }
+    },
+    "kilo/google/lyria-3-pro-preview": {
+      "model": "kilo/google/lyria-3-pro-preview",
+      "aggregator": "kilo",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:09:32+00:00",
+      "assessment": "unknown",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "ba7354b5-5e00-53a7-bd81-efda124e1d96",
+        "upstream_id": "google/lyria-3-pro-preview",
+        "alias": "kilo/google/lyria-3-pro-preview",
+        "variant": "base",
+        "author": "google",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "max_tokens",
+          "response_format",
+          "seed",
+          "temperature",
+          "top_p"
+        ],
+        "context_tokens": 1048576,
+        "max_output_tokens": 65536,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text",
+          "audio"
+        ],
+        "created_at": "2026-09-21T21:27:06+00:00",
+        "updated_at": "2026-09-21T21:27:06+00:00"
+      }
+    },
+    "kilo/inclusionai/ling-3.0-flash-sante:free": {
+      "model": "kilo/inclusionai/ling-3.0-flash-sante:free",
+      "aggregator": "kilo",
+      "status": "green",
+      "checked_at": "2026-09-29T08:09:43+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "da95ca5d-4f6c-5b0f-8bb6-d76448964ab8",
+        "upstream_id": "inclusionai/ling-3.0-flash-sante:free",
+        "alias": "kilo/inclusionai/ling-3.0-flash-sante:free",
+        "variant": "base",
+        "author": "inclusionai",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "logprobs",
+          "max_tokens",
+          "presence_penalty",
+          "reasoning",
+          "repetition_penalty",
+          "seed",
+          "stop",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_k",
+          "top_logprobs",
+          "top_p"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 32768,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:06+00:00",
+        "updated_at": "2026-09-21T21:27:06+00:00"
+      }
+    },
+    "kilo/kilo-auto/free": {
+      "model": "kilo/kilo-auto/free",
+      "aggregator": "kilo",
+      "status": "green",
+      "checked_at": "2026-09-29T08:13:41+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "30a1ca34-d24c-5744-a08e-ca0d03a6aad4",
+        "upstream_id": "kilo-auto/free",
+        "alias": "kilo/kilo-auto/free",
+        "variant": "base",
+        "author": "kilo-auto",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "max_tokens",
+          "temperature",
+          "tools",
+          "reasoning",
+          "include_reasoning"
+        ],
+        "context_tokens": 256000,
+        "max_output_tokens": 32768,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:06+00:00",
+        "updated_at": "2026-09-26T23:50:09+00:00"
+      }
+    },
+    "kilo/liquid/lfm-2.5-2.6b:free": {
+      "model": "kilo/liquid/lfm-2.5-2.6b:free",
+      "aggregator": "kilo",
+      "status": "green",
+      "checked_at": "2026-09-29T08:13:52+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "59e467e6-5bbe-5c50-b2cd-1616feb8df30",
+        "upstream_id": "liquid/lfm-2.5-2.6b:free",
+        "alias": "kilo/liquid/lfm-2.5-2.6b:free",
+        "variant": "base",
+        "author": "liquid",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "logprobs",
+          "max_completion_tokens",
+          "max_tokens",
+          "min_p",
+          "presence_penalty",
+          "reasoning",
+          "repetition_penalty",
+          "response_format",
+          "seed",
+          "stop",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_k",
+          "top_logprobs",
+          "top_p"
+        ],
+        "context_tokens": 65536,
+        "max_output_tokens": 8192,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:06+00:00",
+        "updated_at": "2026-09-26T23:50:09+00:00"
+      }
+    },
+    "kilo/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": {
+      "model": "kilo/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "aggregator": "kilo",
+      "status": "green",
+      "checked_at": "2026-09-29T08:09:58+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "f37527d1-8cec-5d6a-a025-5f188047bb03",
+        "upstream_id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "alias": "kilo/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "variant": "base",
+        "author": "nvidia",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "seed",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 256000,
+        "max_output_tokens": 65536,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "audio",
+          "image",
+          "video"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:06+00:00",
+        "updated_at": "2026-09-21T21:27:06+00:00"
+      }
+    },
+    "kilo/nvidia/nemotron-3-super-120b-a12b:free": {
+      "model": "kilo/nvidia/nemotron-3-super-120b-a12b:free",
+      "aggregator": "kilo",
+      "status": "green",
+      "checked_at": "2026-09-29T08:10:09+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "9b2a296a-8b58-5a5e-aebb-e925cb670942",
+        "upstream_id": "nvidia/nemotron-3-super-120b-a12b:free",
+        "alias": "kilo/nvidia/nemotron-3-super-120b-a12b:free",
+        "variant": "base",
+        "author": "nvidia",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "reasoning_effort",
+          "response_format",
+          "seed",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 235929,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:06+00:00",
+        "updated_at": "2026-09-21T21:27:06+00:00"
+      }
+    },
+    "kilo/nvidia/nemotron-3-ultra-550b-a55b:free": {
+      "model": "kilo/nvidia/nemotron-3-ultra-550b-a55b:free",
+      "aggregator": "kilo",
+      "status": "green",
+      "checked_at": "2026-09-29T08:10:20+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "531f0b25-f117-5caf-97e1-814e7e1b4a65",
+        "upstream_id": "nvidia/nemotron-3-ultra-550b-a55b:free",
+        "alias": "kilo/nvidia/nemotron-3-ultra-550b-a55b:free",
+        "variant": "base",
+        "author": "nvidia",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "reasoning_effort",
+          "seed",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 1000000,
+        "max_output_tokens": 65536,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:06+00:00",
+        "updated_at": "2026-09-21T21:27:06+00:00"
+      }
+    },
+    "kilo/nvidia/nemotron-3.5-content-safety:free": {
+      "model": "kilo/nvidia/nemotron-3.5-content-safety:free",
+      "aggregator": "kilo",
+      "status": "green",
+      "checked_at": "2026-09-29T08:10:31+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "b72dfc13-d537-55f6-ae2a-747a1c2b0133",
+        "upstream_id": "nvidia/nemotron-3.5-content-safety:free",
+        "alias": "kilo/nvidia/nemotron-3.5-content-safety:free",
+        "variant": "base",
+        "author": "nvidia",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "seed",
+          "temperature",
+          "top_p"
+        ],
+        "context_tokens": 128000,
+        "max_output_tokens": 8192,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:06+00:00",
+        "updated_at": "2026-09-21T21:27:06+00:00"
+      }
+    },
+    "kilo/nvidia/nemotron-3.5-lightning:free": {
+      "model": "kilo/nvidia/nemotron-3.5-lightning:free",
+      "aggregator": "kilo",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:12:11+00:00",
+      "assessment": "unknown",
+      "http_status": null,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "c103dbaa-fa2d-5003-828b-933e13185798",
+        "upstream_id": "nvidia/nemotron-3.5-lightning:free",
+        "alias": "kilo/nvidia/nemotron-3.5-lightning:free",
+        "variant": "base",
+        "author": "nvidia",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "seed",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 1000000,
+        "max_output_tokens": 65536,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:06+00:00",
+        "updated_at": "2026-09-21T21:27:06+00:00"
+      }
+    },
+    "kilo/openrouter/free": {
+      "model": "kilo/openrouter/free",
+      "aggregator": "kilo",
+      "status": "green",
+      "checked_at": "2026-09-29T08:12:21+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "85b5aee0-fc80-51ad-9943-66f18b581477",
+        "upstream_id": "openrouter/free",
+        "alias": "kilo/openrouter/free",
+        "variant": "base",
+        "author": "openrouter",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "logprobs",
+          "max_completion_tokens",
+          "max_tokens",
+          "min_p",
+          "presence_penalty",
+          "reasoning",
+          "reasoning_effort",
+          "repetition_penalty",
+          "response_format",
+          "seed",
+          "stop",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_k",
+          "top_logprobs",
+          "top_p"
+        ],
+        "context_tokens": 200000,
+        "max_output_tokens": null,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:06+00:00",
+        "updated_at": "2026-09-21T21:27:06+00:00"
+      }
+    },
+    "kilo/poolside/laguna-s-2.1:free": {
+      "model": "kilo/poolside/laguna-s-2.1:free",
+      "aggregator": "kilo",
+      "status": "green",
+      "checked_at": "2026-09-29T08:12:35+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "8b9b5f02-a3bb-581f-a7ce-8d248b76858e",
+        "upstream_id": "poolside/laguna-s-2.1:free",
+        "alias": "kilo/poolside/laguna-s-2.1:free",
+        "variant": "base",
+        "author": "poolside",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "temperature",
+          "tool_choice",
+          "tools"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 32768,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:06+00:00",
+        "updated_at": "2026-09-21T21:27:06+00:00"
+      }
+    },
+    "kilo/poolside/laguna-xs-2.1:free": {
+      "model": "kilo/poolside/laguna-xs-2.1:free",
+      "aggregator": "kilo",
+      "status": "green",
+      "checked_at": "2026-09-29T08:12:46+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "40faae0b-b5c7-510e-9644-9a1e2538a903",
+        "upstream_id": "poolside/laguna-xs-2.1:free",
+        "alias": "kilo/poolside/laguna-xs-2.1:free",
+        "variant": "base",
+        "author": "poolside",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "temperature",
+          "tool_choice",
+          "tools"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 32768,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:06+00:00",
+        "updated_at": "2026-09-21T21:27:06+00:00"
+      }
+    },
+    "kilo/qwen/qwen3.8-27b:free": {
+      "model": "kilo/qwen/qwen3.8-27b:free",
+      "aggregator": "kilo",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:13:02+00:00",
+      "assessment": "transient",
+      "http_status": 429,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "96e68935-a1cf-584c-900a-32a530740d50",
+        "upstream_id": "qwen/qwen3.8-27b:free",
+        "alias": "kilo/qwen/qwen3.8-27b:free",
+        "variant": "base",
+        "author": "qwen",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "max_tokens",
+          "presence_penalty",
+          "reasoning",
+          "reasoning_effort",
+          "repetition_penalty",
+          "stop",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 235929,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "image",
+          "video"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:06+00:00",
+        "updated_at": "2026-09-21T21:27:06+00:00"
+      }
+    },
+    "kilo/stealth/space-bunny-alpha": {
+      "model": "kilo/stealth/space-bunny-alpha",
+      "aggregator": "kilo",
+      "status": "green",
+      "checked_at": "2026-09-29T08:14:05+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "990b61f2-c708-5aed-b7a0-59c1e4b19438",
+        "upstream_id": "stealth/space-bunny-alpha",
+        "alias": "kilo/stealth/space-bunny-alpha",
+        "variant": "base",
+        "author": "stealth",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "reasoning_effort",
+          "response_format",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 1000000,
+        "max_output_tokens": 524288,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "image",
+          "video"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-26T23:50:09+00:00",
+        "updated_at": "2026-09-26T23:50:09+00:00"
+      }
+    },
+    "kilo/stepfun/step-3.7-flash:free": {
+      "model": "kilo/stepfun/step-3.7-flash:free",
+      "aggregator": "kilo",
+      "status": "green",
+      "checked_at": "2026-09-29T08:13:14+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "7a1a4145-265f-5f0f-952a-8198fdc689eb",
+        "upstream_id": "stepfun/step-3.7-flash:free",
+        "alias": "kilo/stepfun/step-3.7-flash:free",
+        "variant": "base",
+        "author": "stepfun",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "max_tokens",
+          "temperature",
+          "tools",
+          "reasoning",
+          "include_reasoning"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 262144,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:06+00:00",
+        "updated_at": "2026-09-21T21:27:06+00:00"
+      }
+    },
+    "kilo/thinkingmachines/inkling-small:free": {
+      "model": "kilo/thinkingmachines/inkling-small:free",
+      "aggregator": "kilo",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:13:30+00:00",
+      "assessment": "transient",
+      "http_status": 429,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "2df63819-ca0f-5ba3-9820-23709d8a203a",
+        "upstream_id": "thinkingmachines/inkling-small:free",
+        "alias": "kilo/thinkingmachines/inkling-small:free",
+        "variant": "base",
+        "author": "thinkingmachines",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "max_tokens",
+          "presence_penalty",
+          "reasoning",
+          "reasoning_effort",
+          "seed",
+          "stop",
+          "temperature",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 1048576,
+        "max_output_tokens": 262144,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "image",
+          "audio"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:06+00:00",
+        "updated_at": "2026-09-21T21:27:06+00:00"
+      }
+    },
+    "nous/inclusionai/ling-3.0-flash-fin:free": {
+      "model": "nous/inclusionai/ling-3.0-flash-fin:free",
+      "aggregator": "nous",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:12:55+00:00",
+      "assessment": "unknown",
+      "http_status": 404,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "efd56e33-5d38-519f-98d5-e73f90742823",
+        "upstream_id": "inclusionai/ling-3.0-flash-fin:free",
+        "alias": "nous/inclusionai/ling-3.0-flash-fin:free",
+        "variant": "base",
+        "author": "inclusionai",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "logit_bias",
+          "logprobs",
+          "max_tokens",
+          "min_p",
+          "presence_penalty",
+          "reasoning",
+          "repetition_penalty",
+          "seed",
+          "stop",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_k",
+          "top_logprobs",
+          "top_p"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 32768,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:07+00:00",
+        "updated_at": "2026-09-29T08:07:29+00:00"
+      }
+    },
+    "nous/inclusionai/ling-3.0-flash-sante:free": {
+      "model": "nous/inclusionai/ling-3.0-flash-sante:free",
+      "aggregator": "nous",
+      "status": "green",
+      "checked_at": "2026-09-29T08:09:06+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "4d41965c-6441-54b3-89c0-74ddffee5621",
+        "upstream_id": "inclusionai/ling-3.0-flash-sante:free",
+        "alias": "nous/inclusionai/ling-3.0-flash-sante:free",
+        "variant": "base",
+        "author": "inclusionai",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "logprobs",
+          "max_tokens",
+          "presence_penalty",
+          "reasoning",
+          "repetition_penalty",
+          "seed",
+          "stop",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_k",
+          "top_logprobs",
+          "top_p"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 32768,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:07+00:00",
+        "updated_at": "2026-09-21T21:27:11+00:00"
+      }
+    },
+    "nous/meituan/longcat-2.0:free": {
+      "model": "nous/meituan/longcat-2.0:free",
+      "aggregator": "nous",
+      "status": "red",
+      "checked_at": "2026-09-29T08:12:34+00:00",
+      "assessment": "confirmed_failure",
+      "http_status": 404,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "6f197394-4792-56fe-a49d-a76caf5f4698",
+        "upstream_id": "meituan/longcat-2.0:free",
+        "alias": "nous/meituan/longcat-2.0:free",
+        "variant": "base",
+        "author": "meituan",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "logit_bias",
+          "max_tokens",
+          "min_p",
+          "presence_penalty",
+          "reasoning",
+          "repetition_penalty",
+          "seed",
+          "stop",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_k",
+          "top_p"
+        ],
+        "context_tokens": 1048756,
+        "max_output_tokens": 262144,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": true,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:07+00:00",
+        "updated_at": "2026-09-26T23:50:10+00:00"
+      }
+    },
+    "nous/meituan/longcat-2.5-preview:free": {
+      "model": "nous/meituan/longcat-2.5-preview:free",
+      "aggregator": "nous",
+      "status": "green",
+      "checked_at": "2026-09-29T08:13:17+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "83589d95-9458-560c-83f6-126ce780cb9e",
+        "upstream_id": "meituan/longcat-2.5-preview:free",
+        "alias": "nous/meituan/longcat-2.5-preview:free",
+        "variant": "base",
+        "author": "meituan",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "logit_bias",
+          "max_tokens",
+          "presence_penalty",
+          "reasoning",
+          "seed",
+          "stop",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_k",
+          "top_p"
+        ],
+        "context_tokens": 1048576,
+        "max_output_tokens": 131072,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-29T08:07:29+00:00",
+        "updated_at": "2026-09-29T08:07:53+00:00"
+      }
+    },
+    "nous/poolside/laguna-s-2.1:free": {
+      "model": "nous/poolside/laguna-s-2.1:free",
+      "aggregator": "nous",
+      "status": "green",
+      "checked_at": "2026-09-29T08:11:16+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "67b1552f-6fc1-5162-adba-aa4af86d8f50",
+        "upstream_id": "poolside/laguna-s-2.1:free",
+        "alias": "nous/poolside/laguna-s-2.1:free",
+        "variant": "base",
+        "author": "poolside",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "temperature",
+          "tool_choice",
+          "tools"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 131072,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:07+00:00",
+        "updated_at": "2026-09-21T21:29:11+00:00"
+      }
+    },
+    "nous/poolside/laguna-xs-2.1:free": {
+      "model": "nous/poolside/laguna-xs-2.1:free",
+      "aggregator": "nous",
+      "status": "green",
+      "checked_at": "2026-09-29T08:11:46+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "a1876c4b-dbe3-5695-87f4-c5d9af2ec084",
+        "upstream_id": "poolside/laguna-xs-2.1:free",
+        "alias": "nous/poolside/laguna-xs-2.1:free",
+        "variant": "base",
+        "author": "poolside",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "temperature",
+          "tool_choice",
+          "tools"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 32768,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:07+00:00",
+        "updated_at": "2026-09-21T21:29:16+00:00"
+      }
+    },
+    "nous/stepfun/step-3.7-flash:free": {
+      "model": "nous/stepfun/step-3.7-flash:free",
+      "aggregator": "nous",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:10:46+00:00",
+      "assessment": "unknown",
+      "http_status": null,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "5eed53a9-c13a-56b3-8553-a83a548bc77a",
+        "upstream_id": "stepfun/step-3.7-flash:free",
+        "alias": "nous/stepfun/step-3.7-flash:free",
+        "variant": "base",
+        "author": "stepfun",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "logit_bias",
+          "logprobs",
+          "max_tokens",
+          "min_p",
+          "presence_penalty",
+          "reasoning",
+          "reasoning_effort",
+          "repetition_penalty",
+          "response_format",
+          "seed",
+          "stop",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_k",
+          "top_logprobs",
+          "top_p"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 32768,
+        "reasoning": {
+          "supported": true,
+          "mandatory": true,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [
+            "high",
+            "medium",
+            "low"
+          ],
+          "default_effort": "medium"
+        },
+        "input_modalities": [
+          "text",
+          "image",
+          "video"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:07+00:00",
+        "updated_at": "2026-09-21T21:29:09+00:00"
+      }
+    },
+    "nous/upstage/solar-pro4:free": {
+      "model": "nous/upstage/solar-pro4:free",
+      "aggregator": "nous",
+      "status": "green",
+      "checked_at": "2026-09-29T08:12:24+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "ad8a8234-a4c6-5be0-b876-3035d2033379",
+        "upstream_id": "upstage/solar-pro4:free",
+        "alias": "nous/upstage/solar-pro4:free",
+        "variant": "base",
+        "author": "upstage",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "max_tokens",
+          "parallel_tool_calls",
+          "presence_penalty",
+          "reasoning",
+          "reasoning_effort",
+          "response_format",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 524288,
+        "max_output_tokens": 131072,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": false,
+          "budget_supported": null,
+          "effort_levels": [
+            "max",
+            "xhigh",
+            "high",
+            "medium",
+            "low",
+            "minimal",
+            "none"
+          ],
+          "default_effort": "medium"
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:27:07+00:00",
+        "updated_at": "2026-09-21T21:29:21+00:00"
+      }
+    },
+    "nvidia/deepseek-ai/deepseek-v4.1-flash": {
+      "model": "nvidia/deepseek-ai/deepseek-v4.1-flash",
+      "aggregator": "nvidia",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:10:20+00:00",
+      "assessment": "unknown",
+      "http_status": null,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "92fb8e6b-8602-55af-aac8-d13e477a65f9",
+        "upstream_id": "deepseek-ai/deepseek-v4.1-flash",
+        "alias": "nvidia/deepseek-ai/deepseek-v4.1-flash",
+        "variant": "base",
+        "author": "deepseek-ai",
+        "reported_provider": "deepseek-ai",
+        "reported_providers": [],
+        "parameters": [],
+        "context_tokens": null,
+        "max_output_tokens": null,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [],
+        "output_modalities": [],
+        "created_at": "2026-09-26T00:10:15+00:00",
+        "updated_at": "2026-09-26T00:10:15+00:00"
+      }
+    },
+    "nvidia/moonshotai/kimi-k3": {
+      "model": "nvidia/moonshotai/kimi-k3",
+      "aggregator": "nvidia",
+      "status": "green",
+      "checked_at": "2026-09-29T08:10:41+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "0da6a367-2445-5e87-80c0-9e3c0648aa6e",
+        "upstream_id": "moonshotai/kimi-k3",
+        "alias": "nvidia/moonshotai/kimi-k3",
+        "variant": "base",
+        "author": "moonshotai",
+        "reported_provider": "moonshotai",
+        "reported_providers": [],
+        "parameters": [],
+        "context_tokens": null,
+        "max_output_tokens": null,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [],
+        "output_modalities": [],
+        "created_at": "2026-09-26T00:10:15+00:00",
+        "updated_at": "2026-09-26T00:10:15+00:00"
+      }
+    },
+    "nvidia/z-ai/glm-5.3": {
+      "model": "nvidia/z-ai/glm-5.3",
+      "aggregator": "nvidia",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:12:21+00:00",
+      "assessment": "unknown",
+      "http_status": null,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "5b5efca1-aa73-5f91-ac70-e2d4e93eb7d4",
+        "upstream_id": "z-ai/glm-5.3",
+        "alias": "nvidia/z-ai/glm-5.3",
+        "variant": "base",
+        "author": "z-ai",
+        "reported_provider": "z-ai",
+        "reported_providers": [],
+        "parameters": [],
+        "context_tokens": null,
+        "max_output_tokens": null,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [],
+        "output_modalities": [],
+        "created_at": "2026-09-26T00:10:15+00:00",
+        "updated_at": "2026-09-26T00:10:15+00:00"
+      }
+    },
+    "nvidia/z-ai/glm-5.3-flash": {
+      "model": "nvidia/z-ai/glm-5.3-flash",
+      "aggregator": "nvidia",
+      "status": "green",
+      "checked_at": "2026-09-29T08:13:56+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "0f68156e-b26f-5bea-b901-4277d2a51d53",
+        "upstream_id": "z-ai/glm-5.3-flash",
+        "alias": "nvidia/z-ai/glm-5.3-flash",
+        "variant": "base",
+        "author": "z-ai",
+        "reported_provider": "z-ai",
+        "reported_providers": [],
+        "parameters": [],
+        "context_tokens": null,
+        "max_output_tokens": null,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [],
+        "output_modalities": [],
+        "created_at": "2026-09-26T00:10:15+00:00",
+        "updated_at": "2026-09-26T00:10:15+00:00"
+      }
+    },
+    "opencode/jev-1.13-free": {
+      "model": "opencode/jev-1.13-free",
+      "aggregator": "opencode",
+      "status": "red",
+      "checked_at": "2026-09-29T08:08:57+00:00",
+      "assessment": "confirmed_failure",
+      "http_status": 403,
+      "listed_in_proxy": true,
+      "access_note": "OpenCode free routes must be used through the OpenCode software; direct LiteLLM/API calls are not accepted.",
+      "catalog": {
+        "id": "2d95701b-ebf9-58ab-9c4f-77d68dfb33f8",
+        "upstream_id": "jev-1.13-free",
+        "alias": "opencode/jev-1.13-free",
+        "variant": "base",
+        "author": null,
+        "reported_provider": "opencode",
+        "reported_providers": [],
+        "parameters": [],
+        "context_tokens": null,
+        "max_output_tokens": null,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [],
+        "output_modalities": [],
+        "created_at": "2026-09-22T12:59:05+00:00",
+        "updated_at": "2026-09-22T12:59:05+00:00"
+      }
+    },
+    "opencode/ling-3.0-flash-fin-free": {
+      "model": "opencode/ling-3.0-flash-fin-free",
+      "aggregator": "opencode",
+      "status": "red",
+      "checked_at": "2026-09-29T08:09:13+00:00",
+      "assessment": "confirmed_failure",
+      "http_status": 403,
+      "listed_in_proxy": true,
+      "access_note": "OpenCode free routes must be used through the OpenCode software; direct LiteLLM/API calls are not accepted.",
+      "catalog": {
+        "id": "48c66d0d-b0fa-5cba-8aa5-1c2c19f0a607",
+        "upstream_id": "ling-3.0-flash-fin-free",
+        "alias": "opencode/ling-3.0-flash-fin-free",
+        "variant": "base",
+        "author": null,
+        "reported_provider": "opencode",
+        "reported_providers": [],
+        "parameters": [],
+        "context_tokens": null,
+        "max_output_tokens": null,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [],
+        "output_modalities": [],
+        "created_at": "2026-09-22T12:59:05+00:00",
+        "updated_at": "2026-09-22T12:59:05+00:00"
+      }
+    },
+    "opencode/longcat-2.5-preview-free": {
+      "model": "opencode/longcat-2.5-preview-free",
+      "aggregator": "opencode",
+      "status": "red",
+      "checked_at": "2026-09-29T08:11:03+00:00",
+      "assessment": "confirmed_failure",
+      "http_status": 403,
+      "listed_in_proxy": true,
+      "access_note": "OpenCode free routes must be used through the OpenCode software; direct LiteLLM/API calls are not accepted.",
+      "catalog": {
+        "id": "c2323a13-89be-5023-9f5d-5ea6ffb19848",
+        "upstream_id": "longcat-2.5-preview-free",
+        "alias": "opencode/longcat-2.5-preview-free",
+        "variant": "base",
+        "author": null,
+        "reported_provider": "opencode",
+        "reported_providers": [],
+        "parameters": [],
+        "context_tokens": null,
+        "max_output_tokens": null,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [],
+        "output_modalities": [],
+        "created_at": "2026-09-26T23:50:11+00:00",
+        "updated_at": "2026-09-26T23:50:11+00:00"
+      }
+    },
+    "opencode/mimo-v2.5-free": {
+      "model": "opencode/mimo-v2.5-free",
+      "aggregator": "opencode",
+      "status": "red",
+      "checked_at": "2026-09-29T08:09:28+00:00",
+      "assessment": "confirmed_failure",
+      "http_status": 403,
+      "listed_in_proxy": true,
+      "access_note": "OpenCode free routes must be used through the OpenCode software; direct LiteLLM/API calls are not accepted.",
+      "catalog": {
+        "id": "f2d9534f-a1bd-5935-82f8-2f3285df9cc4",
+        "upstream_id": "mimo-v2.5-free",
+        "alias": "opencode/mimo-v2.5-free",
+        "variant": "base",
+        "author": null,
+        "reported_provider": "opencode",
+        "reported_providers": [],
+        "parameters": [],
+        "context_tokens": null,
+        "max_output_tokens": null,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [],
+        "output_modalities": [],
+        "created_at": "2026-09-22T12:59:05+00:00",
+        "updated_at": "2026-09-22T12:59:05+00:00"
+      }
+    },
+    "opencode/mimo-v2.6-flash-free": {
+      "model": "opencode/mimo-v2.6-flash-free",
+      "aggregator": "opencode",
+      "status": "red",
+      "checked_at": "2026-09-29T08:09:43+00:00",
+      "assessment": "confirmed_failure",
+      "http_status": 403,
+      "listed_in_proxy": true,
+      "access_note": "OpenCode free routes must be used through the OpenCode software; direct LiteLLM/API calls are not accepted.",
+      "catalog": {
+        "id": "0ba9801f-e18a-53e8-a0ae-c0af867bd7a1",
+        "upstream_id": "mimo-v2.6-flash-free",
+        "alias": "opencode/mimo-v2.6-flash-free",
+        "variant": "base",
+        "author": null,
+        "reported_provider": "opencode",
+        "reported_providers": [],
+        "parameters": [],
+        "context_tokens": null,
+        "max_output_tokens": null,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [],
+        "output_modalities": [],
+        "created_at": "2026-09-22T12:59:05+00:00",
+        "updated_at": "2026-09-22T12:59:05+00:00"
+      }
+    },
+    "opencode/muse-spark-1.2-contributor-free": {
+      "model": "opencode/muse-spark-1.2-contributor-free",
+      "aggregator": "opencode",
+      "status": "red",
+      "checked_at": "2026-09-29T08:10:00+00:00",
+      "assessment": "confirmed_failure",
+      "http_status": 403,
+      "listed_in_proxy": true,
+      "access_note": "OpenCode free routes must be used through the OpenCode software; direct LiteLLM/API calls are not accepted.",
+      "catalog": {
+        "id": "3cc1ffc3-c8f2-5e8c-9a2c-7d97013b8cae",
+        "upstream_id": "muse-spark-1.2-contributor-free",
+        "alias": "opencode/muse-spark-1.2-contributor-free",
+        "variant": "base",
+        "author": null,
+        "reported_provider": "opencode",
+        "reported_providers": [],
+        "parameters": [],
+        "context_tokens": null,
+        "max_output_tokens": null,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [],
+        "output_modalities": [],
+        "created_at": "2026-09-22T12:59:05+00:00",
+        "updated_at": "2026-09-22T12:59:05+00:00"
+      }
+    },
+    "opencode/muse-spark-1.3-contributor-free": {
+      "model": "opencode/muse-spark-1.3-contributor-free",
+      "aggregator": "opencode",
+      "status": "red",
+      "checked_at": "2026-09-29T08:10:15+00:00",
+      "assessment": "confirmed_failure",
+      "http_status": 403,
+      "listed_in_proxy": true,
+      "access_note": "OpenCode free routes must be used through the OpenCode software; direct LiteLLM/API calls are not accepted.",
+      "catalog": {
+        "id": "5e7ddb51-77df-51b1-8227-e8a474e88062",
+        "upstream_id": "muse-spark-1.3-contributor-free",
+        "alias": "opencode/muse-spark-1.3-contributor-free",
+        "variant": "base",
+        "author": null,
+        "reported_provider": "opencode",
+        "reported_providers": [],
+        "parameters": [],
+        "context_tokens": null,
+        "max_output_tokens": null,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [],
+        "output_modalities": [],
+        "created_at": "2026-09-22T12:59:05+00:00",
+        "updated_at": "2026-09-22T12:59:05+00:00"
+      }
+    },
+    "opencode/nemotron-3-ultra-free": {
+      "model": "opencode/nemotron-3-ultra-free",
+      "aggregator": "opencode",
+      "status": "red",
+      "checked_at": "2026-09-29T08:10:31+00:00",
+      "assessment": "confirmed_failure",
+      "http_status": 403,
+      "listed_in_proxy": true,
+      "access_note": "OpenCode free routes must be used through the OpenCode software; direct LiteLLM/API calls are not accepted.",
+      "catalog": {
+        "id": "9a03fd95-29ac-5912-91c3-bac70756f190",
+        "upstream_id": "nemotron-3-ultra-free",
+        "alias": "opencode/nemotron-3-ultra-free",
+        "variant": "base",
+        "author": null,
+        "reported_provider": "opencode",
+        "reported_providers": [],
+        "parameters": [],
+        "context_tokens": null,
+        "max_output_tokens": null,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [],
+        "output_modalities": [],
+        "created_at": "2026-09-22T12:59:05+00:00",
+        "updated_at": "2026-09-22T12:59:05+00:00"
+      }
+    },
+    "opencode/nemotron-3.5-lightning-free": {
+      "model": "opencode/nemotron-3.5-lightning-free",
+      "aggregator": "opencode",
+      "status": "red",
+      "checked_at": "2026-09-29T08:10:47+00:00",
+      "assessment": "confirmed_failure",
+      "http_status": 403,
+      "listed_in_proxy": true,
+      "access_note": "OpenCode free routes must be used through the OpenCode software; direct LiteLLM/API calls are not accepted.",
+      "catalog": {
+        "id": "e2234cb5-c9ea-5040-b72b-6e055f36eda8",
+        "upstream_id": "nemotron-3.5-lightning-free",
+        "alias": "opencode/nemotron-3.5-lightning-free",
+        "variant": "base",
+        "author": null,
+        "reported_provider": "opencode",
+        "reported_providers": [],
+        "parameters": [],
+        "context_tokens": null,
+        "max_output_tokens": null,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [],
+        "output_modalities": [],
+        "created_at": "2026-09-22T12:59:05+00:00",
+        "updated_at": "2026-09-22T12:59:05+00:00"
+      }
+    },
+    "opencode/space-bunny-free": {
+      "model": "opencode/space-bunny-free",
+      "aggregator": "opencode",
+      "status": "green",
+      "checked_at": "2026-09-29T08:11:15+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": "OpenCode free routes must be used through the OpenCode software; direct LiteLLM/API calls are not accepted.",
+      "catalog": {
+        "id": "549ed405-b41b-5732-8567-aec2687f1aa6",
+        "upstream_id": "space-bunny-free",
+        "alias": "opencode/space-bunny-free",
+        "variant": "base",
+        "author": null,
+        "reported_provider": "opencode",
+        "reported_providers": [],
+        "parameters": [],
+        "context_tokens": null,
+        "max_output_tokens": null,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [],
+        "output_modalities": [],
+        "created_at": "2026-09-26T23:50:11+00:00",
+        "updated_at": "2026-09-26T23:50:11+00:00"
+      }
+    },
+    "openrouter/cohere/north-mini-code:free-fast": {
+      "model": "openrouter/cohere/north-mini-code:free-fast",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:08:51+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "5f0eed65-05c8-50b5-875a-feb9b0366fc7",
+        "upstream_id": "cohere/north-mini-code:free",
+        "alias": "openrouter/cohere/north-mini-code:free-fast",
+        "variant": "fast",
+        "author": "cohere",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "max_tokens",
+          "presence_penalty",
+          "reasoning",
+          "seed",
+          "stop",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_k",
+          "top_p"
+        ],
+        "context_tokens": 256000,
+        "max_output_tokens": 64000,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/cohere/north-mini-code:free-think": {
+      "model": "openrouter/cohere/north-mini-code:free-think",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:09:02+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "b2b09fda-ec36-5412-b14f-42112a04b675",
+        "upstream_id": "cohere/north-mini-code:free",
+        "alias": "openrouter/cohere/north-mini-code:free-think",
+        "variant": "think",
+        "author": "cohere",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "max_tokens",
+          "presence_penalty",
+          "reasoning",
+          "seed",
+          "stop",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_k",
+          "top_p"
+        ],
+        "context_tokens": 256000,
+        "max_output_tokens": 64000,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/dots-studio/dots-3-note-preview:free-fast": {
+      "model": "openrouter/dots-studio/dots-3-note-preview:free-fast",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:09:13+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "f48c9151-c751-534b-bc9d-0c9d45077164",
+        "upstream_id": "dots-studio/dots-3-note-preview:free",
+        "alias": "openrouter/dots-studio/dots-3-note-preview:free-fast",
+        "variant": "fast",
+        "author": "dots-studio",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "response_format",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 512000,
+        "max_output_tokens": 460800,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/dots-studio/dots-3-note-preview:free-think": {
+      "model": "openrouter/dots-studio/dots-3-note-preview:free-think",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:09:25+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "57e123a0-011d-517e-81cc-6116e62000b1",
+        "upstream_id": "dots-studio/dots-3-note-preview:free",
+        "alias": "openrouter/dots-studio/dots-3-note-preview:free-think",
+        "variant": "think",
+        "author": "dots-studio",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "response_format",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 512000,
+        "max_output_tokens": 460800,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/google/gemma-4-26b-a4b-it:free-fast": {
+      "model": "openrouter/google/gemma-4-26b-a4b-it:free-fast",
+      "aggregator": "openrouter",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:09:41+00:00",
+      "assessment": "transient",
+      "http_status": 429,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "f32f167a-a483-5597-911b-e85cd71f87c2",
+        "upstream_id": "google/gemma-4-26b-a4b-it:free",
+        "alias": "openrouter/google/gemma-4-26b-a4b-it:free-fast",
+        "variant": "fast",
+        "author": "google",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "response_format",
+          "seed",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 32768,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": false,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "image",
+          "text",
+          "video"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/google/gemma-4-26b-a4b-it:free-think": {
+      "model": "openrouter/google/gemma-4-26b-a4b-it:free-think",
+      "aggregator": "openrouter",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:09:56+00:00",
+      "assessment": "transient",
+      "http_status": 429,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "d958c465-ca59-52a9-80c1-b181d07b82b2",
+        "upstream_id": "google/gemma-4-26b-a4b-it:free",
+        "alias": "openrouter/google/gemma-4-26b-a4b-it:free-think",
+        "variant": "think",
+        "author": "google",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "response_format",
+          "seed",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 32768,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": false,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "image",
+          "text",
+          "video"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/google/gemma-4-31b-it:free-fast": {
+      "model": "openrouter/google/gemma-4-31b-it:free-fast",
+      "aggregator": "openrouter",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:10:12+00:00",
+      "assessment": "transient",
+      "http_status": 429,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "cc298946-17dd-5864-9659-4473758b112e",
+        "upstream_id": "google/gemma-4-31b-it:free",
+        "alias": "openrouter/google/gemma-4-31b-it:free-fast",
+        "variant": "fast",
+        "author": "google",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "response_format",
+          "seed",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 32768,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": false,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "image",
+          "text",
+          "video"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/google/gemma-4-31b-it:free-think": {
+      "model": "openrouter/google/gemma-4-31b-it:free-think",
+      "aggregator": "openrouter",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:10:27+00:00",
+      "assessment": "transient",
+      "http_status": 429,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "be273e26-5ef0-55ca-beb1-283160723070",
+        "upstream_id": "google/gemma-4-31b-it:free",
+        "alias": "openrouter/google/gemma-4-31b-it:free-think",
+        "variant": "think",
+        "author": "google",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "response_format",
+          "seed",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 32768,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": false,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "image",
+          "text",
+          "video"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/google/lyria-3-clip-preview": {
+      "model": "openrouter/google/lyria-3-clip-preview",
+      "aggregator": "openrouter",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:10:45+00:00",
+      "assessment": "transient",
+      "http_status": 502,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "cdc2caee-d120-57c6-8fa6-110f961e5531",
+        "upstream_id": "google/lyria-3-clip-preview",
+        "alias": "openrouter/google/lyria-3-clip-preview",
+        "variant": "base",
+        "author": "google",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "max_tokens",
+          "response_format",
+          "seed",
+          "temperature",
+          "top_p"
+        ],
+        "context_tokens": 1048576,
+        "max_output_tokens": 65536,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text",
+          "audio"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/google/lyria-3-pro-preview": {
+      "model": "openrouter/google/lyria-3-pro-preview",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:10:56+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "7a0b83a9-7c49-5489-89e0-5f8079929121",
+        "upstream_id": "google/lyria-3-pro-preview",
+        "alias": "openrouter/google/lyria-3-pro-preview",
+        "variant": "base",
+        "author": "google",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "max_tokens",
+          "response_format",
+          "seed",
+          "temperature",
+          "top_p"
+        ],
+        "context_tokens": 1048576,
+        "max_output_tokens": 65536,
+        "reasoning": {
+          "supported": false,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text",
+          "audio"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/inclusionai/ling-3.0-flash-sante:free-fast": {
+      "model": "openrouter/inclusionai/ling-3.0-flash-sante:free-fast",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:11:07+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "aea996b2-2400-5072-b5e0-c1687fb0a252",
+        "upstream_id": "inclusionai/ling-3.0-flash-sante:free",
+        "alias": "openrouter/inclusionai/ling-3.0-flash-sante:free-fast",
+        "variant": "fast",
+        "author": "inclusionai",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "logprobs",
+          "max_tokens",
+          "presence_penalty",
+          "reasoning",
+          "repetition_penalty",
+          "seed",
+          "stop",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_k",
+          "top_logprobs",
+          "top_p"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 32768,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/inclusionai/ling-3.0-flash-sante:free-think": {
+      "model": "openrouter/inclusionai/ling-3.0-flash-sante:free-think",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:11:18+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "e9907437-a8fd-55b3-b79d-fde672006025",
+        "upstream_id": "inclusionai/ling-3.0-flash-sante:free",
+        "alias": "openrouter/inclusionai/ling-3.0-flash-sante:free-think",
+        "variant": "think",
+        "author": "inclusionai",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "logprobs",
+          "max_tokens",
+          "presence_penalty",
+          "reasoning",
+          "repetition_penalty",
+          "seed",
+          "stop",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_k",
+          "top_logprobs",
+          "top_p"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 32768,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/liquid/lfm-2.5-2.6b:free": {
+      "model": "openrouter/liquid/lfm-2.5-2.6b:free",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:18:07+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "76695ed0-e3bb-5975-b56c-0649a6c18e62",
+        "upstream_id": "liquid/lfm-2.5-2.6b:free",
+        "alias": "openrouter/liquid/lfm-2.5-2.6b:free",
+        "variant": "base",
+        "author": "liquid",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "logprobs",
+          "max_completion_tokens",
+          "max_tokens",
+          "min_p",
+          "presence_penalty",
+          "reasoning",
+          "repetition_penalty",
+          "response_format",
+          "seed",
+          "stop",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_k",
+          "top_logprobs",
+          "top_p"
+        ],
+        "context_tokens": 65536,
+        "max_output_tokens": 8192,
+        "reasoning": {
+          "supported": true,
+          "mandatory": true,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-26T23:50:07+00:00"
+      }
+    },
+    "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free-fast": {
+      "model": "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free-fast",
+      "aggregator": "openrouter",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:11:34+00:00",
+      "assessment": "transient",
+      "http_status": 502,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "ccf1d155-4588-55e4-a7b2-8d07068ad408",
+        "upstream_id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "alias": "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free-fast",
+        "variant": "fast",
+        "author": "nvidia",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "seed",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 256000,
+        "max_output_tokens": 65536,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": true,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "audio",
+          "image",
+          "video"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free-think": {
+      "model": "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free-think",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:11:46+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "0639d685-313a-58de-8789-6404b4ba9498",
+        "upstream_id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "alias": "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free-think",
+        "variant": "think",
+        "author": "nvidia",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "seed",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 256000,
+        "max_output_tokens": 65536,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": true,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "audio",
+          "image",
+          "video"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/nvidia/nemotron-3-super-120b-a12b:free-fast": {
+      "model": "openrouter/nvidia/nemotron-3-super-120b-a12b:free-fast",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:11:57+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "bb571c14-45f9-55ca-a3fc-fec460211ab2",
+        "upstream_id": "nvidia/nemotron-3-super-120b-a12b:free",
+        "alias": "openrouter/nvidia/nemotron-3-super-120b-a12b:free-fast",
+        "variant": "fast",
+        "author": "nvidia",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "reasoning_effort",
+          "response_format",
+          "seed",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 235929,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": true,
+          "effort_levels": [
+            "medium",
+            "low"
+          ],
+          "default_effort": "medium"
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/nvidia/nemotron-3-super-120b-a12b:free-think": {
+      "model": "openrouter/nvidia/nemotron-3-super-120b-a12b:free-think",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:12:08+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "7fdec0a2-6a1d-5fef-ac57-bcc5c41d8f76",
+        "upstream_id": "nvidia/nemotron-3-super-120b-a12b:free",
+        "alias": "openrouter/nvidia/nemotron-3-super-120b-a12b:free-think",
+        "variant": "think",
+        "author": "nvidia",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "reasoning_effort",
+          "response_format",
+          "seed",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 235929,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": true,
+          "effort_levels": [
+            "medium",
+            "low"
+          ],
+          "default_effort": "medium"
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free-fast": {
+      "model": "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free-fast",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:12:24+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "b35a7cd9-5633-575c-a7ba-a64a05942ea6",
+        "upstream_id": "nvidia/nemotron-3-ultra-550b-a55b:free",
+        "alias": "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free-fast",
+        "variant": "fast",
+        "author": "nvidia",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "reasoning_effort",
+          "seed",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 1000000,
+        "max_output_tokens": 65536,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": true,
+          "effort_levels": [
+            "high",
+            "medium"
+          ],
+          "default_effort": "high"
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free-think": {
+      "model": "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free-think",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:12:35+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "ed66da6b-3e87-5d10-b45e-961aadc7d1c6",
+        "upstream_id": "nvidia/nemotron-3-ultra-550b-a55b:free",
+        "alias": "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free-think",
+        "variant": "think",
+        "author": "nvidia",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "reasoning_effort",
+          "seed",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 1000000,
+        "max_output_tokens": 65536,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": true,
+          "effort_levels": [
+            "high",
+            "medium"
+          ],
+          "default_effort": "high"
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/nvidia/nemotron-3.5-content-safety:free-fast": {
+      "model": "openrouter/nvidia/nemotron-3.5-content-safety:free-fast",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:12:45+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "086f468a-7a7c-561f-8241-3db22335282e",
+        "upstream_id": "nvidia/nemotron-3.5-content-safety:free",
+        "alias": "openrouter/nvidia/nemotron-3.5-content-safety:free-fast",
+        "variant": "fast",
+        "author": "nvidia",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "seed",
+          "temperature",
+          "top_p"
+        ],
+        "context_tokens": 128000,
+        "max_output_tokens": 8192,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/nvidia/nemotron-3.5-content-safety:free-think": {
+      "model": "openrouter/nvidia/nemotron-3.5-content-safety:free-think",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:12:56+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "4aec622a-ad27-53d3-8fde-322b0572537b",
+        "upstream_id": "nvidia/nemotron-3.5-content-safety:free",
+        "alias": "openrouter/nvidia/nemotron-3.5-content-safety:free-think",
+        "variant": "think",
+        "author": "nvidia",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "seed",
+          "temperature",
+          "top_p"
+        ],
+        "context_tokens": 128000,
+        "max_output_tokens": 8192,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/nvidia/nemotron-3.5-lightning:free-fast": {
+      "model": "openrouter/nvidia/nemotron-3.5-lightning:free-fast",
+      "aggregator": "openrouter",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:14:36+00:00",
+      "assessment": "unknown",
+      "http_status": null,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "12c8136c-d308-5285-9dd8-4ce7d7c79398",
+        "upstream_id": "nvidia/nemotron-3.5-lightning:free",
+        "alias": "openrouter/nvidia/nemotron-3.5-lightning:free-fast",
+        "variant": "fast",
+        "author": "nvidia",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "seed",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 1000000,
+        "max_output_tokens": 65536,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/nvidia/nemotron-3.5-lightning:free-think": {
+      "model": "openrouter/nvidia/nemotron-3.5-lightning:free-think",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:15:08+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "49071f11-4a77-5899-959a-bf3eee40077d",
+        "upstream_id": "nvidia/nemotron-3.5-lightning:free",
+        "alias": "openrouter/nvidia/nemotron-3.5-lightning:free-think",
+        "variant": "think",
+        "author": "nvidia",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "seed",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 1000000,
+        "max_output_tokens": 65536,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/openrouter/free-fast": {
+      "model": "openrouter/openrouter/free-fast",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:15:19+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "c21facf4-c972-5d6f-91ce-30345f7d7208",
+        "upstream_id": "openrouter/free",
+        "alias": "openrouter/openrouter/free-fast",
+        "variant": "fast",
+        "author": "openrouter",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "logprobs",
+          "max_completion_tokens",
+          "max_tokens",
+          "min_p",
+          "presence_penalty",
+          "reasoning",
+          "reasoning_effort",
+          "repetition_penalty",
+          "response_format",
+          "seed",
+          "stop",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_k",
+          "top_logprobs",
+          "top_p"
+        ],
+        "context_tokens": 200000,
+        "max_output_tokens": null,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/openrouter/free-think": {
+      "model": "openrouter/openrouter/free-think",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:15:29+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "30235f1b-1e3a-5e09-a187-5ecbabacf426",
+        "upstream_id": "openrouter/free",
+        "alias": "openrouter/openrouter/free-think",
+        "variant": "think",
+        "author": "openrouter",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "logprobs",
+          "max_completion_tokens",
+          "max_tokens",
+          "min_p",
+          "presence_penalty",
+          "reasoning",
+          "reasoning_effort",
+          "repetition_penalty",
+          "response_format",
+          "seed",
+          "stop",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_k",
+          "top_logprobs",
+          "top_p"
+        ],
+        "context_tokens": 200000,
+        "max_output_tokens": null,
+        "reasoning": {
+          "supported": true,
+          "mandatory": null,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/poolside/laguna-s-2.1:free-fast": {
+      "model": "openrouter/poolside/laguna-s-2.1:free-fast",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:15:44+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "4e050dea-929a-547b-8878-bbdfd097d546",
+        "upstream_id": "poolside/laguna-s-2.1:free",
+        "alias": "openrouter/poolside/laguna-s-2.1:free-fast",
+        "variant": "fast",
+        "author": "poolside",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "temperature",
+          "tool_choice",
+          "tools"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 32768,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/poolside/laguna-s-2.1:free-think": {
+      "model": "openrouter/poolside/laguna-s-2.1:free-think",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:15:55+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "3ee9f970-c30f-5748-9815-81d71bf95afa",
+        "upstream_id": "poolside/laguna-s-2.1:free",
+        "alias": "openrouter/poolside/laguna-s-2.1:free-think",
+        "variant": "think",
+        "author": "poolside",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "temperature",
+          "tool_choice",
+          "tools"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 32768,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/poolside/laguna-xs-2.1:free-fast": {
+      "model": "openrouter/poolside/laguna-xs-2.1:free-fast",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:16:07+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "cd17abb1-47cf-509a-9f2e-d310eb6090ab",
+        "upstream_id": "poolside/laguna-xs-2.1:free",
+        "alias": "openrouter/poolside/laguna-xs-2.1:free-fast",
+        "variant": "fast",
+        "author": "poolside",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "temperature",
+          "tool_choice",
+          "tools"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 32768,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/poolside/laguna-xs-2.1:free-think": {
+      "model": "openrouter/poolside/laguna-xs-2.1:free-think",
+      "aggregator": "openrouter",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:16:23+00:00",
+      "assessment": "transient",
+      "http_status": 429,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "eebbcd31-311c-5317-842a-97c8c84c4cb2",
+        "upstream_id": "poolside/laguna-xs-2.1:free",
+        "alias": "openrouter/poolside/laguna-xs-2.1:free-think",
+        "variant": "think",
+        "author": "poolside",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "temperature",
+          "tool_choice",
+          "tools"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 32768,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": null,
+          "effort_levels": [],
+          "default_effort": null
+        },
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/qwen/qwen3.8-27b:free-fast": {
+      "model": "openrouter/qwen/qwen3.8-27b:free-fast",
+      "aggregator": "openrouter",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:16:38+00:00",
+      "assessment": "transient",
+      "http_status": 429,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "4f657bbc-fbd7-5a4c-bb59-6f3b16d9a32e",
+        "upstream_id": "qwen/qwen3.8-27b:free",
+        "alias": "openrouter/qwen/qwen3.8-27b:free-fast",
+        "variant": "fast",
+        "author": "qwen",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "max_tokens",
+          "presence_penalty",
+          "reasoning",
+          "reasoning_effort",
+          "repetition_penalty",
+          "stop",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 235929,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": null,
+          "effort_levels": [
+            "xhigh",
+            "medium",
+            "low"
+          ],
+          "default_effort": "xhigh"
+        },
+        "input_modalities": [
+          "text",
+          "image",
+          "video"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/qwen/qwen3.8-27b:free-think": {
+      "model": "openrouter/qwen/qwen3.8-27b:free-think",
+      "aggregator": "openrouter",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:16:54+00:00",
+      "assessment": "transient",
+      "http_status": 429,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "6ba0198e-6909-5bd9-bd07-7cecea3b7f2e",
+        "upstream_id": "qwen/qwen3.8-27b:free",
+        "alias": "openrouter/qwen/qwen3.8-27b:free-think",
+        "variant": "think",
+        "author": "qwen",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "max_tokens",
+          "presence_penalty",
+          "reasoning",
+          "reasoning_effort",
+          "repetition_penalty",
+          "stop",
+          "structured_outputs",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 262144,
+        "max_output_tokens": 235929,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": null,
+          "effort_levels": [
+            "xhigh",
+            "medium",
+            "low"
+          ],
+          "default_effort": "xhigh"
+        },
+        "input_modalities": [
+          "text",
+          "image",
+          "video"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/stealth/space-bunny-alpha": {
+      "model": "openrouter/stealth/space-bunny-alpha",
+      "aggregator": "openrouter",
+      "status": "green",
+      "checked_at": "2026-09-29T08:18:19+00:00",
+      "assessment": "success",
+      "http_status": 200,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "dfb73dce-504b-58fa-9b79-26adeb5151b8",
+        "upstream_id": "stealth/space-bunny-alpha",
+        "alias": "openrouter/stealth/space-bunny-alpha",
+        "variant": "base",
+        "author": "stealth",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "include_reasoning",
+          "max_tokens",
+          "reasoning",
+          "reasoning_effort",
+          "response_format",
+          "temperature",
+          "tool_choice",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 1000000,
+        "max_output_tokens": 524288,
+        "reasoning": {
+          "supported": true,
+          "mandatory": true,
+          "default_enabled": null,
+          "budget_supported": null,
+          "effort_levels": [
+            "max",
+            "xhigh",
+            "high",
+            "medium",
+            "low"
+          ],
+          "default_effort": "max"
+        },
+        "input_modalities": [
+          "text",
+          "image",
+          "video"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-26T23:50:07+00:00",
+        "updated_at": "2026-09-26T23:50:07+00:00"
+      }
+    },
+    "openrouter/thinkingmachines/inkling-small:free-fast": {
+      "model": "openrouter/thinkingmachines/inkling-small:free-fast",
+      "aggregator": "openrouter",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:17:10+00:00",
+      "assessment": "unknown",
+      "http_status": 403,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "b3cba385-c8b1-55ab-84e1-56f8ac47d419",
+        "upstream_id": "thinkingmachines/inkling-small:free",
+        "alias": "openrouter/thinkingmachines/inkling-small:free-fast",
+        "variant": "fast",
+        "author": "thinkingmachines",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "max_tokens",
+          "presence_penalty",
+          "reasoning",
+          "reasoning_effort",
+          "seed",
+          "stop",
+          "temperature",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 1048576,
+        "max_output_tokens": 262144,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": null,
+          "effort_levels": [
+            "max",
+            "high",
+            "medium",
+            "low",
+            "minimal",
+            "none"
+          ],
+          "default_effort": "high"
+        },
+        "input_modalities": [
+          "text",
+          "image",
+          "audio"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/thinkingmachines/inkling-small:free-think": {
+      "model": "openrouter/thinkingmachines/inkling-small:free-think",
+      "aggregator": "openrouter",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:17:25+00:00",
+      "assessment": "unknown",
+      "http_status": 403,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "3d311b1b-6bcb-5451-b857-e7bf995a42d2",
+        "upstream_id": "thinkingmachines/inkling-small:free",
+        "alias": "openrouter/thinkingmachines/inkling-small:free-think",
+        "variant": "think",
+        "author": "thinkingmachines",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "max_tokens",
+          "presence_penalty",
+          "reasoning",
+          "reasoning_effort",
+          "seed",
+          "stop",
+          "temperature",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 1048576,
+        "max_output_tokens": 262144,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": null,
+          "effort_levels": [
+            "max",
+            "high",
+            "medium",
+            "low",
+            "minimal",
+            "none"
+          ],
+          "default_effort": "high"
+        },
+        "input_modalities": [
+          "text",
+          "image",
+          "audio"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/thinkingmachines/inkling:free-fast": {
+      "model": "openrouter/thinkingmachines/inkling:free-fast",
+      "aggregator": "openrouter",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:17:40+00:00",
+      "assessment": "unknown",
+      "http_status": 403,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "dbdc86c9-575c-5dbe-9d11-7cc1a91357f7",
+        "upstream_id": "thinkingmachines/inkling:free",
+        "alias": "openrouter/thinkingmachines/inkling:free-fast",
+        "variant": "fast",
+        "author": "thinkingmachines",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "max_tokens",
+          "presence_penalty",
+          "reasoning",
+          "reasoning_effort",
+          "seed",
+          "stop",
+          "temperature",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 1048576,
+        "max_output_tokens": 262144,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": null,
+          "effort_levels": [
+            "max",
+            "high",
+            "medium",
+            "low",
+            "minimal",
+            "none"
+          ],
+          "default_effort": "high"
+        },
+        "input_modalities": [
+          "text",
+          "image",
+          "audio"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    },
+    "openrouter/thinkingmachines/inkling:free-think": {
+      "model": "openrouter/thinkingmachines/inkling:free-think",
+      "aggregator": "openrouter",
+      "status": "yellow",
+      "checked_at": "2026-09-29T08:17:55+00:00",
+      "assessment": "unknown",
+      "http_status": 403,
+      "listed_in_proxy": true,
+      "access_note": null,
+      "catalog": {
+        "id": "b5febe77-5eaf-599b-9cb9-f624346ce1c6",
+        "upstream_id": "thinkingmachines/inkling:free",
+        "alias": "openrouter/thinkingmachines/inkling:free-think",
+        "variant": "think",
+        "author": "thinkingmachines",
+        "reported_provider": null,
+        "reported_providers": [],
+        "parameters": [
+          "frequency_penalty",
+          "include_reasoning",
+          "max_tokens",
+          "presence_penalty",
+          "reasoning",
+          "reasoning_effort",
+          "seed",
+          "stop",
+          "temperature",
+          "tools",
+          "top_p"
+        ],
+        "context_tokens": 1048576,
+        "max_output_tokens": 262144,
+        "reasoning": {
+          "supported": true,
+          "mandatory": false,
+          "default_enabled": true,
+          "budget_supported": null,
+          "effort_levels": [
+            "max",
+            "high",
+            "medium",
+            "low",
+            "minimal",
+            "none"
+          ],
+          "default_effort": "high"
+        },
+        "input_modalities": [
+          "text",
+          "image",
+          "audio"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "created_at": "2026-09-21T21:26:59+00:00",
+        "updated_at": "2026-09-21T21:26:59+00:00"
+      }
+    }
+  }
+}

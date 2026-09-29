@@ -35,6 +35,7 @@ PROVIDERS = {
     "kilo": "https://api.kilo.ai/api/gateway",
     "nous": "https://inference-api.nousresearch.com/v1",
     "opencode": "https://opencode.ai/zen/v1",
+    "nvidia": "https://integrate.api.nvidia.com/v1",
 }
 KEY_ENV = {p: p.upper() + "_API_KEY" for p in PROVIDERS}
 SECRET_NAMES = {*KEY_ENV.values(), "CLIENT_KEY", "LITELLM_ADMIN_KEY"}
@@ -349,6 +350,14 @@ def free_models(provider, rows, cfg):
             suffixes = cfg.get("free_suffixes", ["-free", ":free"])
             free = any(name.endswith(suffix) for suffix in suffixes
                        if isinstance(suffix, str) and suffix)
+        elif provider == "nvidia":
+            # NVIDIA's OpenAI-compatible catalog does not expose reliable
+            # pricing/free metadata. Use an explicit audited allowlist instead
+            # of treating the entire catalog as free.
+            allowlist = cfg.get("free_allowlist", [])
+            if not isinstance(allowlist, list) or not allowlist:
+                raise Failure("NVIDIA catalog requires an explicit free_allowlist")
+            free = matches(allowlist, name)
         else:
             free = (provider == "openrouter" and name.endswith(":free")) or (zero(price.get("prompt")) and zero(price.get("completion")))
             if provider == "kilo" and free:
@@ -444,8 +453,30 @@ def key_hash(row):
     return value
 
 
-def restricted(info, group):
-    return (info.get("models") == [group] and not info.get("team_id") and not info.get("organization_id")
+def load_green_probe_models(path: Path) -> list[str] | None:
+    """Read the last full probe without ever reading a bearer from it."""
+    if not path.exists():
+        return None
+    document = json.loads(path.read_text(encoding="utf-8"))
+    if document.get("source_type") != "model_probe" or not isinstance(document.get("models"), dict):
+        raise Failure("Probe SOT is invalid; refusing to broaden the client key")
+    result = []
+    seen = set()
+    for row in document["models"].values():
+        model = row.get("model") if isinstance(row, dict) else None
+        if isinstance(row, dict) and row.get("status") == "green" and isinstance(model, str) and model and model not in seen:
+            result.append(model)
+            seen.add(model)
+    if not result:
+        raise Failure("Probe SOT has no green models; refusing to broaden or empty the client key")
+    return result
+
+
+def restricted(info, group, models=None):
+    model_scope = info.get("models") or []
+    expected = [group] if models is None else models
+    model_match = model_scope == [group] if models is None else set(model_scope) == set(models)
+    return (model_match and not info.get("team_id") and not info.get("organization_id")
             and not info.get("project_id") and not info.get("access_group_ids") and not info.get("aliases")
             and not info.get("blocked") and not info.get("allowed_passthrough_routes")
             and set(info.get("allowed_routes") or []) == {"/v1/models", "/v1/chat/completions"})
@@ -461,6 +492,11 @@ class Sync:
         self.alias = env.get("CLIENT_KEY_ALIAS") or config.get("client_key_alias", "litellm-free")
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", self.group):
             raise Fatal("ACCESS_GROUP must be a literal name, not a wildcard")
+        probe_path = Path(env.get("PROBE_SOT_FILE") or ROOT / "model_probe_results.json").expanduser()
+        if not probe_path.is_absolute():
+            probe_path = ROOT / probe_path
+        self.green_models = load_green_probe_models(probe_path)
+        self.client_target_models = None
         self.rows = proxy.models()
 
     def error(self, message):
@@ -484,7 +520,7 @@ class Sync:
         if provider == "openrouter":
             self.proxy.http.request("GET", cfg.get("api_base", PROVIDERS[provider]).rstrip("/") + "/key",
                                     key=key, label="OpenRouter key validation")
-        elif provider in {"kilo", "nous", "opencode"}:
+        elif provider in {"kilo", "nous", "opencode", "nvidia"}:
             LOG.warning("%s: public catalog HTTP 200 does not prove key validity; verify authentication with inference", provider)
         base = cfg.get("api_base", PROVIDERS[provider]).rstrip("/")
         fingerprint = digest(key)[:8]
@@ -593,6 +629,8 @@ class Sync:
                 self.error(str(exc))
 
     def client(self):
+        target_models = self.client_model_scope()
+        self.client_target_models = target_models
         supplied = self.env.get("CLIENT_KEY", "").strip()
         keys = self.proxy.keys(self.alias)
         chosen = None
@@ -619,7 +657,7 @@ class Sync:
         if chosen is None:
             if keys and self.args.no_delete:
                 raise Failure("Client rotation requires deletion; --no-delete preserves the old key")
-            body = {"key_alias": self.alias, "models": [self.group],
+            body = {"key_alias": self.alias, "models": target_models,
                     "metadata": {"managed_by": OWNER}, "allowed_routes": ["/v1/models", "/v1/chat/completions"],
                     "allowed_passthrough_routes": []}
             if supplied:
@@ -636,7 +674,7 @@ class Sync:
             if not supplied:
                 print("CLIENT_KEY=" + raw, flush=True)
             info = self.proxy.get("/key/info", params={"key": digest(raw)}).get("info", {})
-            if not restricted(info, self.group):
+            if not restricted(info, self.group, target_models):
                 raise Failure("Generated key permissions differ; old key preserved")
             if not supplied:
                 self.save_client(raw)
@@ -649,15 +687,15 @@ class Sync:
             return raw
         ident = key_hash(chosen)
         info = self.proxy.get("/key/info", params={"key": ident}).get("info", {})
-        if not restricted(info, self.group):
+        if not restricted(info, self.group, target_models):
             # Team/org grants can expand access. Do not silently edit outside ownership.
             if any(info.get(k) for k in ("team_id", "organization_id", "project_id", "access_group_ids")):
                 raise Failure("Client key has inherited grants; detach them before syncing")
-            self.proxy.write("POST", "/key/update", {"key": ident, "models": [self.group], "aliases": {},
+            self.proxy.write("POST", "/key/update", {"key": ident, "models": target_models, "aliases": {},
                 "allowed_routes": ["/v1/models", "/v1/chat/completions"], "allowed_passthrough_routes": []}, retry=True)
             if not self.args.dry_run:
                 after = self.proxy.get("/key/info", params={"key": ident}).get("info", {})
-                if not restricted(after, self.group):
+                if not restricted(after, self.group, target_models):
                     raise Failure("Client restriction readback failed")
         if supplied:
             if not self.args.dry_run:
@@ -670,6 +708,16 @@ class Sync:
                 LOG.warning("--no-delete retains other keys with the same alias")
             self.scrubbable.add("CLIENT_KEY")
         return supplied or None
+
+    def client_model_scope(self):
+        if not self.green_models:
+            return [self.group]
+        available = {row.get("model_name") for row in self.proxy.models()
+                     if self.group in ((row.get("model_info") or {}).get("access_groups") or [])}
+        target = [model for model in self.green_models if model in available]
+        if not target:
+            raise Failure("No green probe models are currently present in the LiteLLM access group")
+        return target
 
     def save_client(self, raw):
         path = self.args.env_file
@@ -690,8 +738,8 @@ class Sync:
     def smoke(self, client_key):
         data = self.proxy.http.request("GET", self.proxy.base + "/v1/models", key=client_key, label="Client /v1/models")
         visible = catalog_rows(data)
-        allowed = {r["model_name"] for r in self.proxy.models()
-                   if self.group in (r.get("model_info", {}).get("access_groups") or [])}
+        allowed = set(self.client_target_models or [r["model_name"] for r in self.proxy.models()
+                   if self.group in (r.get("model_info", {}).get("access_groups") or [])])
         returned = {r["id"] for r in visible}
         if returned - allowed:
             raise Failure("Client sees models outside its access group")
@@ -858,6 +906,12 @@ class Journal:
                   "status": "OK" if code == 0 else "PARTIAL_ERROR" if code == 1 else "FATAL",
                   "exit_code": code, "dry_run": self.args.dry_run, "providers": self.summary}
         append_file(self.runs, json.dumps(record, ensure_ascii=True) + "\n")
+        if not self.args.dry_run and self.path.exists() and (ROOT / "model_metadata.json").exists():
+            from catalog_store import CatalogStore
+            try:
+                CatalogStore(ROOT, source=self.path, news=self.news, runs=self.runs).refresh()
+            except (OSError, ValueError, KeyError, TypeError):
+                LOG.warning("Website history refresh failed; source catalog and change log are retained")
 
 
 def arguments():

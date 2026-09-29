@@ -1,0 +1,6 @@
+<div class="gateway-actions">
+  {% if a.signup %}<a href="{{ a.signup }}" target="_blank" rel="noopener noreferrer">Sign up <span aria-hidden="true">↗</span></a>{% endif %}
+  {% if a.docs %}<div class="gateway-api"><a href="{{ a.docs }}" target="_blank" rel="noopener noreferrer">API <span aria-hidden="true">↗</span></a>
+    {% if a.id == 'opencode' %}<p class="software-warning"><span role="img" aria-label="Warning">⚠️</span> <em>Free access requires the OpenCode app or CLI.</em></p>{% endif %}
+  </div>{% endif %}
+</div>

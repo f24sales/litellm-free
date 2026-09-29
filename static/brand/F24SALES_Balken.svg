@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Original bar group copied verbatim from F24SALES_blau.svg (brand package v031).
+     Only the canvas is cropped to the bars; geometry and native size are retained. -->
+<svg
+   width="196.088427363266mm"
+   height="13.5643mm"
+   viewBox="422.867696 0 694.801504 48.062477"
+   version="1.1"
+   xmlns="http://www.w3.org/2000/svg">
+  <g
+     id="f24-right-only-v017-comparison-v021-golden-step-v027"
+     transform="matrix(1,0,-0.238063,1,434.29472,0.03123915)">
+    <rect
+       id="f24-right-only-block-1-v017-comparison-v021-golden-step-v027"
+       x="0"
+       y="0"
+       width="13.874891"
+       height="48"
+       fill="#1975d1"
+       opacity="1" />
+    <rect
+       id="f24-right-only-block-2-v017-comparison-v021-golden-step-v027"
+       x="22.874891"
+       y="0"
+       width="22.450045"
+       height="48"
+       fill="#1975d1"
+       opacity="0.5" />
+    <rect
+       id="f24-right-only-block-3-v017-comparison-v021-golden-step-v027"
+       x="54.324936"
+       y="0"
+       width="36.324932"
+       height="48"
+       fill="#1975d1"
+       opacity="0.25" />
+    <rect
+       id="f24-right-only-block-4-v017-comparison-v021-golden-step-v027"
+       x="99.649872"
+       y="0"
+       width="58.774975"
+       height="48"
+       fill="#1975d1"
+       opacity="0.125" />
+    <rect
+       id="f24-right-only-block-5-v017-comparison-v021-golden-step-v027"
+       x="167.42485"
+       y="0"
+       width="95.099915"
+       height="48"
+       fill="#1975d1"
+       opacity="0.0625" />
+    <rect
+       id="f24-right-only-block-6-v018-comparison-v021-golden-step-v027"
+       x="271.52475"
+       y="0"
+       width="153.87489"
+       height="48"
+       fill="#1975d1"
+       opacity="0.03125" />
+    <rect
+       id="f24-right-only-block-7-v018-comparison-v021-golden-step-v027"
+       x="434.39966"
+       y="0"
+       width="248.97481"
+       height="48"
+       fill="#1975d1"
+       opacity="0.015625" />
+  </g>
+</svg>

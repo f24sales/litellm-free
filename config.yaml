@@ -54,6 +54,21 @@
       "denylist": [],
       "free_suffixes": ["-free", ":free"],
       "proxy_catalog_path": null
+    },
+    "nvidia": {
+      "enabled": true,
+      "api_base": "https://integrate.api.nvidia.com/v1",
+      "rpm": null,
+      "tpm": null,
+      "allowlist": [],
+      "denylist": [],
+      "free_allowlist": [
+        "^deepseek-ai/deepseek-v4\\.1-flash$",
+        "^z-ai/glm-5\\.3$",
+        "^z-ai/glm-5\\.3-flash$",
+        "^moonshotai/kimi-k3$"
+      ],
+      "proxy_catalog_path": null
     }
   }
 }

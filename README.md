@@ -1,238 +1,158 @@
-# litellm-free
+# litellm-free · F24 SALES
 
-Ein Python-3.11-Script synchronisiert kostenlose Chatmodelle von OpenRouter, Groq,
-Kilo Gateway, Nous Portal und OpenCode Zen mit einem LiteLLM-Proxy. Verwaltung ausschließlich
-über HTTP; keine direkten Datenbankzugriffe. LiteLLM benötigt PostgreSQL und
-`STORE_MODEL_IN_DB=True`.
+**Webseite: [www.f24-sales.com](https://www.f24-sales.com/)**
 
-## Start
+Kostenlos zugängliche KI-Chatmodelle, ihre Aggregatoren und tatsächlich geprüfte
+API-Routen an einem Ort. Dieses Repository enthält die Webseite, den
+LiteLLM-Synchronisierer, die Modellprüfungen, eine Agent-Anbindung zur Recherche
+neuer Modelle und den Import für eigene LiteLLM-Installationen.
+
+Unterstützte Aggregatoren: **OpenRouter, Groq, Kilo, Nous Portal, OpenCode Zen
+und NVIDIA Build**. Modellhersteller und Aggregator werden getrennt ausgewiesen.
+
+## Webseite
+
+- Ein gemeinsamer Eintrag je Modell mit seinen verfügbaren Aggregatoren.
+- Kontext, Output-Limits, Modalitäten, offene Gewichte und Thinking je API-Zugang.
+- Info-Popups mit Anmeldung, API-Basis-URL, Dokumentation und Quellen.
+- Originale Modell-IDs, offizielle Modellseiten und lokal eingebundene Logos.
+- Filter nach Aggregator und Hersteller sowie eine Fire-Demo mit festen Fragen.
+- Downloads für LiteLLM und ein GitHub-Button mit dem originalen GitHub-Symbol.
+
+Musik, Guardrails, Entscheidungsmodelle, Embeddings, Sprache und reine Router
+werden nicht als normale Chatmodelle angeboten. Die Karten verwenden beim
+Scan erfolgreiche Routen; historische Hinweise können frühere Zugänge erwähnen.
+Ein erfolgreicher Scan ist eine Momentaufnahme und keine Verfügbarkeitsgarantie.
+
+**🏆**: zuerst in unseren Scans gelistet. **🥈**: nächster unterschiedlicher
+Entdeckungstag. Spätere Aggregatoren teilen sich Platz drei. Diese Reihenfolge
+bezeichnet weder Qualität noch exklusiven Zugang. Bei Modellen aus dem ersten
+Bestand ist eine frühere Reihenfolge nicht bekannt.
+
+## Import
+
+**[LiteLLM-Konfiguration herunterladen](https://www.f24-sales.com/litellm-config.json)**
+· **[.env-Vorlage herunterladen](https://www.f24-sales.com/litellm.env.example)**
+
+Der Importer lädt standardmäßig direkt von der oben verlinkten Adresse auf
+**www.f24-sales.com**. Die JSON-Datei ist auch gültiges YAML und lässt sich als
+LiteLLM-Startkonfiguration verwenden. Sie enthält ausschließlich Verweise auf
+Umgebungsvariablen für API-Schlüssel.
 
 ```sh
-python3.11 -m venv .venv
-.venv/bin/pip install httpx
-cp .env.example .env
+git clone https://github.com/f24sales/litellm-free.git
+cd litellm-free
+python3 -m pip install --user -r requirements-import.txt
+cp import.env.example .env
 chmod 600 .env
-# .env bearbeiten: URL, Port, LITELLM_ADMIN_KEY und Provider-Tokens eintragen
-.venv/bin/python free_sync.py --dry-run
-.venv/bin/python free_sync.py
+# .env bearbeiten: eigene Provider-Schlüssel eintragen
 ```
 
-`.env` und `config.yaml` werden standardmäßig neben dem Script gesucht. Relative
-Dateipfade beziehen sich auf das Arbeitsverzeichnis. Ein expliziter Port in
-`LITELLM_BASE_URL` hat Vorrang vor `LITELLM_PORT`. Nichtleere Prozessvariablen
-haben Vorrang vor `.env`. Die Konfiguration verwendet **JSON-Syntax, eine gültige
-YAML-1.2-Teilmenge**; deshalb ist kein YAML-Paket erforderlich.
+| Weg | Befehl | Ergebnis |
+| --- | --- | --- |
+| Konfigurationsdatei | `python3 import_litellm.py file --env-file .env` | `litellm-free.json` für `litellm --config` |
+| HTTP-API → Datenbank | `python3 import_litellm.py api --env-file .env` | Modelle über die LiteLLM-Verwaltungs-API speichern |
+| Direktes SQL | `python3 import_litellm.py sql --env-file .env --container litellm-database` | Transaktion in der PostgreSQL-Datenbank des laufenden LiteLLM-Containers |
 
-`.env` bleibt die lokale Soll-Quelle für Tokens. Provider-Tokens werden zusätzlich
-über `/credentials` verschlüsselt durch LiteLLM persistiert, als
-`free-sync-openrouter`, `free-sync-groq`, `free-sync-kilo`, `free-sync-nous` und
-`free-sync-opencode`.
-Deployments referenzieren nur den Credential-Namen; sie enthalten keine eigenen
-`api_key`/`api_base`-Werte. Leere oder fehlende Eingaben löschen niemals Credentials.
-Der Admin-Key muss bei jedem Lauf lokal verfügbar sein.
+Alle Wege unterstützen `--dry-run`, wiederholtes `--env-file` und `--input`
+für eine bereits heruntergeladene JSON-Datei. Provider ohne lokalen Schlüssel
+werden übersprungen. Fremd verwaltete Modelle werden nicht überschrieben;
+der Importer löscht keine Modelle. SQL verwendet die Verschlüsselung der
+installierten LiteLLM-Version. Bestehende Datenbank-/Saltschlüssel bleiben erhalten.
 
-### Separater Verwaltungsschlüssel
+**Vollständige Beispiele, Datenbankvoraussetzungen, Docker/Podman und Reload:
+[IMPORT.md](IMPORT.md).**
 
-`LITELLM_ADMIN_KEY` muss nicht der globale Master-Key sein. Ein separater
-LiteLLM-Virtual-Key genügt, wenn er als `proxy_admin`/Administrator ausgestellt
-ist und die Management-Routen dieses Scripts verwenden darf: `GET /openapi.json`,
-`/credentials`, `/model/*`, `/key/list`, `/key/info`, `/key/generate`,
-`/key/update`, `/key/delete` sowie `/v1/models` und die kurze Nous-Prüfung.
-Ein normaler Modell-Client-Key oder ein Key, der nur `models=[litellm-free]`
-und Chat/Models-Routen besitzt, reicht dafür nicht. Der Verwaltungsschlüssel
-bleibt ausschließlich in `.env` und wird nie in `free_models.json`, `news.md`
-oder `runs.log` geschrieben.
+## Scan und Recherche durch einen Agenten
 
-## Virtual Key
-
-`CLIENT_KEY` ist ausschließlich der LiteLLM-Bearer für die Access Group
-`litellm-free`, kein Provider-Token. Ohne lokalen Bearer erzeugt das Script ihn über
-`/key/generate`, prüft seine Beschränkungen und schreibt ihn atomar mit `0600` in
-`.env`. Ein erzeugter Bearer wird außerdem genau einmal auf stdout ausgegeben:
-den ersten Lauf deshalb interaktiv ausführen und dessen Ausgabe vertraulich halten.
-
-Ein vorhandener `CLIENT_KEY` wird wiederverwendet und über `/key/info` geprüft.
-Sein Alias muss `CLIENT_KEY_ALIAS` entsprechen. Ein neuer, selbst gewählter
-`sk-…`-Wert kann ebenfalls registriert werden. Der Key erlaubt nur die konfigurierte
-Access Group und die Routen `/v1/models` und `/v1/chat/completions`.
-
-LiteLLM gibt vorhandene Bearer nicht im Klartext zurück. Ist der lokale Bearer
-verloren, wird ein neuer erzeugt, lokal gespeichert und mit `/v1/models` geprüft;
-erst danach werden alte Keys desselben Alias gelöscht. `--no-delete` verhindert
-diese Rotation. Alias daher ausschließlich für dieses Script verwenden.
-
-## Lokale Soll-Liste und Verlauf
-
-- **`free_models.json`** bleibt dauerhaft im Repo-Verzeichnis. Sie enthält die
-  Soll-Deployments für die Access Group, Aggregator, gemeldete Provider,
-  Modellautor, unterstützte Parameter, Fähigkeiten, Kontext-/Output-Limits,
-  Routing-Parameter und UTC-Zeitstempel `created_at`/`updated_at`. Keine Tokens.
-  Der erste erfolgreiche Provider-Abruf legt die Datei an. Erfolgreiche Abrufe
-  aktualisieren nur den betreffenden Provider. Das Script persistiert die
-  Soll-Liste **vor** dem Abgleich und liest daraus die anzuwendenden Deployments.
-  Ein fehlgeschlagener API-Schreibzugriff kann deshalb vorübergehend zu einer
-  Abweichung zwischen Soll-Liste und Proxy führen; der nächste Lauf gleicht nach.
-- **`runs.log`** erhält pro abgeschlossenem Aufruf eine zusätzliche JSON-Zeile
-  mit Start/Ende in UTC, Status, Exit-Code und Zählern pro Provider. Auch Dry-Runs
-  und fehlgeschlagene Läufe werden erfasst; ein hart beendeter Prozess kann
-  keinen Abschluss schreiben.
-- **`news.md`** wird ausschließlich um Änderungen der Soll-Liste ergänzt:
-  aufgenommen, geändert oder entfernt, jeweils mit vollständigen Parametern
-  und bei Änderungen dem vorherigen Stand. Beim ersten Lauf werden sämtliche
-  aufgenommenen Modelle aufgeführt. Unveränderte Läufe erzeugen keine News.
-  News beschreiben die Soll-Liste; den Erfolg ihrer Anwendung zeigt `runs.log`.
-- `free_sync_state.json` enthält lediglich Deployment-IDs und Hashes als Cache.
-  Ownership wird immer anhand von `model_info.managed_by=free-sync` aus LiteLLM
-  ermittelt. Ein fehlender State-Cache verhindert den Abgleich nicht.
-
-Fehlgeschlagene Provider-Abrufe lassen deren lokale Soll-Liste und Deployments
-unverändert. Bei einem API-Fehler während der Anwendung können bereits erfolgreiche
-Änderungen bestehen bleiben; weitere Löschungen dieses Providers unterbleiben.
-`--no-delete` behält auch verschwundene Modelle in der Soll-Liste und im Proxy.
-Zeitstempel bestehender, unveränderter Einträge bleiben erhalten.
-
-`aggregator` bezeichnet den abgefragten Dienst. Der tatsächlich ausführende Provider
-ist bei dynamischem Routing nicht immer bekannt: `provider`/`providers` bleiben
-in diesem Fall `null`. `model_author` wird separat aus dem ID-Präfix ausgewiesen;
-es wird kein Inferenzanbieter daraus erfunden. Unbekannte Parameter/Limits bleiben
-leer beziehungsweise `null`.
-
-Tokens, Soll-Datei, State, Backups und Logs bleiben per `.gitignore` aus dem
-öffentlichen Repository. `free_models.json` bleibt dabei lokal die aktuelle
-Soll-Datei und enthält keine Geheimnisse. Die Beispiele enthalten ausschließlich
-Platzhalter.
-
-## Täglich um 04:00
-
-Crontab; Pfad anpassen, 04:00 bezieht sich auf die Zeitzone des Cron-Dienstes:
-
-```cron
-0 4 * * * cd /opt/litellm-free && .venv/bin/python free_sync.py >/dev/null 2>&1
+```text
+Provider-Kataloge → LiteLLM-Sync → API-Scan → neue IDs recherchieren
+                                               ↓
+                                   validierte Modell-Metadaten
+                                               ↓
+                                Webseite und LiteLLM-Download
 ```
 
-Das Script schreibt `runs.log` und `news.md` selbst mit Append-Semantik (`>>`).
-Ein Dateilock verhindert parallele Läufe mit demselben `STATE_FILE`. Exit-Codes:
-`0` erfolgreich, `1` teilweise Fehler, `2` fataler Start-/Konfigurationsfehler.
-Fehlende Provider-Tokens ohne gespeichertes Credential führen zu einer Warnung
-und zum Überspringen des Providers. Fehlender Admin-Key führt zu Exit-Code `2`.
+Der API-Scan prüft Erreichbarkeit. Ein LLM-Agent recherchiert ausschließlich neue
+oder noch ungeprüfte IDs: Hersteller, Modelltyp, Dubletten, Fähigkeiten,
+Thinking beim jeweiligen Aggregator und belastbare Quellen. Die Zuordnungen
+werden vor der Übernahme strukturell geprüft. Bestehende recherchierte Einträge
+werden nicht bei jedem Scan erneut an ein LLM geschickt.
 
-## Optionen
+Für den eingebauten Codex-CLI-Adapter in der lokalen `.env`:
+
+```env
+MODEL_REVIEW_AGENT=codex
+MODEL_REVIEW_TIMEOUT=900
+```
+
+Codex CLI muss installiert und angemeldet sein. Andere Agenten wie Claude Code,
+Hermes oder OpenClaw können über `MODEL_REVIEW_COMMAND` angebunden werden.
+Ohne Agent wird ein prüfbarer Rechercheauftrag abgelegt. Vollständiger Ablauf,
+Ausgabeformat und Fehlerbehandlung: **[AGENT_REVIEW.md](AGENT_REVIEW.md)**.
+
+## Lokal ansehen
+
+Python 3.11 oder neuer; Node.js für die UI-Tests. Für die Vorschau sind weder
+API-Schlüssel noch ein LiteLLM-Server nötig.
 
 ```sh
-.venv/bin/python free_sync.py --provider openrouter --provider groq
-.venv/bin/python free_sync.py --no-delete
-.venv/bin/python free_sync.py --verbose
-.venv/bin/python free_sync.py --forget nous
-.venv/bin/python free_sync.py --forget nous --forget-cascade
-.venv/bin/python free_sync.py --config config.local.yaml --env-file .env
+python3 -m pip install --user -r requirements-web.txt
+cp examples/model_probe_results.json model_probe_results.json
+python3 -m uvicorn web:app --host 127.0.0.1 --port 8080 --no-access-log
 ```
 
-`--forget` arbeitet getrennt vom normalen Sync, damit Credentials nicht sofort
-neu angelegt werden. Referenzierende Deployments verhindern die Löschung, sofern
-`--forget-cascade` fehlt. Fremde Referenzen verhindern sie immer. Zum dauerhaften
-Abschalten zusätzlich `enabled: false` setzen oder den lokalen Token entfernen.
+Danach **http://127.0.0.1:8080/** öffnen. Der bereinigte Beispielkatalog stammt
+vom 29. September 2026. Fire benötigt eine eigene Backend-Konfiguration.
 
-`--dry-run` führt lesende HTTP-Aufrufe und Schema-Prüfungen durch, schreibt aber
-keine Credentials, Deployments, Keys, Soll-Liste oder News. Lock und Laufprotokoll
-werden auch dann geschrieben.
+## Eigene Synchronisierung betreiben
 
-`--scrub-env` ist optional und nicht für den normalen Betrieb mit `.env` als
-Soll-Quelle gedacht. Nach erfolgreicher Übernahme entfernt es geeignete Provider-
-und explizit übernommene Client-Key-Zeilen, mit Backup `.env.bak` (`0600`). Den
-Admin-Key entfernt es nie. Ein entfernter Client-Bearer führt beim nächsten Lauf
-zur beschriebenen Rotation. Ein gerade automatisch erzeugter Client-Key bleibt
-lokal erhalten. Ohne diesen Schalter werden nur automatisch erzeugte Client-Keys
-in `.env` geschrieben; bestehende Eingaben werden nicht verändert.
+Ein vorhandener LiteLLM-Proxy mit PostgreSQL und `STORE_MODEL_IN_DB=True` wird
+vorausgesetzt. In `.env` die Werte aus [.env.example](.env.example) ergänzen.
 
-## Provider-Regeln
+```sh
+python3 free_sync.py --dry-run
+python3 free_sync.py
+python3 model_probe.py
+```
 
-| Dienst | Auswahl und Einschränkungen |
+`free_sync.py` aktualisiert die verwalteten Deployments. `model_probe.py` führt
+echte Testanfragen aus, startet bei Bedarf die Recherche und beschränkt vorhandene
+Client-/Web-Schlüssel auf grüne Routen. Provider-Limits gelten weiterhin.
+`python3 setup_web_key.py` richtet den separaten Schlüssel und Vor-/Nachfilter
+für die optionale Fire-Demo ein. Schlüssel bleiben im Backend; Antworten werden
+von der Webanwendung nicht gespeichert.
+
+## Modell-IDs
+
+Direkte Aggregator-Aufrufe verwenden dessen Basis-URL und originale Modell-ID,
+etwa `https://api.groq.com/openai/v1` mit `openai/gpt-oss-120b`.
+`groq/openai/gpt-oss-120b` wäre dagegen ein lokaler LiteLLM-Routingname.
+Zusätzliche `-fast`-/`-think`-Aliase sind lokale Voreinstellungen. Echte
+Hersteller-Präfixe und dokumentierte Suffixe wie `:free` bleiben erhalten.
+Ein Katalogeintrag allein beweist keine funktionierende Inferenz. Einige
+OpenCode-Free-Routen verlangen App oder CLI; das gilt nicht für alle Modelle.
+
+## Dokumentation und Tests
+
+| Datei | Inhalt |
 | --- | --- |
-| OpenRouter | ID endet auf `:free` oder Prompt- und Completion-Preis sind exakt null. Unterstützte Parameter, Kontext und `top_provider.max_completion_tokens` werden übernommen. |
-| Groq | Chatmodelle des Free Tiers; Whisper, TTS, Guard und verwandte Nicht-Chatmodelle werden ausgeschlossen. Keine Garantie kostenloser Nutzung eines kostenpflichtigen Kontos. Limits gelten organisations- und modellbezogen, nicht pro Key. |
-| Kilo | `https://api.kilo.ai/api/gateway`, ohne `/v1`. Prompt, Completion und weitere gemeldete Preise müssen strikt null sein. Negative Platzhalterpreise werden abgelehnt. |
-| Nous | `:free`-Suffix gemäß Nutzerangabe. Fehlen solche IDs, ist eine ausdrücklich geprüfte `free_allowlist` nötig; andernfalls kein Abgleich und keine Löschung. |
-| OpenCode Zen | Katalog über `https://opencode.ai/zen/v1/models`. Die Antwort enthält kostenpflichtige und kostenlose Modelle ohne Preisfelder; standardmäßig werden nur IDs mit `-free` oder `:free` übernommen. Die Suffixe sind über `free_suffixes` konfigurierbar. |
+| [IMPORT.md](IMPORT.md) | JSON-Download, `.env`, Datei-, API- und SQL-Import |
+| [AGENT_REVIEW.md](AGENT_REVIEW.md) | Recherche-Agent nach dem Scan, Adapter und Validierung |
+| [MODEL_REVIEW_TASK.md](MODEL_REVIEW_TASK.md) | Vollständiger Rechercheauftrag für den Agenten |
+| [WEB.md](WEB.md) | Darstellung, Datenmodell, Branding, Fire und Deployment |
+| [SYNC.md](SYNC.md) | Synchronisierer, Credentials, Virtual Keys und Provider-Regeln |
+| [model_metadata.json](model_metadata.json) | Recherchierte Zuordnungen und Quellen |
 
-Kilos Modellkatalog ist öffentlich; kostenlose Inferenz ist laut
-[Gateway-Dokumentation](https://kilo.ai/docs/gateway/authentication) auch anonym
-möglich. Dieses Script überspringt dennoch gemäß Credential-Regel Provider ohne
-lokalen Token **und** ohne gespeichertes Credential.
-
-Der OpenCode-Zen-Katalog ist öffentlich abrufbar. Für Inferenz wird ein
-`OPENCODE_API_KEY` als `free-sync-opencode`-Credential hinterlegt; ein HTTP-200
-bei `/models` beweist allein nicht, dass dieser Token für Chat-Anfragen berechtigt
-ist. Das Script markiert deshalb auch hier nur die Katalogprüfung als erfolgreich
-und lässt die Inferenzberechtigung offen. Wenn der Key-Katalog weniger Modelle
-liefert als ein anonymer Abruf, gilt ausschließlich die Key-Sicht; öffentlich
-gelistete, mit dem Key nicht erreichbare Modelle werden nicht registriert.
-
-HTTP 200 auf öffentlichen Katalogen beweist nicht die Gültigkeit eines Tokens.
-OpenRouter wird zusätzlich über `/key` geprüft. **TODO/verifizieren:** Kilo- und
-Nous-Tokenautorisierung mittels Inferenz; `/models` allein genügt dort nicht als
-Authentifizierungsnachweis. Fehlgeschlagene Validierung ersetzt keine gespeicherten
-Credentials und führt zu Exit-Code `1`.
-
-Nous `tags_mode=auto` prüft neue Deployments einmal mit einer kurzen Inferenz.
-Nur bei einem HTTP-400-Fehler mit Hinweis auf fehlende Tags folgt ein Versuch mit
-`extra_body={"tags":["user=free-sync"]}`. Erfolgreiche Ergebnisse werden gespeichert.
-Andere Fehler werden nicht als Tags-Problem ausgelegt. `always` setzt Tags fest,
-`off` deaktiviert den Test. **TODO/verifizieren:** tatsächliche Anforderung für
-aktuelle `:free`-Modelle; sie wird nicht pauschal unterstellt.
-
-Groqs Katalog verlangt einen Token. Gespeicherte LiteLLM-Credentials werden von
-GET `/credentials` nur maskiert zurückgegeben. Ohne lokalen Token benötigt Groq
-daher einen vom Betreiber eingerichteten `proxy_catalog_path`. Dieser muss über
-den Proxy den authentifizierten Upstream-Katalog liefern. Das Script richtet
-keine solche Route ein und kopiert keine Geheimnisse in Passthrough-Konfigurationen.
-`/v1/models` ist die Client-Sicht auf bereits registrierte Modelle und ersetzt
-keinen Provider-Katalog mit Preisen und neu hinzugekommenen IDs. Bei den anderen
-Providern kann der öffentliche Katalog ohne lokalen Token verwendet werden.
-
-## Konfiguration und Varianten
-
-Pro Provider: `enabled`, `allowlist`/`denylist` als Regex-Listen, `rpm`, `tpm`,
-`reasoning_variants` und optional `proxy_catalog_path`. Standardmäßig werden keine
-unverifizierten Rate-Limits erfunden. Für Nous zusätzlich `free_allowlist` und
-`tags_mode`. `api_base` darf nur HTTPS verwenden; Konfiguration ist vertrauenswürdig
-zu behandeln, da Provider-Tokens an die konfigurierte Adresse gesendet werden.
-
-Reasoning-Varianten entstehen nur bei entsprechender Katalog-Metadatenangabe.
-OpenRouter erhält `-think`/`-fast` mit `reasoning.enabled=true/false`; Modelle mit
-zwingendem Reasoning behalten die Basisvariante. Groq verwendet nur bekannte,
-modellbezogene Werte aus der [API-Referenz](https://console.groq.com/docs/api-reference)
-und [Reasoning-Dokumentation](https://console.groq.com/docs/reasoning). `fast`
-bedeutet bei GPT-OSS niedrigen Reasoning-Aufwand, nicht abgeschaltetes Reasoning.
-Bei fehlenden Fähigkeitsdaten werden keine Varianten geraten.
-
-Modellnamen tragen standardmäßig immer den Aggregator-Präfix. Explizites
-Zusammenlegen benötigt eine `merge_rules`-Regel, beispielsweise:
-
-```json
-{"name":"shared/my-model", "members":["openrouter/vendor/my-model:free", "nous/vendor/my-model:free"]}
+```sh
+python3 -m pip install --user -r requirements-web.txt pytest
+python3 -m pytest -q tests
+node --test tests/catalog-ui.test.cjs
 ```
 
-Die IDs sind hier Platzhalter. Verschiedene Anbieter bleiben getrennte Deployments;
-nur der Routingname wird vereinheitlicht. Namen fremder Deployments werden nicht
-übernommen, um fremde Routen nicht unbeabsichtigt freizugeben.
-
-## Verifikation und Grenzen
-
-Vor der Implementierung wurden `/openapi.json` und der installierte Quellcode
-von LiteLLM **1.101.0** gelesen, einschließlich Credentials, Model-Updates,
-Key-Erzeugung mit benutzerdefiniertem `key`, `credential_info` und erweiterbarem
-`model_info`. Das Script prüft diese Schemas erneut bei jedem Lauf. Es wurde
-noch kein vollständiger Sync mit den persönlichen Provider-Tokens durchgeführt.
-
-Credential-Änderungen aktualisieren in dieser Version den CredentialAccessor des
-bearbeitenden Workers; neue Requests lösen benannte Credentials zur Laufzeit auf.
-Zusätzlich aktualisiert das Script betroffene Deployments, damit Router-Clients
-neu aufgebaut werden. **TODO/verifizieren:** Cache-Übernahme über mehrere getrennte
-Proxy-Worker/Instanzen; die HTTP-Antwort eines Workers garantiert das nicht.
-
-GETs und wiederholbare Updates verwenden Timeouts und Backoff bei 429/5xx.
-Erzeugungs-Requests werden bei unklarer Antwort nicht blind wiederholt; der nächste
-Lauf gleicht über feste Deployment-IDs und Key-Alias ab. API-Fehlerantworten werden
-nicht geloggt, um enthaltene Tokens auszuschließen. Modelländerungen und Provider-
-Refreshs sind keine gemeinsame Datenbanktransaktion. Logs werden nicht automatisch
-rotiert; sie wachsen absichtlich fortlaufend.
+Lokale Zugangsdaten, aktuelle Scan-Dateien, Rechercheaufträge und Laufprotokolle
+bleiben außerhalb von Git. Quellen und Lizenzen eingebundener Logos, Schrift
+und HTMX stehen unter [static/logos](static/logos/SOURCES.md),
+[static/fonts](static/fonts/Adwaita-LICENSE.txt) und
+[static/vendor](static/vendor/htmx-LICENSE.txt). F24-SALES- und GitHub-Vektoren
+behalten ihre ursprünglichen Proportionen.
