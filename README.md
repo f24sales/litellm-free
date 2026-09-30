@@ -1,43 +1,44 @@
 # litellm-free · F24 SALES
 
-**Webseite: [www.f24-sales.com](https://www.f24-sales.com/)**
+**Website: [www.f24-sales.com](https://www.f24-sales.com/)**
 
-Kostenlos zugängliche KI-Chatmodelle, ihre Aggregatoren und tatsächlich geprüfte
-API-Routen an einem Ort. Dieses Repository enthält die Webseite, den
-LiteLLM-Synchronisierer, die Modellprüfungen, eine Agent-Anbindung zur Recherche
-neuer Modelle und den Import für eigene LiteLLM-Installationen.
+Freely accessible AI chat models, their aggregators, and verified API routes in
+one place. This repository contains the website, LiteLLM synchronization,
+model checks, an agent integration for researching new models, and an importer
+for your own LiteLLM installation.
 
-Unterstützte Aggregatoren: **OpenRouter, Groq, Kilo, Nous Portal, OpenCode Zen
-und NVIDIA Build**. Modellhersteller und Aggregator werden getrennt ausgewiesen.
+OpenAI-compatible `/v1/models` services can be integrated. As of September 2026,
+**OpenRouter, Groq, Kilo, Nous Portal, OpenCode Zen, and NVIDIA Build** are
+preconfigured. Model developers and aggregators are listed separately.
 
-## Webseite
+## Website
 
-- Ein gemeinsamer Eintrag je Modell mit seinen verfügbaren Aggregatoren.
-- Kontext, Output-Limits, Modalitäten, offene Gewichte und Thinking je API-Zugang.
-- Info-Popups mit Anmeldung, API-Basis-URL, Dokumentation und Quellen.
-- Originale Modell-IDs, offizielle Modellseiten und lokal eingebundene Logos.
-- Filter nach Aggregator und Hersteller sowie eine Fire-Demo mit festen Fragen.
-- Downloads für LiteLLM und ein GitHub-Button mit dem originalen GitHub-Symbol.
+- One shared entry per model, showing its available aggregators.
+- Context and output limits, modalities, open weights, and thinking per API route.
+- Information dialogs with signup links, API base URLs, documentation, and sources.
+- Original model IDs, official model pages, and locally hosted logos.
+- Aggregator and developer filters, plus a Fire demo with predefined questions.
+- LiteLLM downloads and a GitHub button using the original GitHub icon.
 
-Musik, Guardrails, Entscheidungsmodelle, Embeddings, Sprache und reine Router
-werden nicht als normale Chatmodelle angeboten. Die Karten verwenden beim
-Scan erfolgreiche Routen; historische Hinweise können frühere Zugänge erwähnen.
-Ein erfolgreicher Scan ist eine Momentaufnahme und keine Verfügbarkeitsgarantie.
+Music, guardrails, decision models, embeddings, speech, and pure routers are
+excluded from the regular chat model catalog. Cards use routes that passed the
+scan; historical notes may mention earlier access. A successful scan is a
+snapshot, not a guarantee of continued availability.
 
-**🏆**: zuerst in unseren Scans gelistet. **🥈**: nächster unterschiedlicher
-Entdeckungstag. Spätere Aggregatoren teilen sich Platz drei. Diese Reihenfolge
-bezeichnet weder Qualität noch exklusiven Zugang. Bei Modellen aus dem ersten
-Bestand ist eine frühere Reihenfolge nicht bekannt.
+**🏆**: first listed in our scans. **🥈**: the next distinct discovery date.
+Later aggregators share third place. This order indicates neither quality nor
+exclusive access. Earlier discovery order is unknown for models in the initial
+catalog.
 
 ## Import
 
-**[LiteLLM-Konfiguration herunterladen](https://www.f24-sales.com/litellm-config.json)**
-· **[.env-Vorlage herunterladen](https://www.f24-sales.com/litellm.env.example)**
+**[Download the LiteLLM configuration](https://www.f24-sales.com/litellm-config.json)**
+· **[Download the .env template](https://www.f24-sales.com/litellm.env.example)**
 
-Der Importer lädt standardmäßig direkt von der oben verlinkten Adresse auf
-**www.f24-sales.com**. Die JSON-Datei ist auch gültiges YAML und lässt sich als
-LiteLLM-Startkonfiguration verwenden. Sie enthält ausschließlich Verweise auf
-Umgebungsvariablen für API-Schlüssel.
+By default, the importer downloads directly from the address above on
+**www.f24-sales.com**. The JSON file is also valid YAML and can serve as a
+LiteLLM startup configuration. API keys appear only as environment variable
+references.
 
 ```sh
 git clone https://github.com/f24sales/litellm-free.git
@@ -45,56 +46,56 @@ cd litellm-free
 python3 -m pip install --user -r requirements-import.txt
 cp import.env.example .env
 chmod 600 .env
-# .env bearbeiten: eigene Provider-Schlüssel eintragen
+# Edit .env and enter your own provider keys.
 ```
 
-| Weg | Befehl | Ergebnis |
+| Method | Command | Result |
 | --- | --- | --- |
-| Konfigurationsdatei | `python3 import_litellm.py file --env-file .env` | `litellm-free.json` für `litellm --config` |
-| HTTP-API → Datenbank | `python3 import_litellm.py api --env-file .env` | Modelle über die LiteLLM-Verwaltungs-API speichern |
-| Direktes SQL | `python3 import_litellm.py sql --env-file .env --container litellm-database` | Transaktion in der PostgreSQL-Datenbank des laufenden LiteLLM-Containers |
+| Configuration file | `python3 import_litellm.py file --env-file .env` | `litellm-free.json` for `litellm --config` |
+| HTTP API → database | `python3 import_litellm.py api --env-file .env` | Store models through the LiteLLM management API |
+| Direct SQL | `python3 import_litellm.py sql --env-file .env --container litellm-database` | Transaction in the running LiteLLM container's PostgreSQL database |
 
-Alle Wege unterstützen `--dry-run`, wiederholtes `--env-file` und `--input`
-für eine bereits heruntergeladene JSON-Datei. Provider ohne lokalen Schlüssel
-werden übersprungen. Fremd verwaltete Modelle werden nicht überschrieben;
-der Importer löscht keine Modelle. SQL verwendet die Verschlüsselung der
-installierten LiteLLM-Version. Bestehende Datenbank-/Saltschlüssel bleiben erhalten.
+All methods support `--dry-run`, repeated `--env-file` arguments, and `--input`
+for an already downloaded JSON file. Providers without a local key are skipped.
+Models managed elsewhere are not overwritten; the importer does not delete
+models. SQL uses the installed LiteLLM version's encryption. Existing database
+and salt keys are preserved.
 
-**Vollständige Beispiele, Datenbankvoraussetzungen, Docker/Podman und Reload:
+**Complete examples, database prerequisites, Docker/Podman, and reload behavior:
 [IMPORT.md](IMPORT.md).**
 
-## Scan und Recherche durch einen Agenten
+## Scanning and agent research
 
 ```text
-Provider-Kataloge → LiteLLM-Sync → API-Scan → neue IDs recherchieren
-                                               ↓
-                                   validierte Modell-Metadaten
-                                               ↓
-                                Webseite und LiteLLM-Download
+Provider catalogs → LiteLLM sync → API scan → research new IDs
+                                                  ↓
+                                      validated model metadata
+                                                  ↓
+                                    website and LiteLLM download
 ```
 
-Der API-Scan prüft Erreichbarkeit. Ein LLM-Agent recherchiert ausschließlich neue
-oder noch ungeprüfte IDs: Hersteller, Modelltyp, Dubletten, Fähigkeiten,
-Thinking beim jeweiligen Aggregator und belastbare Quellen. Die Zuordnungen
-werden vor der Übernahme strukturell geprüft. Bestehende recherchierte Einträge
-werden nicht bei jedem Scan erneut an ein LLM geschickt.
+The API scan checks reachability. An LLM agent researches only new or unreviewed
+IDs: developers, model types, duplicates, capabilities, thinking support through
+each aggregator, and reliable sources. Mappings are structurally validated
+before being accepted. Previously reviewed entries are not sent to an LLM again
+on every scan.
 
-Für den eingebauten Codex-CLI-Adapter in der lokalen `.env`:
+For the built-in Codex CLI adapter, set these values in the local `.env`:
 
 ```env
 MODEL_REVIEW_AGENT=codex
 MODEL_REVIEW_TIMEOUT=900
 ```
 
-Codex CLI muss installiert und angemeldet sein. Andere Agenten wie Claude Code,
-Hermes oder OpenClaw können über `MODEL_REVIEW_COMMAND` angebunden werden.
-Ohne Agent wird ein prüfbarer Rechercheauftrag abgelegt. Vollständiger Ablauf,
-Ausgabeformat und Fehlerbehandlung: **[AGENT_REVIEW.md](AGENT_REVIEW.md)**.
+Codex CLI must be installed and authenticated. Other agents, such as Claude Code,
+Hermes, or OpenClaw, can be connected through `MODEL_REVIEW_COMMAND`.
+Without an agent, a research task is saved for review. The complete workflow,
+output format, and error handling are documented in **[AGENT_REVIEW.md](AGENT_REVIEW.md)**.
 
-## Lokal ansehen
+## Local preview
 
-Python 3.11 oder neuer; Node.js für die UI-Tests. Für die Vorschau sind weder
-API-Schlüssel noch ein LiteLLM-Server nötig.
+Requires Python 3.11 or newer; Node.js is needed for UI tests. The preview needs
+neither API keys nor a LiteLLM server.
 
 ```sh
 python3 -m pip install --user -r requirements-web.txt
@@ -102,13 +103,13 @@ cp examples/model_probe_results.json model_probe_results.json
 python3 -m uvicorn web:app --host 127.0.0.1 --port 8080 --no-access-log
 ```
 
-Danach **http://127.0.0.1:8080/** öffnen. Der bereinigte Beispielkatalog stammt
-vom 29. September 2026. Fire benötigt eine eigene Backend-Konfiguration.
+Then open **http://127.0.0.1:8080/**. The sanitized example catalog is dated
+September 29, 2026. Fire requires its own backend configuration.
 
-## Eigene Synchronisierung betreiben
+## Running your own synchronization
 
-Ein vorhandener LiteLLM-Proxy mit PostgreSQL und `STORE_MODEL_IN_DB=True` wird
-vorausgesetzt. In `.env` die Werte aus [.env.example](.env.example) ergänzen.
+Requires an existing LiteLLM proxy with PostgreSQL and `STORE_MODEL_IN_DB=True`.
+Fill in `.env` using [.env.example](.env.example).
 
 ```sh
 python3 free_sync.py --dry-run
@@ -116,33 +117,32 @@ python3 free_sync.py
 python3 model_probe.py
 ```
 
-`free_sync.py` aktualisiert die verwalteten Deployments. `model_probe.py` führt
-echte Testanfragen aus, startet bei Bedarf die Recherche und beschränkt vorhandene
-Client-/Web-Schlüssel auf grüne Routen. Provider-Limits gelten weiterhin.
-`python3 setup_web_key.py` richtet den separaten Schlüssel und Vor-/Nachfilter
-für die optionale Fire-Demo ein. Schlüssel bleiben im Backend; Antworten werden
-von der Webanwendung nicht gespeichert.
+`free_sync.py` updates managed deployments. `model_probe.py` sends real test
+requests, starts research when needed, and restricts existing client/web keys
+to passing routes. Provider limits still apply. `python3 setup_web_key.py`
+configures the separate key and pre/post filters for the optional Fire demo.
+Keys remain in the backend; the web application does not store responses.
 
-## Modell-IDs
+## Model IDs
 
-Direkte Aggregator-Aufrufe verwenden dessen Basis-URL und originale Modell-ID,
-etwa `https://api.groq.com/openai/v1` mit `openai/gpt-oss-120b`.
-`groq/openai/gpt-oss-120b` wäre dagegen ein lokaler LiteLLM-Routingname.
-Zusätzliche `-fast`-/`-think`-Aliase sind lokale Voreinstellungen. Echte
-Hersteller-Präfixe und dokumentierte Suffixe wie `:free` bleiben erhalten.
-Ein Katalogeintrag allein beweist keine funktionierende Inferenz. Einige
-OpenCode-Free-Routen verlangen App oder CLI; das gilt nicht für alle Modelle.
+Direct aggregator requests use that aggregator's base URL and original model ID,
+for example `https://api.groq.com/openai/v1` with `openai/gpt-oss-120b`.
+By contrast, `groq/openai/gpt-oss-120b` is a local LiteLLM routing name.
+Additional `-fast`/`-think` aliases are local presets. Actual developer prefixes
+and documented suffixes such as `:free` are preserved.
+A catalog entry alone does not prove working inference. Some OpenCode free
+routes require the app or CLI; this does not apply to every model.
 
-## Dokumentation und Tests
+## Documentation and tests
 
-| Datei | Inhalt |
+| File | Contents |
 | --- | --- |
-| [IMPORT.md](IMPORT.md) | JSON-Download, `.env`, Datei-, API- und SQL-Import |
-| [AGENT_REVIEW.md](AGENT_REVIEW.md) | Recherche-Agent nach dem Scan, Adapter und Validierung |
-| [MODEL_REVIEW_TASK.md](MODEL_REVIEW_TASK.md) | Vollständiger Rechercheauftrag für den Agenten |
-| [WEB.md](WEB.md) | Darstellung, Datenmodell, Branding, Fire und Deployment |
-| [SYNC.md](SYNC.md) | Synchronisierer, Credentials, Virtual Keys und Provider-Regeln |
-| [model_metadata.json](model_metadata.json) | Recherchierte Zuordnungen und Quellen |
+| [IMPORT.md](IMPORT.md) | JSON download, `.env`, file, API, and SQL import |
+| [AGENT_REVIEW.md](AGENT_REVIEW.md) | Post-scan research agent, adapters, and validation |
+| [MODEL_REVIEW_TASK.md](MODEL_REVIEW_TASK.md) | Complete research task for the agent |
+| [WEB.md](WEB.md) | Presentation, data model, branding, Fire, and deployment |
+| [SYNC.md](SYNC.md) | Synchronization, credentials, virtual keys, and provider rules |
+| [model_metadata.json](model_metadata.json) | Researched mappings and sources |
 
 ```sh
 python3 -m pip install --user -r requirements-web.txt pytest
@@ -150,9 +150,9 @@ python3 -m pytest -q tests
 node --test tests/catalog-ui.test.cjs
 ```
 
-Lokale Zugangsdaten, aktuelle Scan-Dateien, Rechercheaufträge und Laufprotokolle
-bleiben außerhalb von Git. Quellen und Lizenzen eingebundener Logos, Schrift
-und HTMX stehen unter [static/logos](static/logos/SOURCES.md),
-[static/fonts](static/fonts/Adwaita-LICENSE.txt) und
-[static/vendor](static/vendor/htmx-LICENSE.txt). F24-SALES- und GitHub-Vektoren
-behalten ihre ursprünglichen Proportionen.
+Local credentials, current scan files, research tasks, and run logs stay outside
+Git. Sources and licenses for bundled logos, the font, and HTMX are listed under
+[static/logos](static/logos/SOURCES.md),
+[static/fonts](static/fonts/Adwaita-LICENSE.txt), and
+[static/vendor](static/vendor/htmx-LICENSE.txt). F24 SALES and GitHub vectors
+retain their original proportions.
