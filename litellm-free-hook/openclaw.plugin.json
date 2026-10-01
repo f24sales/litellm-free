@@ -1,0 +1,11 @@
+{
+  "id": "litellm-free-hook",
+  "name": "LiteLLM-Free events",
+  "description": "Deterministic model refresh and Telegram notifications for scan and import events.",
+  "activation": {"onStartup": true},
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {"configPath": {"type": "string"}}
+  }
+}

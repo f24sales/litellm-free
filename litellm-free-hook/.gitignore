@@ -1,0 +1,5 @@
+config.json
+.state/
+worker/
+tmp/
+node_modules/
