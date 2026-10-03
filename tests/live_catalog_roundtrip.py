@@ -13,7 +13,7 @@ import httpx
 from dotenv import dotenv_values
 
 PROBE = r"""
-import json, os, subprocess, sys
+import base64, json, os, subprocess, sys
 from pathlib import Path
 from urllib.request import Request, urlopen
 import yaml
@@ -25,7 +25,11 @@ with urlopen(Request(block["baseUrl"].rstrip("/") + "/models", headers={"Authori
     upstream = sorted(row["id"] for row in json.load(r)["data"])
 if sys.argv[1] == "upstream":
     print(json.dumps(upstream)); raise SystemExit(0)
-with urlopen("http://127.0.0.1:4096/provider", timeout=15) as r:
+headers = {}
+if os.environ.get("OPENCODE_SERVER_PASSWORD"):
+    credentials = (os.environ.get("OPENCODE_SERVER_USERNAME") or "opencode") + ":" + os.environ["OPENCODE_SERVER_PASSWORD"]
+    headers["Authorization"] = "Basic " + base64.b64encode(credentials.encode()).decode()
+with urlopen(Request("http://127.0.0.1:4096/provider", headers=headers), timeout=15) as r:
     opencode = next(row for row in json.load(r)["all"] if row["id"] == provider)
 native = subprocess.run(["/usr/local/lib/hermes-agent/venv/bin/python", "-c",
     "import sys,json; sys.path.insert(0,'/usr/local/lib/hermes-agent'); from hermes_cli.config_providers import get_compatible_custom_providers; print(json.dumps(sorted(next(row['models'] for row in get_compatible_custom_providers() if row.get('provider_key')=='litellm-free'))))"],
