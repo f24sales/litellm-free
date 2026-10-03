@@ -15,6 +15,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: python -m pip install -r requirements-web.txt pytest
+      - run: python -m pip install . -r requirements-web.txt -r requirements-import.txt pytest
       - run: python -m pytest -q tests
       - run: node --test tests/catalog-ui.test.cjs
