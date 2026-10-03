@@ -1,0 +1,7 @@
+# Download source for the twice-daily client refresh.
+#default-preset: https://www.f24-sales.com/litellm-config.yaml
+IMPORT_SOURCE_URL=https://www.f24-sales.com/litellm-config.yaml
+
+# Select the existing OPENAI_V1_* group; no additional credentials are needed.
+#default-preset: litellm-free
+LITELLM_FREE_PROVIDER=litellm-free

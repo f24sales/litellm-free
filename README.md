@@ -66,6 +66,41 @@ and salt keys are preserved.
 
 ## Scanning and agent research
 
+### AI-container client refresh
+
+`ops/refresh-models.sh` queries the configured `litellm-free` OpenAI-v1 group
+once and reconciles **additions and removals** in OpenClaw, Hermes and OpenCode.
+It does not run the ephemeral generators: Voice, MCP, credentials, model
+preferences and other providers remain intact. An empty/unreachable catalog
+fails without replacing the existing lists. Failed service reloads are retried
+on the next invocation even if the upstream catalog has not changed.
+
+OpenCode and Hermes are reloaded after changes. Success requires the running
+OpenCode API and Hermes' native provider reader to contain the live catalog;
+OpenClaw uses its existing configuration watcher. The refresh is locked against
+overlapping hook/cron runs and writes a credential-free status receipt under
+`/var/lib/litellm-free`.
+
+The Fedora Core integration installs this repository at
+`/opt/safrano9999/litellm-free` and the `image/runtime` files. The cron job runs
+at **00:10 and 12:10 UTC** through `litellm-free-refresh.service`. Its environment
+comes from the container's systemd environment injection, not cron's empty
+environment. `config.conf_example` follows the shared `config.sh` presets:
+`IMPORT_SOURCE_URL=https://www.f24-sales.com/litellm-config.yaml` and
+`LITELLM_FREE_PROVIDER=litellm-free`.
+
+The scheduled task downloads and validates the public YAML catalog, then always
+refreshes client lists from their authorized live `/v1/models` endpoint. The
+public download is not itself an authorized model list: the existing LiteLLM
+import/key-management pipeline still owns database imports and key restrictions.
+This task never changes those restrictions or adds routes to the database.
+An unchanged public file therefore does **not** skip client reconciliation.
+
+`tests/live_catalog_roundtrip.py` is an explicit opt-in integration test. It adds
+one isolated, temporary mock model to LiteLLM and the existing client key's
+allowlist, verifies all three clients, and removes only its own test entry in a
+`finally` block. It does not make inference calls or rotate credentials.
+
 ```text
 Provider catalogs → LiteLLM sync → API scan → research new IDs
                                                   ↓

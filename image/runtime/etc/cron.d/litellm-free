@@ -1,0 +1,4 @@
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+CRON_TZ=UTC
+10 0,12 * * * root /usr/bin/systemctl start --no-block litellm-free-refresh.service
