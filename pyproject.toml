@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "litellm-free-config"
+version = "0.1.0"
+description = "Validation and route definitions for F24 SALES LiteLLM imports"
+requires-python = ">=3.11"
+
+[tool.setuptools]
+py-modules = ["litellm_export", "config_files", "model_diff", "hook_client", "python_header"]

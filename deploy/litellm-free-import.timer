@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh F24 SALES models in LiteLLM twice daily
+
+[Timer]
+OnCalendar=*-*-* 00,12:10:00 UTC
+AccuracySec=1s
+Persistent=true
+Unit=litellm-free-import.service
+
+[Install]
+WantedBy=timers.target

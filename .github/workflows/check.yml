@@ -12,9 +12,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - run: python -m pip install -r requirements-web.txt pytest
+      - run: python -m pip install -r requirements-import.txt pytest
       - run: python -m pytest -q tests
-      - run: node --test tests/catalog-ui.test.cjs
+      - run: docker build -f Containerfile -t litellm-free-import:test .
+      - run: docker run --rm --network none litellm-free-import:test --help

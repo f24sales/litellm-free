@@ -1,0 +1,22 @@
+# Non-secret settings. Copy to config.conf; .env holds credentials.
+IMPORT_SOURCE_URL=https://www.f24-sales.com/litellm-config.yaml
+IMPORT_SOURCE_UDS=
+IMPORT_SOURCE_CA_FILE=
+IMPORT_DELAY_SECONDS=10
+# Retain older configuration files in ./archiv only when explicitly enabled.
+LITELLM_FREE_ARCHIVE=0
+LITELLM_BASE_URL=https://your-litellm.example
+LITELLM_PORT=
+LITELLM_CA_FILE=
+LITELLM_ALLOW_HTTP=false
+# Optional API metadata-only mode for exactly this existing manager.
+IMPORT_PATCH_MANAGED_BY=
+# Optional exact free-sync route adoption, preserving existing model IDs.
+# Mutually exclusive with IMPORT_PATCH_MANAGED_BY.
+IMPORT_ADOPT_MANAGED_BY=
+# Remove obsolete imported routes only after successful import/readback.
+IMPORT_PRUNE=false
+# Optional local prerequisite after import/readback, before the success webhook.
+# JSON argv, without a shell: ["/absolute/path/script", "--argument"]
+IMPORT_PRE_SUCCESS_COMMAND_JSON=
+IMPORT_PRE_SUCCESS_TIMEOUT_SECONDS=180

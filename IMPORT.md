@@ -1,171 +1,148 @@
-# LiteLLM-Konfiguration importieren
+# Import the LiteLLM catalog
 
-Öffentliche, feste Quelle: **https://www.f24-sales.com/litellm-config.json**.
-Die aktuelle Vorlage für Zugangsdaten liegt unter
-**https://www.f24-sales.com/litellm.env.example** und als
-[import.env.example](import.env.example) im Repository.
+The published source is directly importable **[LiteLLM YAML](https://www.f24-sales.com/litellm-config.yaml)** containing `model_list`. It carries compact routing, stable model identity, provider and aggregator fields only. The full researched JSON catalog remains in the private backend; the public importer downloads only the compact YAML.
 
-Der Export enthält nur erfolgreiche, recherchierte Chat-Routen. Musik,
-Guardrails, Entscheidungsmodelle, Embeddings, Sprache und Router sind ausgeschlossen.
-Eine Route kann eine bestätigte `fast`-/`think`-Voreinstellung enthalten;
-`litellm_params.model` behält die originale Upstream-ID. Die lokale `model_name`
-enthält den Aggregator und gegebenenfalls das Preset.
+## Local files and credentials
 
-## Einrichtung und .env-Dateien
+Follow the [README setup instructions](README.md#setup). Copy [env.example](env.example) to `.env` and [config.conf_example](config.conf_example) to `config.conf`. The shared `python_header.py` loads the project configuration and additional `*.env` files; `.env` is loaded last. Local configuration and credential files are excluded from version control. `.env.example` and `import.env.example` point to the same environment template.
 
-```sh
-git clone https://github.com/f24sales/litellm-free.git
-cd litellm-free
-python3 -m pip install --user -r requirements-import.txt
-cp import.env.example .env
-chmod 600 .env
-```
+- `.env`: your own `OPENROUTER_API_KEY`, `GROQ_API_KEY`, `KILO_API_KEY`, `NOUS_API_KEY`, `OPENCODE_API_KEY`, `NVIDIA_API_KEY` and LiteLLM bearer token. These gateways are preconfigured as of September 2026; OpenAI-compatible `/v1/models` services can be integrated through explicit validated presets.
+- `config.conf`: `IMPORT_SOURCE_URL`, `LITELLM_BASE_URL`, optional ports/CA paths, `IMPORT_DELAY_SECONDS=10` and optional `IMPORT_PATCH_MANAGED_BY`, `IMPORT_ADOPT_MANAGED_BY` and `IMPORT_PRUNE`.
 
-In `.env` nur eigene Schlüssel für die verwendeten Aggregatoren eintragen:
-`OPENROUTER_API_KEY`, `GROQ_API_KEY`, `KILO_API_KEY`, `NOUS_API_KEY`,
-`OPENCODE_API_KEY`, `NVIDIA_API_KEY`. Anbieter mit leeren Schlüsseln werden beim
-Import ausgelassen. Die Datei enthält keine F24-Zugangsdaten.
+`LITELLM_ADMIN_KEY` can be the existing master key or an admin virtual key with model-management permissions. `LITELLM_VIRTUAL_KEY` is the fallback when `LITELLM_ADMIN_KEY` is empty. This does not grant additional permissions to an ordinary chat bearer token.
 
-`--env-file` darf mehrfach vorkommen; spätere nichtleere Werte gewinnen.
-Nichtleere Prozessvariablen haben Vorrang. Ohne Angabe wird `.env` im aktuellen
-Arbeitsverzeichnis verwendet, falls vorhanden. Werte werden nicht als Shellcode
-ausgeführt und nicht durch `${...}`-Interpolation verändert.
+`--config /path/config.conf` selects the configuration explicitly. Multiple `--env-file` arguments are allowed; later nonempty values win. Nonempty injected process environment variables take precedence. Explicitly selected files are read without `${...}` interpolation. No shell code is executed.
 
 ```sh
-python3 import_litellm.py file --env-file /etc/litellm/providers.env \
-  --env-file /etc/litellm/site.env --output ./litellm-free.json
+python3 import_litellm.py api --config /etc/litellm-free/config.conf \
+  --env-file /etc/litellm-free/providers.env --env-file /etc/litellm-free/proxy.env --dry-run
 ```
 
-Der Download sendet keine Provider-Schlüssel an F24 SALES. Er erfolgt über HTTPS
-von der fest im Skript hinterlegten Quelle. Vor dem Einsatz eigener Schlüssel
-prüft der Importer API-Adressen, Variablenreferenzen, Presets und Modellidentitäten
-gegen seine erlaubten Provider. Damit kann der Download keine fremde Zieladresse
-für einen lokalen Schlüssel vorgeben.
-
-## 1. Konfigurationsdatei
+## Download YAML
 
 ```sh
-python3 import_litellm.py file --env-file .env --output litellm-free.json
+python3 import_litellm.py pull --output config.yaml --force
+python3 import_litellm.py file --format yaml --output config.yaml --force
 ```
 
-Die erzeugte JSON-Datei enthält `model_list` und `os.environ/…`-Referenzen,
-keine aufgelösten Schlüssel. JSON ist gültiges YAML und kann von LiteLLM als
-Startkonfiguration geladen werden. TOML ist hierfür nicht das LiteLLM-Format.
+`pull` requires no provider keys and saves native LiteLLM YAML with all routes by default. `file` selects routes with a locally available provider key; `--all-providers` produces the complete template. Configuration files contain `os.environ/…` references rather than resolved keys. The LiteLLM process that later loads the file needs the same provider environment variables. `model_name` is the local gateway alias; `f24_upstream_id` contains the original API model ID. An additional `openai/` in `litellm_params.model` selects LiteLLM's OpenAI-compatible adapter. Local `-think`/`-fast` aliases are not new upstream IDs:
 
 ```sh
-# Die Provider-Variablen müssen auch im LiteLLM-Prozess verfügbar sein.
-# Bei Containern dessen --env-file verwenden, bei systemd EnvironmentFile.
-litellm --config /path/to/litellm-free.json
+litellm --config /path/to/config.yaml
 ```
 
-Für einen bestehenden Konfigurationsbestand nur `model_list` gezielt ergänzen;
-das Skript überschreibt keine bestehenden Dateien ohne `--force`. Mit
-`--all-providers` entsteht eine Vorlage für alle exportierten Provider, auch wenn
-lokal noch Schlüssel fehlen. `--dry-run` zeigt den Umfang ohne Dateiänderung.
+Every output has a fixed filename, atomically updated as a symlink to a dated file alongside it. The default is `LITELLM_FREE_ARCHIVE=0`: the previous version created by the importer is removed after the switch. With `LITELLM_FREE_ARCHIVE=1` in `config.conf` or the injected environment, older versions move to `./archiv/`; an existing regular file is also archived. External symlink targets and existing archive history are preserved. Without `--force`, an existing output is not replaced. Identical content retains its existing version.
 
-Das Laden einer Konfigurationsdatei ist keine Datenbankmigration. Um dieselbe
-heruntergeladene Datei in die LiteLLM-Datenbank zu übernehmen, Weg 2 oder 3 nutzen.
+`--input config.yaml` or an explicitly selected JSON file works offline. `--source-url` overrides `IMPORT_SOURCE_URL`; remote sources require HTTPS, and HTTP is allowed only for localhost/loopback. For a local web service, set `IMPORT_SOURCE_UDS=/run/user/1000/litellm-free/litellm-free.sock` together with `IMPORT_SOURCE_URL=http://localhost/litellm-config.yaml`. `IMPORT_SOURCE_CA_FILE` adds trusted certificates when needed; otherwise, `LITELLM_CA_FILE` is respected. Redirects are not followed, and downloads include no provider or LiteLLM keys.
 
-## 2. Datei oder Download über die Verwaltungs-API in die Datenbank
+Before actual online runs, the importer waits ten seconds by default. `IMPORT_DELAY_SECONDS` or `--delay-seconds` changes this delay; offline files and `--dry-run` do not wait. Use `--delay-seconds 0` to disable the delay.
 
-Zusätzlich in `.env` setzen:
-
-```env
-LITELLM_BASE_URL=https://your-litellm.example
-LITELLM_ADMIN_KEY=your-existing-admin-key
-```
-
-Ein separater `LITELLM_PORT` wird berücksichtigt, wenn die URL keinen Port enthält.
-Remote-Endpunkte brauchen HTTPS; HTTP ist für Loopback erlaubt. LiteLLM benötigt
-eine PostgreSQL-Anbindung und `STORE_MODEL_IN_DB=True`.
+## API import and metadata patch
 
 ```sh
 python3 import_litellm.py api --env-file .env --dry-run
 python3 import_litellm.py api --env-file .env
-# Alternativ aus einer bereits geladenen Datei:
-python3 import_litellm.py api --env-file .env --input litellm-free.json
 ```
 
-Neue Modelle gehen an `/model/new`, eigene bereits importierte Modelle an
-`/model/{id}/update`. LiteLLM verschlüsselt die Daten und aktualisiert seine
-Verwaltung. Mehrere HTTP-Aufrufe bilden keine gemeinsame Transaktion: Bei einem
-Fehler können vorherige Modelle bereits übernommen sein. Ein erneuter Lauf nutzt
-dieselben IDs und erzeugt keine zusätzlichen Kopien.
+LiteLLM requires a database connection and `STORE_MODEL_IN_DB=True`. New models are created through `/model/new`; models owned by this importer are updated through `/model/{id}/update`. IDs are stable. Models managed by other owners are skipped by default. No models are deleted by default. Routes without a provider key are skipped during regular imports.
 
-## 3. Direktes SQL, etwa bei litellm-database
-
-Für einen vorhandenen Podman-Container:
+For existing routes with a specific owner, an explicit mode adds the compact
+`f24_*` route identity only:
 
 ```sh
-python3 import_litellm.py sql --env-file .env \
-  --container litellm-database --dry-run
-python3 import_litellm.py sql --env-file .env \
-  --container litellm-database
+python3 import_litellm.py api --env-file .env --patch-managed-by free-sync --dry-run
+python3 import_litellm.py api --env-file .env --patch-managed-by free-sync
 ```
 
-Für Docker `--engine docker` ergänzen. Mit `--input litellm-free.json` wird eine
-lokale Datei statt des Downloads verwendet. Das Skript übergibt die ausgewählten
-Modelle per stdin an [sql_import.py](sql_import.py) im Container. Zugangsdaten
-stehen weder im Prozessargument noch in erzeugten SQL-Dateien.
+Alternatively, set `IMPORT_PATCH_MANAGED_BY=free-sync` in `config.conf`. This mode requires no provider keys. The model name and `managed_by` must match exactly; ambiguous matches abort the operation. IDs, owners, deployment parameters and keys are preserved. The PATCH body contains only `model_info`. A readback confirms the stored fields. No PATCH is sent when they already match. No new routes are created.
 
-Im LiteLLM-Container müssen `psycopg` (Version 3), das installierte LiteLLM-Paket,
-`DATABASE_URL` und die **bereits verwendete** `LITELLM_SALT_KEY` beziehungsweise
-`LITELLM_MASTER_KEY` vorhanden sein. Beim Container-Modus gelten dessen Datenbank-
-und Verschlüsselungseinstellungen; entsprechende Werte aus der Host-`.env`
-überschreiben sie nicht. Provider-Schlüssel stammen aus den ausgewählten
-Host-`.env`-Dateien. Den bestehenden Saltschlüssel niemals für den Import ersetzen.
+A separate mode fully adopts existing free-sync routes:
 
-Ohne Container läuft derselbe Worker in der aktuellen Python-Umgebung. Dafür
-müssen LiteLLM und `psycopg[binary]` installiert sein; die `.env` benötigt dann
-zusätzlich die existierende `DATABASE_URL` und den bestehenden Verschlüsselungsschlüssel.
+```sh
+python3 import_litellm.py api --env-file .env --adopt-managed-by free-sync --dry-run
+python3 import_litellm.py api --env-file .env --adopt-managed-by free-sync
+```
 
-Der Worker:
+Alternatively, set `IMPORT_ADOPT_MANAGED_BY=free-sync`. The exact name, previous owner, provider, upstream ID and variant must match. Existing IDs and metadata are preserved; the new owner is `f24-sales-import`. New routes receive a stable import ID. Later updates use the name and verified identity to find adopted routes with their original IDs. A stored `f24_import_hash` detects identical incoming parameters/model information and avoids repeated writes. The two owner modes are mutually exclusive.
 
-- prüft die Spalten von `public."LiteLLM_ProxyModelTable"` vor dem Schreiben;
-- nutzt LiteLLMs installierte `encrypt_value_helper` für String-Parameter;
-- schreibt parametrisierte SQL-Anweisungen in einer gemeinsamen Transaktion;
-- aktualisiert nur Modelle mit `managed_by=f24-sales-import` und stabiler Import-ID;
-- überspringt gleichnamige fremde Modelle und bricht bei fremder ID-Eigentümerschaft ab;
-- erhält vorhandene Sperrflags und löscht keine Modelle;
-- verwendet beim Dry-Run eine tatsächlich schreibgeschützte Transaktion.
+Optionally, `--prune` or `IMPORT_PRUNE=true` removes obsolete routes owned by this importer. Checks cover the owner, fixed source, access group, route identity and local provider configuration. Obsolete owned routes are deleted only after successful writes and readback. Routes managed by other owners remain unchanged. An empty model selection aborts the operation. The generic default is `IMPORT_PRUNE=false`.
 
-Geprüft wird das in LiteLLM 1.101.0 vorhandene PostgreSQL-Schema. Zusätzliche
-Spalten sind möglich; inkompatible Pflichtspalten/Datentypen führen zum Abbruch.
-Ein SQL-Fehler rollt die gesamte Importtransaktion zurück. Fehlerausgaben enthalten
-keine SQL-Parameter, Datenbank-Passwörter oder Provider-Schlüssel.
+Remote targets require HTTPS. Set `LITELLM_ALLOW_HTTP=true` for an explicitly configured internal container endpoint such as `http://litellm-database:4000`. Downloaded data does not control this setting.
 
-Direkte SQL-Änderungen umgehen die Verwaltungs-API und deren Cache-Aktualisierung.
-Nach einem echten SQL-Import die LiteLLM-Worker neu laden beziehungsweise neu
-starten, z. B. `systemctl --user restart litellm-database.service` bei einem
-entsprechenden Quadlet. Das Skript startet keine Dienste selbstständig neu.
-Es ändert auch keine vorhandenen Virtual-Key-Freigaben; bei festen Modelllisten
-müssen neue Aliase dort separat freigegeben werden.
+API calls do not form a single transaction. If a call fails, earlier changes may already be stored; rerunning reconciles the same model set. Allowed provider URLs, key references, presets and identities are validated before local keys are used. Descriptive metadata does not control commands, API targets or credentials.
 
-## Wiederholungen und Grenzen
+## Direct SQL
 
-Datei, API und SQL sind alternative Wege für denselben Modellbestand. Nicht
-zusätzlich denselben Bestand aus einer Startdatei und der Datenbank laden.
-Bestehende durch `free_sync.py` verwaltete Modelle werden beim Datenbankimport
-als fremder Bestand erkannt und übersprungen. Der Import ist keine automatische
-Löschung später entfallener Modelle. Die laufende Provider-Synchronisierung ist
-separat in [SYNC.md](SYNC.md) beschrieben.
+```sh
+python3 import_litellm.py sql --env-file .env --container litellm-database --dry-run
+python3 import_litellm.py sql --env-file .env --container litellm-database
+```
 
-Ein Free-Tier hängt weiterhin von Anbieter, Konto, Kontingent und Zeitpunkt ab.
-Die JSON-Datei enthält den letzten geprüften Stand, keine dauerhafte Zusage.
+Use `--engine docker` for the same workflow with Docker. The worker receives models through stdin; database and encryption settings come from the existing LiteLLM container. It requires `psycopg` version 3, LiteLLM, `DATABASE_URL` and the existing `LITELLM_SALT_KEY` or `LITELLM_MASTER_KEY`. Keep the existing encryption key. Without `--container`, the worker runs in the local LiteLLM Python environment.
 
-## Verifikation
+The SQL importer validates the ProxyModelTable schema, executes parameterized statements in a transaction, preserves lock flags and updates only models with `managed_by=f24-sales-import`. Aliases belonging to other owners are preserved, and conflicting IDs owned by others abort the transaction. An error rolls back the entire transaction; dry-run uses a read-only transaction. Metadata patches for other owners are available only through the API.
 
-Am 29. September 2026 gegen das Schema der installierten LiteLLM-Version 1.101.0
-geprüft. Ein echter Importlauf in einer separaten, kurzlebigen PostgreSQL-18-
-Testdatenbank bestätigte: schreibgeschützten Dry-Run, Insert, Verschlüsselung und
-Entschlüsselung, unveränderten Wiederholungslauf, Update, Erhalt von Sperrflags,
-Überspringen fremder Aliase und vollständigen Rollback bei einer ID-Kollision.
-Der produktive Bestand wurde dafür nur mit einem Read-only-Dry-Run geprüft.
+Direct SQL bypasses LiteLLM's API cache. LiteLLM workers must be reloaded or restarted afterwards. The importer does not restart services or extend virtual-key model permissions.
 
-Der reproduzierbare Integrationstest liegt unter
-[tests/sql_integration_check.py](tests/sql_integration_check.py). Er verlangt eine
-separate Datenbank namens `f24_import_test`, eine passende LiteLLM-Python-Umgebung
-und mindestens drei Export-Einträge mit Dummy-Schlüsseln als JSON-Liste auf stdin.
-Die regulären Tests unter `tests/test_import_and_review.py` prüfen Downloads,
-Umgebungsvariablen, manipulierte Konfigurationen, API-Import, SQL-Transport und
-die Agent-Validierung ohne Live-Inferenz.
+## Container and systemd
+
+The container includes the importer for pull, file and API operations. Your own configuration and credentials are supplied at startup:
+
+```sh
+podman run --rm --read-only --cap-drop=ALL --security-opt=no-new-privileges \
+  --env-file config.conf --env-file .env localhost/litellm-free-import:latest api --dry-run
+```
+
+The LiteLLM address must be reachable from the container; localhost refers to the container itself. Mount an internal CA certificate as PEM and set `LITELLM_CA_FILE` or `IMPORT_SOURCE_CA_FILE` as needed. For file output, mount a writable directory at `/data`:
+
+```sh
+mkdir -p output
+podman run --rm --userns=keep-id --user "$(id -u):$(id -g)" \
+  --env-file config.conf --env-file .env -v "$PWD/output:/data:Z" \
+  localhost/litellm-free-import:latest pull --output config.yaml --force
+```
+
+Omit `--userns=keep-id` with Docker. Direct SQL runs from the host or an existing LiteLLM Python environment.
+
+Host libraries are installed without a virtual environment using `pip --target ~/.local/share/litellm-free/python`. The service sets `PYTHONPATH` only for that package directory and uses `/usr/bin/python3`.
+
+The optional systemd files use a separate `.env` and `config.conf` under `~/.config/litellm-free/`. The timer runs at **00:10 and 12:10 UTC**. An independent calendar timer cannot detect when an external scan finishes. When operating a scanner alongside the importer, the same service can instead start after a successful scan. The delay remains configurable through `IMPORT_DELAY_SECONDS`. Missed timer runs are caught up. The container drop-in is [deploy/container.conf](deploy/container.conf).
+
+## Verification
+
+Regular tests use generated model information without credentials and cover pull, source validation, JSON/YAML, archive switching, API ownership, metadata patches, repeated runs and SQL transport. The integration test [tests/sql_integration_check.py](tests/sql_integration_check.py) requires a separate PostgreSQL database named `f24_import_test` and a matching LiteLLM environment. A real SQL test against LiteLLM 1.101.0/PostgreSQL 18 on September 29, 2026 verified encryption, dry-run, insert/update, repeated runs, models managed by other owners and rollback.
+### Optional OpenClaw webhook
+
+The importer can send the final result to an OpenClaw-compatible HTTP hook after
+LiteLLM accepts the models and the readback succeeds. Configure
+`IMPORT_HOOK_URL`, `IMPORT_HOOK_BEARER`, and optionally
+`IMPORT_HOOK_TIMEOUT_SECONDS` and `IMPORT_HOOK_CA_FILE` in the local `.env`.
+The credentials are never part of the repository or the event body. A changed
+import emits `import_succeeded` with the sanitized `added`, `removed`, and
+`updated` model diff. A failed import or readback emits `import_failed`.
+Diffs retain model, provider and aggregator identity, while removing credential fields,
+HTTP headers/cookies, and URL credentials, query strings and fragments.
+An unchanged import is skipped by default (`IMPORT_HOOK_ON_NO_CHANGE=false`).
+Set it to `true` when another service has announced an upcoming import and needs
+a completion event even if LiteLLM already has the desired models. A caller may
+set `IMPORT_HOOK_RUN_ID` to correlate that completion with its scan.
+
+Each event includes an `event_id`, preserved across up to three attempts on
+transient HTTP or transport failures. Receivers should deduplicate that ID before
+running actions. Authentication failures are not retried. Delivery failure is
+reported in the import result; there is no durable delivery queue.
+
+An optional `IMPORT_PRE_SUCCESS_COMMAND_JSON` in `config.conf` runs a local
+prerequisite after successful import/readback and before the success event:
+
+```dotenv
+IMPORT_PRE_SUCCESS_COMMAND_JSON=["/absolute/path/sync-access", "--configured-target"]
+IMPORT_PRE_SUCCESS_TIMEOUT_SECONDS=180
+```
+
+The command runs directly without a shell and receives the import status JSON on
+stdin. Use it, for example, to update model access before a receiver refreshes
+client catalogs. A nonzero exit or timeout sets `post_import.ok=false` and emits
+`import_failed` with `phase="post_import"` and `import_ok=true`; it does not undo
+the confirmed LiteLLM import. No success event is sent in that case. The command
+is never run during dry runs or file exports. Its output is not forwarded.

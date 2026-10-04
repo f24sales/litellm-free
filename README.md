@@ -1,158 +1,80 @@
-# litellm-free · F24 SALES
+# litellm-free
 
-**Website: [www.f24-sales.com](https://www.f24-sales.com/)**
+Download the curated model catalog from **[www.f24-sales.com](https://www.f24-sales.com/)** and import it into your own LiteLLM installation. Model information is preserved when importing through files, the API or SQL.
 
-Freely accessible AI chat models, their aggregators, and verified API routes in
-one place. This repository contains the website, LiteLLM synchronization,
-model checks, an agent integration for researching new models, and an importer
-for your own LiteLLM installation.
+OpenAI-compatible `/v1/models` services can be integrated. As of September 2026, Groq, Kilo, Nous Portal, NVIDIA, OpenCode Zen and OpenRouter are preconfigured. The importer validates routes against explicit endpoint and credential presets.
 
-OpenAI-compatible `/v1/models` services can be integrated. As of September 2026,
-**OpenRouter, Groq, Kilo, Nous Portal, OpenCode Zen, and NVIDIA Build** are
-preconfigured. Model developers and aggregators are listed separately.
+**[LiteLLM YAML](https://www.f24-sales.com/litellm-config.yaml)** · **[.env template](env.example)** · **[Import guide](IMPORT.md)**
 
-## Website
-
-- One shared entry per model, showing its available aggregators.
-- Context and output limits, modalities, open weights, and thinking per API route.
-- Information dialogs with signup links, API base URLs, documentation, and sources.
-- Original model IDs, official model pages, and locally hosted logos.
-- Aggregator and developer filters, plus a Fire demo with predefined questions.
-- LiteLLM downloads and a GitHub button using the original GitHub icon.
-
-Music, guardrails, decision models, embeddings, speech, and pure routers are
-excluded from the regular chat model catalog. Cards use routes that passed the
-scan; historical notes may mention earlier access. A successful scan is a
-snapshot, not a guarantee of continued availability.
-
-**🏆**: first listed in our scans. **🥈**: the next distinct discovery date.
-Later aggregators share third place. This order indicates neither quality nor
-exclusive access. Earlier discovery order is unknown for models in the initial
-catalog.
-
-## Import
-
-**[Download the LiteLLM configuration](https://www.f24-sales.com/litellm-config.json)**
-· **[Download the .env template](https://www.f24-sales.com/litellm.env.example)**
-
-By default, the importer downloads directly from the address above on
-**www.f24-sales.com**. The JSON file is also valid YAML and can serve as a
-LiteLLM startup configuration. API keys appear only as environment variable
-references.
+## Setup
 
 ```sh
-git clone https://github.com/f24sales/litellm-free.git
-cd litellm-free
-python3 -m pip install --user -r requirements-import.txt
-cp import.env.example .env
-chmod 600 .env
-# Edit .env and enter your own provider keys.
+git clone https://github.com/f24sales/litellm-free.git "$HOME/litellm-free"
+cd "$HOME/litellm-free"
+python3 -m pip install --target "$HOME/.local/share/litellm-free/python" -r requirements-import.txt
+export PYTHONPATH="$HOME/.local/share/litellm-free/python${PYTHONPATH:+:$PYTHONPATH}"
+cp env.example .env
+cp config.conf_example config.conf
+chmod 600 .env config.conf
+# Enter your gateway keys and LiteLLM address/bearer token.
 ```
 
-| Method | Command | Result |
-| --- | --- | --- |
-| Configuration file | `python3 import_litellm.py file --env-file .env` | `litellm-free.json` for `litellm --config` |
-| HTTP API → database | `python3 import_litellm.py api --env-file .env` | Store models through the LiteLLM management API |
-| Direct SQL | `python3 import_litellm.py sql --env-file .env --container litellm-database` | Transaction in the running LiteLLM container's PostgreSQL database |
+Store your keys in `.env`; `config.conf` contains the source, target address and configurable delay before online downloads (`IMPORT_DELAY_SECONDS=10`). The shared `python_header.py` loads these files; injected process environment variables take precedence. Both files stay local. The LiteLLM bearer token needs model-management permissions; an ordinary chat key is insufficient.
 
-All methods support `--dry-run`, repeated `--env-file` arguments, and `--input`
-for an already downloaded JSON file. Providers without a local key are skipped.
-Models managed elsewhere are not overwritten; the importer does not delete
-models. SQL uses the installed LiteLLM version's encryption. Existing database
-and salt keys are preserved.
-
-**Complete examples, database prerequisites, Docker/Podman, and reload behavior:
-[IMPORT.md](IMPORT.md).**
-
-## Scanning and agent research
-
-```text
-Provider catalogs → LiteLLM sync → API scan → research new IDs
-                                                  ↓
-                                      validated model metadata
-                                                  ↓
-                                    website and LiteLLM download
-```
-
-The API scan checks reachability. An LLM agent researches only new or unreviewed
-IDs: developers, model types, duplicates, capabilities, thinking support through
-each aggregator, and reliable sources. Mappings are structurally validated
-before being accepted. Previously reviewed entries are not sent to an LLM again
-on every scan.
-
-For the built-in Codex CLI adapter, set these values in the local `.env`:
-
-```env
-MODEL_REVIEW_AGENT=codex
-MODEL_REVIEW_TIMEOUT=900
-```
-
-Codex CLI must be installed and authenticated. Other agents, such as Claude Code,
-Hermes, or OpenClaw, can be connected through `MODEL_REVIEW_COMMAND`.
-Without an agent, a research task is saved for review. The complete workflow,
-output format, and error handling are documented in **[AGENT_REVIEW.md](AGENT_REVIEW.md)**.
-
-## Local preview
-
-Requires Python 3.11 or newer; Node.js is needed for UI tests. The preview needs
-neither API keys nor a LiteLLM server.
+## Catalog and configuration
 
 ```sh
-python3 -m pip install --user -r requirements-web.txt
-cp examples/model_probe_results.json model_probe_results.json
-python3 -m uvicorn web:app --host 127.0.0.1 --port 8080 --no-access-log
+# Native LiteLLM YAML; downloading requires no keys.
+python3 import_litellm.py pull --output config.yaml --force
+# Select routes using locally available gateway keys:
+python3 import_litellm.py file --format yaml --output config.yaml --force
 ```
 
-Then open **http://127.0.0.1:8080/**. The sanitized example catalog is dated
-September 29, 2026. Fire requires its own backend configuration.
+The fixed filename is a symlink to the latest `config_DATETIME.yaml`. Set `LITELLM_FREE_ARCHIVE=1` in `config.conf` to retain earlier versions under `archiv/`; the default is `0`. Repeating the operation with identical content does not create another version. Downloads, local configurations and the archive are excluded from Git.
 
-## Running your own synchronization
-
-Requires an existing LiteLLM proxy with PostgreSQL and `STORE_MODEL_IN_DB=True`.
-Fill in `.env` using [.env.example](.env.example).
-
-```sh
-python3 free_sync.py --dry-run
-python3 free_sync.py
-python3 model_probe.py
-```
-
-`free_sync.py` updates managed deployments. `model_probe.py` sends real test
-requests, starts research when needed, and restricts existing client/web keys
-to passing routes. Provider limits still apply. `python3 setup_web_key.py`
-configures the separate key and pre/post filters for the optional Fire demo.
-Keys remain in the backend; the web application does not store responses.
-
-## Model IDs
-
-Direct aggregator requests use that aggregator's base URL and original model ID,
-for example `https://api.groq.com/openai/v1` with `openai/gpt-oss-120b`.
-By contrast, `groq/openai/gpt-oss-120b` is a local LiteLLM routing name.
-Additional `-fast`/`-think` aliases are local presets. Actual developer prefixes
-and documented suffixes such as `:free` are preserved.
-A catalog entry alone does not prove working inference. Some OpenCode free
-routes require the app or CLI; this does not apply to every model.
-
-## Documentation and tests
-
-| File | Contents |
+| Target | Command with `python3 import_litellm.py` |
 | --- | --- |
-| [IMPORT.md](IMPORT.md) | JSON download, `.env`, file, API, and SQL import |
-| [AGENT_REVIEW.md](AGENT_REVIEW.md) | Post-scan research agent, adapters, and validation |
-| [MODEL_REVIEW_TASK.md](MODEL_REVIEW_TASK.md) | Complete research task for the agent |
-| [WEB.md](WEB.md) | Presentation, data model, branding, Fire, and deployment |
-| [SYNC.md](SYNC.md) | Synchronization, credentials, virtual keys, and provider rules |
-| [model_metadata.json](model_metadata.json) | Researched mappings and sources |
+| HTTPS API → LiteLLM database | `api --env-file .env` |
+| Adopt matching existing free-sync routes | `api --env-file .env --adopt-managed-by free-sync` |
+| Add model information to existing routes only | `api --env-file .env --patch-managed-by free-sync` |
+| Direct SQL inside the existing LiteLLM container | `sql --env-file .env --container litellm-database` |
+
+Before writing to the database, check the same command with `--dry-run`. Metadata mode preserves existing IDs, ownership, routes and keys. Explicit adoption with `--adopt-managed-by` also preserves existing IDs and checks the previous route identity. Without these options, models managed by other owners remain unchanged. `--prune` removes obsolete routes owned by this importer after a successful import; it is disabled by default. Use `--input catalog.json` or `--input config.yaml` to read a local file.
+
+## Container and systemd
 
 ```sh
-python3 -m pip install --user -r requirements-web.txt pytest
-python3 -m pytest -q tests
-node --test tests/catalog-ui.test.cjs
+podman build -f Containerfile -t localhost/litellm-free-import:latest .
+podman run --rm --read-only --cap-drop=ALL --security-opt=no-new-privileges \
+  --env-file config.conf --env-file .env localhost/litellm-free-import:latest api --dry-run
 ```
 
-Local credentials, current scan files, research tasks, and run logs stay outside
-Git. Sources and licenses for bundled logos, the font, and HTMX are listed under
-[static/logos](static/logos/SOURCES.md),
-[static/fonts](static/fonts/Adwaita-LICENSE.txt), and
-[static/vendor](static/vendor/htmx-LICENSE.txt). F24 SALES and GitHub vectors
-retain their original proportions.
+The image contains the importer and its libraries. Your LiteLLM URL must be reachable from the container. Docker can replace Podman.
+
+```sh
+install -d -m 700 "$HOME/.config/litellm-free"
+install -m 600 .env config.conf "$HOME/.config/litellm-free/"
+install -d "$HOME/.config/systemd/user"
+cp deploy/litellm-free-import.service deploy/litellm-free-import.timer "$HOME/.config/systemd/user/"
+systemctl --user daemon-reload
+systemctl --user start litellm-free-import.service
+# Optional: twice daily at 00:10 and 12:10 UTC:
+systemctl --user enable --now litellm-free-import.timer
+```
+
+The unit expects the checkout at `~/litellm-free` and the libraries installed above in the separate Python package directory. No virtual environment is needed. [deploy/container.conf](deploy/container.conf) is the optional drop-in for container operation. See [IMPORT.md](IMPORT.md) for details.
+
+When `IMPORT_HOOK_URL` and `IMPORT_HOOK_BEARER` are set in the local `.env`,
+the importer posts the final result to that OpenClaw-compatible endpoint with
+`curl`. It sends `import_succeeded` only after LiteLLM readback succeeds and
+`import_failed` when the import or readback fails. The body contains the
+credential-free model diff; the bearer is sent only as an HTTP header.
+
+```sh
+python3 -m pip install --target "$HOME/.local/share/litellm-free/python" pytest
+python3 -m pytest -q tests
+```
+
+The [OpenClaw plugin](litellm-free-hook/) receives LiteLLM-Free update webhooks.
+It refreshes the model catalogs in OpenCode, Hermes, and OpenClaw.
+It sends update notifications and model changes to Telegram.

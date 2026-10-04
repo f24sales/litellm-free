@@ -1,11 +1,13 @@
 """Portable LiteLLM configurations containing environment references, never keys."""
 from __future__ import annotations
 
+import hashlib
+import json
+import math
 import uuid
 
-from catalog_store import model_cards
-
 CONFIG_URL = "https://www.f24-sales.com/litellm-config.json"
+CATALOG_URL = "https://www.f24-sales.com/litellm-config.yaml"
 OWNER = "f24-sales-import"
 PROVIDERS = {
     "openrouter": ("https://openrouter.ai/api/v1", "OPENROUTER_API_KEY"),
@@ -39,36 +41,55 @@ def route_params(provider, upstream, variant):
     return params
 
 
-def export_config(data):
-    if data.get("source_type") != "model_probe":
-        raise ValueError("A completed model probe is required for export")
-    visible = {route["id"] for card in model_cards(data, probe_status="green")
-               if card["entry_type"] == "model" for route in card["routes"]}
-    models = []
-    for record in data["models"].values():
-        route = record["details"]
-        if not record["active"] or route["id"] not in visible or route.get("research_status") != "reviewed":
-            continue
-        provider, upstream, variant = route["aggregator"], route["upstream_id"], route["variant"]
-        if provider not in PROVIDERS:
-            continue
-        models.append({
-            "model_name": provider + "/" + upstream + ("-" + variant if variant != "base" else ""),
-            "litellm_params": route_params(provider, upstream, variant),
-            "model_info": {"id": model_id(provider, upstream, variant), "managed_by": OWNER,
-                           "f24_provider": provider, "f24_upstream_id": upstream, "f24_variant": variant,
-                           "source": CONFIG_URL, "checked_at": route["probe_checked_at"],
-                           "access_groups": ["litellm-free"]},
-        })
-    if not models:
-        raise ValueError("No passing chat routes available for export")
-    return {"model_list": sorted(models, key=lambda row: row["model_name"])}
+
+
+def validate_metadata(value, max_bytes=131072, max_items=10000):
+    """Keep descriptive model information bounded, inert JSON data."""
+    if not isinstance(value, dict):
+        raise ValueError("Invalid descriptive model metadata")
+    count = 0
+
+    def visit(item, depth=0):
+        nonlocal count
+        count += 1
+        if depth > 12 or count > max_items:
+            raise ValueError("Model metadata exceeds the nesting or item limit")
+        if item is None or isinstance(item, (bool, int)):
+            return
+        if isinstance(item, float) and math.isfinite(item):
+            return
+        if isinstance(item, str) and len(item) <= 32768:
+            return
+        if isinstance(item, list):
+            for child in item:
+                visit(child, depth + 1)
+            return
+        if isinstance(item, dict) and all(isinstance(key, str) and len(key) <= 256 for key in item):
+            for child in item.values():
+                visit(child, depth + 1)
+            return
+        raise ValueError("Model metadata must contain bounded JSON values")
+
+    visit(value)
+    if len(json.dumps(value, ensure_ascii=False, allow_nan=False).encode()) > max_bytes:
+        raise ValueError("Model metadata exceeds the size limit")
 
 
 def validate_config(document):
     """Downloaded config cannot redirect a locally supplied key to another host."""
-    if not isinstance(document, dict) or set(document) != {"model_list"}:
+    if not isinstance(document, dict):
         raise ValueError("Expected a LiteLLM model_list document")
+    if set(document) != {"model_list"}:
+        expected = {"schema_version", "catalog_updated_at", "checked_at", "models", "aggregators", "model_list"}
+        if (set(document) not in (expected, expected | {"research"})
+                or type(document.get("schema_version")) is not int or document.get("schema_version") != 1
+                or not isinstance(document.get("catalog_updated_at"), str)
+                or not isinstance(document.get("checked_at"), str)
+                or not isinstance(document.get("models"), list)
+                or not isinstance(document.get("aggregators"), dict)):
+            raise ValueError("Expected a supported published catalog or LiteLLM model_list document")
+        if "research" in document:
+            validate_metadata(document["research"], max_bytes=5_000_000, max_items=100000)
     rows = document["model_list"]
     if not isinstance(rows, list) or not rows or len(rows) > 5000:
         raise ValueError("Invalid or empty model_list")
@@ -86,11 +107,15 @@ def validate_config(document):
         expected_name = provider + "/" + upstream + ("-" + variant if variant != "base" else "")
         if row["model_name"] != expected_name or row["litellm_params"] != route_params(provider, upstream, variant):
             raise ValueError("Model name, API endpoint, key reference or preset differs from the supported export")
+        required_info = {"id", "managed_by", "f24_provider", "f24_upstream_id", "f24_variant", "source", "checked_at", "access_groups"}
         if (info.get("managed_by") != OWNER or info.get("source") != CONFIG_URL
                 or info.get("id") != model_id(provider, upstream, variant)
                 or info.get("access_groups") != ["litellm-free"]
-                or set(info) != {"id", "managed_by", "f24_provider", "f24_upstream_id", "f24_variant", "source", "checked_at", "access_groups"}):
+                or set(info) not in (required_info, required_info | {"f24_metadata"})
+                or not isinstance(info.get("checked_at"), str)):
             raise ValueError("Invalid import ownership metadata")
+        if "f24_metadata" in info:
+            validate_metadata(info["f24_metadata"])
         if info["id"] in ids or row["model_name"] in names:
             raise ValueError("Duplicate model in import")
         ids.add(info["id"])
@@ -98,12 +123,61 @@ def validate_config(document):
     return rows
 
 
+def model_config_fingerprint(config):
+    """Hash meaningful model configuration, using the original environment references."""
+    volatile = {"checked_at", "created_at", "updated_at", "researched_at",
+                "identity_reviewed_at", "open_weights_checked_at"}
+
+    def stable(value):
+        if isinstance(value, dict):
+            return {key: stable(item) for key, item in value.items()
+                    if key not in volatile and not key.startswith("probe_")}
+        if isinstance(value, list):
+            return [stable(item) for item in value]
+        return value
+
+    # Validation also ensures that secret bearers have not replaced key references.
+    rows = sorted(validate_config(config), key=lambda row: row["model_name"])
+    encoded = json.dumps(stable(rows), sort_keys=True, separators=(",", ":"),
+                         ensure_ascii=False, allow_nan=False).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
 def env_template():
     lines = ["# https://www.f24-sales.com/ — LiteLLM import", "# Copy to .env; never commit real keys.",
              "# Configure only the providers you use. The importer skips blank keys."]
     lines.extend(key + "=" for _, key in PROVIDERS.values())
-    lines.extend(["", "# Optional: HTTP API import into the LiteLLM database", "LITELLM_BASE_URL=http://127.0.0.1:4000",
-                  "LITELLM_ADMIN_KEY=", "", "# Direct SQL import outside a LiteLLM container only:",
+    lines.extend(["", "# Optional: API import into the LiteLLM database. Set the proxy URL in config.conf.",
+                  "# Master key or an admin virtual bearer with model-management scopes.",
+                  "LITELLM_ADMIN_KEY=", "# Optional fallback when LITELLM_ADMIN_KEY is blank; ordinary chat keys cannot manage models.",
+                  "LITELLM_VIRTUAL_KEY=", "", "# Direct SQL import outside a LiteLLM container only:",
                   "# Use the EXISTING database URL and encryption key of your proxy.",
-                  "DATABASE_URL=", "LITELLM_SALT_KEY=", "LITELLM_MASTER_KEY=", ""])
+                  "DATABASE_URL=", "LITELLM_SALT_KEY=", "LITELLM_MASTER_KEY=", "",
+                  "# Optional OpenClaw webhook for independent scan/import events. Keep both values local.",
+                  "IMPORT_HOOK_URL=", "IMPORT_HOOK_BEARER=", "IMPORT_HOOK_TIMEOUT_SECONDS=30", "IMPORT_HOOK_CA_FILE=",
+                  "# Send import_succeeded even when the model diff is empty.",
+                  "IMPORT_HOOK_ON_NO_CHANGE=false", ""])
     return "\n".join(lines)
+
+
+def config_template():
+    """Portable nonsecret defaults; the generated config example uses these bytes."""
+    return "\n".join([
+        "# Non-secret settings. Copy to config.conf; .env holds credentials.",
+        "IMPORT_SOURCE_URL=" + CATALOG_URL,
+        "IMPORT_SOURCE_UDS=", "IMPORT_SOURCE_CA_FILE=", "IMPORT_DELAY_SECONDS=10",
+        "# Retain older configuration files in ./archiv only when explicitly enabled.",
+        "LITELLM_FREE_ARCHIVE=0",
+        "LITELLM_BASE_URL=https://your-litellm.example", "LITELLM_PORT=", "LITELLM_CA_FILE=",
+        "LITELLM_ALLOW_HTTP=false",
+        "# Optional API metadata-only mode for exactly this existing manager.",
+        "IMPORT_PATCH_MANAGED_BY=",
+        "# Optional exact free-sync route adoption, preserving existing model IDs.",
+        "# Mutually exclusive with IMPORT_PATCH_MANAGED_BY.",
+        "IMPORT_ADOPT_MANAGED_BY=",
+        "# Remove obsolete imported routes only after successful import/readback.",
+        "IMPORT_PRUNE=false",
+        "# Optional local prerequisite after import/readback, before the success webhook.",
+        '# JSON argv, without a shell: ["/absolute/path/script", "--argument"]',
+        "IMPORT_PRE_SUCCESS_COMMAND_JSON=", "IMPORT_PRE_SUCCESS_TIMEOUT_SECONDS=180", "",
+    ])
