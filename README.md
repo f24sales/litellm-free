@@ -95,6 +95,17 @@ listening socket and same-port Tailscale Serve route intact.
 Hermes' model picker reads the updated configuration on each invocation; its
 gateway and dashboard are not restarted merely to update model lists.
 
+Context and output limits come from the authenticated `/v1/models` response,
+including updates to already-known models. Input and output limits are not
+added together. Unknown limits are left unspecified, not replaced with a
+fictional large context window. OpenClaw receives `contextWindow`/`maxTokens`,
+Hermes `context_length`/`max_completion_tokens`, and OpenCode
+`limit.context`/`limit.output`. Metadata-only changes also trigger a reload.
+The metadata reader is bundled here; the refresh does not require patched
+client bootstrap packages. Configured defaults and fallbacks stay untouched;
+unavailable OpenClaw defaults/fallbacks are reported in the refresh status.
+The separate direct ChatGPT/OpenAI discovery call is not changed by this flow.
+
 The image runtime schedules `litellm-free-refresh.service` twice daily through
 cron. It downloads `IMPORT_SOURCE_URL` (default
 `https://www.f24-sales.com/litellm-config.yaml`) and reconciles the existing

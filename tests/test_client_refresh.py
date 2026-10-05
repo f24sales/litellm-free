@@ -1,11 +1,15 @@
 """Model-only refresh contract: all clients, removals, retries and preservation."""
 from copy import deepcopy
 import importlib.util
+from io import BytesIO
 import json
 from pathlib import Path
+import sys
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
+from urllib.request import Request
 
 import yaml
 
@@ -15,7 +19,8 @@ spec.loader.exec_module(refresh)
 
 CATALOG = {"id": "litellm-free", "base_url": "https://proxy.test:2001/v1",
            "key_env": "OPENAI_V1_KEY_3", "models": ["keep", "new"],
-           "openclaw_models": [{"id": "keep", "name": "keep"}, {"id": "new", "name": "new"}]}
+           "metadata": {"keep": {"context": 16384, "output": 4096},
+                        "new": {"context": 65536, "output": 8192}}}
 
 
 def configs():
@@ -61,12 +66,85 @@ class RefreshTests(unittest.TestCase):
             for field in ("plugins", "tts", "stt", "mcp", "mcp_servers", "agent"):
                 self.assertEqual(after.get(field), before.get(field))
             if kind == "openclaw":
-                self.assertEqual(block["models"][0]["contextWindow"], 8192)
+                self.assertEqual(block["models"][0]["contextWindow"], 16384)
+                self.assertEqual(block["models"][0]["maxTokens"], 4096)
                 self.assertNotIn("litellm-free/old", after["agents"]["defaults"]["models"])
                 self.assertEqual(after["agents"]["defaults"]["model"], before["agents"]["defaults"]["model"])
             elif kind == "hermes":
+                self.assertEqual(block["models"]["keep"]["context_length"], 16384)
+                self.assertEqual(block["models"]["keep"]["max_completion_tokens"], 4096)
                 self.assertEqual(after["model"]["available"], ["keep", "new"])
                 self.assertEqual(after["model"]["default"], "keep")
+            else:
+                self.assertEqual(block["models"]["keep"]["limit"], {"context": 16384, "output": 4096})
+
+    def test_discovery_keeps_metadata_with_unpatched_id_only_client_parser(self):
+        payload = {"data": [{"id": "keep", "max_input_tokens": 65536,
+                             "max_output_tokens": 8192}]}
+
+        def id_only_discovery(environ, *, opener, timeout):
+            self.assertNotIn("OPENAI_V1_PROVIDER", environ)
+            self.assertNotIn("OPENAI_V1_MODELS_3", environ)
+            request = Request(CATALOG["base_url"] + "/models")
+            with opener(request, timeout=timeout) as response:
+                ids = tuple(row["id"] for row in json.load(response)["data"])
+            return ((SimpleNamespace(provider_id="litellm-free", models=ids,
+                                     base_url=CATALOG["base_url"], key_env="OPENAI_V1_KEY_3"),), ())
+
+        provider_module = SimpleNamespace(discover_openai_v1_providers=id_only_discovery)
+        env = {"OPENAI_V1_PROVIDER": "other", "OPENAI_V1_PROVIDER_3": "litellm-free",
+               "OPENAI_V1_MODELS_3": "stale"}
+        with patch.dict(sys.modules, {"openclaw_ephemeral.providers": provider_module}), \
+             patch.object(refresh, "build_opener") as opener, patch.object(refresh.time, "sleep"):
+            opener.return_value.open.side_effect = lambda *a, **k: BytesIO(json.dumps(payload).encode())
+            catalog = refresh.discover(env)
+            self.assertEqual(catalog["models"], ["keep"])
+            self.assertEqual(catalog["metadata"], {"keep": {"context": 65536, "output": 8192}})
+            self.assertEqual(opener.return_value.open.call_count, 1)
+            payload["data"] = []
+            with self.assertRaises(refresh.RefreshError):
+                refresh.discover(env)
+
+    def test_metadata_only_change_updates_configs_digest_and_reload(self):
+        with tempfile.TemporaryDirectory() as raw:
+            env = self.setup_files(Path(raw))
+            status = Path(raw) / "status.json"
+            changed = deepcopy(CATALOG)
+            changed["metadata"]["keep"]["context"] = 32768
+            with patch.object(refresh, "discover", side_effect=[CATALOG, changed, changed]), \
+                 patch.object(refresh, "running", return_value=True), \
+                 patch.object(refresh, "verify_opencode"):
+                first = refresh.refresh(env, status)
+                second = refresh.refresh(env, status)
+                third = refresh.refresh(env, status)
+            self.assertNotEqual(first["catalog_sha256"], second["catalog_sha256"])
+            self.assertEqual(second["catalog_sha256"], third["catalog_sha256"])
+            self.assertTrue(all(row["changed"] for row in second["clients"].values()))
+            self.assertTrue(all(not row["changed"] for row in third["clients"].values()))
+            self.assertEqual(self.opencode_reload.call_count, 2)
+
+    def test_api_ids_without_current_limits_cannot_pass_verification(self):
+        rows = {model: {"limit": {"context": 8192, "output": 4096}} for model in CATALOG["models"]}
+        with patch.object(refresh, "build_opener") as opener, patch.object(refresh.time, "sleep"):
+            opener.return_value.open.side_effect = lambda *a, **k: BytesIO(json.dumps(
+                {"all": [{"id": CATALOG["id"], "models": rows}]}).encode())
+            with self.assertRaises(refresh.RefreshError):
+                refresh.verify_opencode({}, CATALOG)
+            for model in rows:
+                rows[model]["limit"] = CATALOG["metadata"][model]
+            refresh.verify_opencode({}, CATALOG)
+
+    def test_unavailable_fallback_is_reported_not_replaced(self):
+        with tempfile.TemporaryDirectory() as raw:
+            env = self.setup_files(Path(raw))
+            path = refresh.paths(env)["openclaw"]
+            config = json.loads(path.read_text())
+            config["agents"]["defaults"]["model"]["fallbacks"] = ["litellm-free/old", "other/native"]
+            path.write_text(json.dumps(config))
+            plans, results = refresh.plan_configs(env, CATALOG)
+            self.assertEqual(results["openclaw"]["unavailable_selections_retained"], ["litellm-free/old"])
+            after = json.loads(plans[0][2])
+            self.assertEqual(after["agents"]["defaults"]["model"], config["agents"]["defaults"]["model"])
 
     def test_empty_or_mismatched_catalog_is_rejected(self):
         for kind, original in configs().items():

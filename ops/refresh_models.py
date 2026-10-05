@@ -7,6 +7,7 @@ import base64
 from copy import deepcopy
 import fcntl
 import hashlib
+from io import BytesIO
 import json
 import os
 from pathlib import Path
@@ -18,6 +19,10 @@ import time
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 import yaml
+
+# Use the bundled helper when invoked directly from the baked repository.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from llm_model_metadata import parse_catalog, render_model
 
 
 class RefreshError(RuntimeError):
@@ -49,13 +54,28 @@ def discover(environ):
         if match and (int(match[2] or 1) != selected or match[1] == "MODELS"):
             del scoped[key]
     opener = build_opener(NoRedirect()).open
+    live_models = parse_catalog(None)
+
+    def read_models(request, **kwargs):
+        # Keep the metadata before the existing provider parser reduces the
+        # response to IDs. No client-package patch or second API call required.
+        nonlocal live_models
+        with opener(request, **kwargs) as response:
+            payload = response.read(8 * 1024 * 1024 + 1)
+        if len(payload) > 8 * 1024 * 1024:
+            raise RefreshError("Provider response exceeds limit")
+        live_models = parse_catalog(json.loads(payload))
+        return BytesIO(payload)
+
     for attempt in range(3):
-        providers, warnings = discover_openai_v1_providers(scoped, opener=opener, timeout=15)
-        if len(providers) == 1 and not warnings and providers[0].models:
+        live_models = parse_catalog(None)
+        providers, warnings = discover_openai_v1_providers(scoped, opener=read_models, timeout=15)
+        if (len(providers) == 1 and not warnings and live_models
+                and set(providers[0].models) == set(live_models)):
             provider = providers[0]
             return {"id": provider.provider_id, "base_url": provider.base_url,
                     "models": list(provider.models), "key_env": provider.key_env,
-                    "openclaw_models": provider.openclaw_config()["models"]}
+                    "metadata": live_models.metadata}
         if attempt < 2:
             time.sleep(attempt + 1)
     raise RefreshError("Live provider discovery failed; existing catalogs retained")
@@ -77,8 +97,8 @@ def update_catalog(kind, original, catalog):
         raise RefreshError(f"{kind}: provider endpoint differs from injected environment")
     if kind == "openclaw":
         rows = {row["id"]: row for row in block.get("models", [])}
-        fresh = {row["id"]: row for row in catalog["openclaw_models"]}
-        block["models"] = [deepcopy(rows.get(model, fresh[model])) for model in ids]
+        block["models"] = [render_model(kind, model, catalog["metadata"].get(model, {}), rows.get(model))
+                           for model in ids]
         agents = config.get("agents", {})
         for agent in [agents.get("defaults", {}), *agents.get("entries", {}).values()]:
             if isinstance(agent.get("models"), dict):
@@ -92,7 +112,8 @@ def update_catalog(kind, original, catalog):
                     allowed[key] = previous.get(key, {})
     else:
         previous = block.get("models", {})
-        block["models"] = {model: deepcopy(previous.get(model, {})) for model in ids}
+        block["models"] = {model: render_model(kind, model, catalog["metadata"].get(model, {}), previous.get(model))
+                           for model in ids}
         if kind == "hermes" and config.get("model", {}).get("provider") == provider:
             config["model"]["available"] = list(ids)
     return config
@@ -138,6 +159,15 @@ def plan_configs(environ, catalog):
                    else json.dumps(updated, indent=2, ensure_ascii=False) + "\n")
         plans.append((path, before, content.encode() if changed else before))
         results[kind] = {"models": len(catalog["models"]), "changed": changed}
+        if kind == "openclaw":
+            selection = original.get("agents", {}).get("defaults", {}).get("model", {})
+            refs = ([selection] if isinstance(selection, str) else
+                    [selection.get("primary"), *selection.get("fallbacks", [])])
+            prefix = catalog["id"] + "/"
+            missing = [ref for ref in refs if isinstance(ref, str) and ref.startswith(prefix)
+                       and ref[len(prefix):] not in catalog["models"]]
+            if missing:
+                results[kind]["unavailable_selections_retained"] = missing
     return plans, results
 
 
@@ -210,7 +240,11 @@ def verify_opencode(environ, catalog):
                 raise RefreshError("OpenCode response exceeds limit")
             rows = json.loads(payload)["all"]
             actual = next(row["models"] for row in rows if row["id"] == catalog["id"])
-            if set(actual) == set(catalog["models"]):
+            expected = catalog["metadata"]
+            if set(actual) == set(catalog["models"]) and all(
+                    all(actual[model].get("limit", {}).get(key) == value
+                        for key, value in expected.get(model, {}).items() if key in ("context", "output"))
+                    for model in catalog["models"]):
                 return
         except Exception:
             pass
@@ -226,18 +260,21 @@ def verify_hermes(catalog):
         "import sys,json; sys.path.insert(0,'/usr/local/lib/hermes-agent'); "
         "from hermes_cli.config_providers import get_compatible_custom_providers; "
         "rows=get_compatible_custom_providers(); "
-        "print(json.dumps(sorted(next(row['models'] for row in rows "
-        "if row.get('provider_key')==sys.argv[1]))))"
+        "print(json.dumps(next(row['models'] for row in rows "
+        "if row.get('provider_key')==sys.argv[1])))"
     )
     actual = json.loads(command(["/usr/local/lib/hermes-agent/venv/bin/python", "-c", code, catalog["id"]]))
-    if actual != sorted(catalog["models"]):
+    if sorted(actual) != sorted(catalog["models"]) or any(
+            any(actual[model].get(key) != value for key, value in render_model(
+                "hermes", model, catalog["metadata"].get(model, {})).items())
+            for model in catalog["models"]):
         raise RefreshError("Hermes native model catalog differs from the live provider")
 
 
 def refresh(environ, status_path):
     catalog = discover(environ)
     plans, clients = plan_configs(environ, catalog)
-    digest = hashlib.sha256(json.dumps([catalog["id"], catalog["base_url"], catalog["models"]],
+    digest = hashlib.sha256(json.dumps([catalog["id"], catalog["base_url"], catalog["models"], catalog["metadata"]],
                                      sort_keys=True).encode()).hexdigest()
     previous = json.loads(status_path.read_text()) if status_path.is_file() else {}
     pending = set(previous.get("pending_services", []))

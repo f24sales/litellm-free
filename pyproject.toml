@@ -9,4 +9,4 @@ description = "Validation and route definitions for F24 SALES LiteLLM imports"
 requires-python = ">=3.11"
 
 [tool.setuptools]
-py-modules = ["litellm_export", "config_files", "model_diff", "hook_client", "python_header"]
+py-modules = ["litellm_export", "config_files", "model_diff", "hook_client", "python_header", "llm_model_metadata"]

@@ -5,6 +5,8 @@
 !sql_import.py
 !litellm_export.py
 !config_files.py
+!model_diff.py
+!hook_client.py
 !python_header.py
 !config.conf_example
 !env.example
