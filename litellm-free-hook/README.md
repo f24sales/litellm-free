@@ -33,7 +33,13 @@ Telegram status text is fixed:
 - `🟢 LiteLLM-Free: Scan valid. Model changes ...`
 - `🔴 LiteLLM-Free: Scan not valid.`
 - `🟢 LiteLLM-Free: Update valid, models reloaded.`
-- `🔴 LiteLLM-Free: Update not valid.`
+- `🔴 LiteLLM-Free: Import failed; models not reloaded.`
+- `🔴 LiteLLM-Free: Import valid; post-import check failed.`
+- `🔴 LiteLLM-Free: Import valid; client model reload failed.`
+
+Client refresh is retried up to three times within the configured total timeout.
+Transient reload failures are logged, not announced as invalid imports. Only
+the final result is sent; receipts retain the last twelve refresh attempts.
 
 Run IDs and delivery receipts remain internal. Notifications contain no test
 prefixes, route counts or diagnostic text.
@@ -44,8 +50,8 @@ JSON attachments). These directories and the live configuration are excluded
 from Git. A repeated successful event does not rerun a recorded refresh;
 failed refreshes and failed delivery can be retried. A crash between an external side effect and its
 receipt can still repeat that step, so the refresh script must stay idempotent.
-Refresh failure is a processed event with red Telegram feedback, while delivery
-failure returns HTTP 503. Neither event depends on receiving the other first.
+Refresh or delivery failure returns HTTP 503 so the sender can retry. Neither
+event depends on receiving the other first.
 
 The general Telegram helper owns route-to-chat mapping. This plugin owns event
 interpretation, the green/red status circles and model-refresh decisions.

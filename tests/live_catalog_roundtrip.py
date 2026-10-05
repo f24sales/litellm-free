@@ -65,6 +65,11 @@ def main():
         result = subprocess.run([*podman, "exec", "-i", args.container, *arguments],
                                 input=input, capture_output=True, text=True, cwd="/tmp", timeout=timeout)
         if result.returncode:
+            if arguments[:2] == ["bash", "/opt/safrano9999/litellm-free/ops/refresh-models.sh"]:
+                report = json.loads(result.stdout)
+                print(json.dumps({"phase": "refresh", "status": report.get("status"),
+                                  "error": report.get("error"),
+                                  "pending": report.get("pending_services")}), flush=True)
             raise RuntimeError("Container check failed: " + arguments[0])
         return json.loads(result.stdout)
 
@@ -147,5 +152,6 @@ if __name__ == "__main__":
         main()
     except Exception as exc:
         # HTTP errors may contain a key hash in their request URL.
-        print(json.dumps({"status": "error", "error_type": type(exc).__name__}))
+        print(json.dumps({"status": "error", "error_type": type(exc).__name__,
+                          **({"detail": str(exc)} if type(exc) is RuntimeError else {})}))
         raise SystemExit(1)

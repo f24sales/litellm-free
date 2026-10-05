@@ -167,16 +167,40 @@ def running(service):
                           capture_output=True, timeout=10).returncode == 0
 
 
-def verify_opencode(environ, catalog):
+def opencode_request(environ, path, method="GET", data=None):
     port = int(environ.get("OPENCODE_API_PORT") or 4096)
     if not 1 <= port <= 65535:
         raise RefreshError("Invalid OpenCode port")
-    headers = {"Accept": "application/json"}
+    headers = {"Accept": "application/json", "Content-Type": "application/json"}
     password = environ.get("OPENCODE_SERVER_PASSWORD", "")
     if password:
         username = environ.get("OPENCODE_SERVER_USERNAME") or "opencode"
         headers["Authorization"] = "Basic " + base64.b64encode(f"{username}:{password}".encode()).decode()
-    request = Request(f"http://127.0.0.1:{port}/provider", headers=headers)
+    return Request(f"http://127.0.0.1:{port}{path}", headers=headers, method=method, data=data)
+
+
+def reload_opencode(environ):
+    # Reload instances/config without rebinding the HTTP socket. Restarting a
+    # wildcard listener can collide with same-port Tailscale Serve listeners.
+    try:
+        # Global config is cached separately from instances. An empty patch
+        # reads our updated file and invalidates that cache without changing
+        # any configuration values (only native JSON formatting may change).
+        with build_opener(NoRedirect()).open(
+                opencode_request(environ, "/global/config", "PATCH", b"{}"), timeout=30) as response:
+            response.read(8 * 1024 * 1024 + 1)
+        with build_opener(NoRedirect()).open(
+                opencode_request(environ, "/global/dispose", "POST"), timeout=30) as response:
+            if json.load(response) is not True:
+                raise RefreshError("OpenCode reload was not acknowledged")
+    except RefreshError:
+        raise
+    except Exception as exc:
+        raise RefreshError("OpenCode API reload failed") from exc
+
+
+def verify_opencode(environ, catalog):
+    request = opencode_request(environ, "/provider")
     opener = build_opener(NoRedirect()).open
     for attempt in range(15):
         try:
@@ -236,7 +260,11 @@ def refresh(environ, status_path):
             attempted.add(kind)
             report["reload_attempted"] = sorted(attempted)
             atomic_write(status_path, (json.dumps(report) + "\n").encode())
-            command(["systemctl", "restart", service])
+            if kind == "opencode":
+                reload_opencode(environ)
+            # Hermes' /model picker reads its mtime-cached config on each
+            # invocation. Restarting its gateway would also stop the dashboard
+            # through Requires=, needlessly rebinding that Serve-shared port.
         if not running(service):
             raise RefreshError(f"{kind}: restart did not activate the service")
         if kind == "opencode":

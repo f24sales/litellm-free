@@ -164,6 +164,7 @@ def config_template():
     """Portable nonsecret defaults; the generated config example uses these bytes."""
     return "\n".join([
         "# Non-secret settings. Copy to config.conf; .env holds credentials.",
+        "#default-preset: " + CATALOG_URL,
         "IMPORT_SOURCE_URL=" + CATALOG_URL,
         "IMPORT_SOURCE_UDS=", "IMPORT_SOURCE_CA_FILE=", "IMPORT_DELAY_SECONDS=10",
         "# Retain older configuration files in ./archiv only when explicitly enabled.",
@@ -180,4 +181,6 @@ def config_template():
         "# Optional local prerequisite after import/readback, before the success webhook.",
         '# JSON argv, without a shell: ["/absolute/path/script", "--argument"]',
         "IMPORT_PRE_SUCCESS_COMMAND_JSON=", "IMPORT_PRE_SUCCESS_TIMEOUT_SECONDS=180", "",
+        "# Existing OPENAI_V1_* provider used by the twice-daily client refresh.",
+        "#default-preset: litellm-free", "LITELLM_FREE_PROVIDER=litellm-free", "",
     ])

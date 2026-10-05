@@ -145,7 +145,10 @@ function message(event, refresh) {
       : "🟢 LiteLLM-Free: Scan valid. No model changes.";
   }
   if (event.event === "scan_failed") return "🔴 LiteLLM-Free: Scan not valid.";
-  if (event.event === "import_failed" || !refresh?.ok) return "🔴 LiteLLM-Free: Update not valid.";
+  if (event.event === "import_failed") return event.import_ok === true
+    ? "🔴 LiteLLM-Free: Import valid; post-import check failed."
+    : "🔴 LiteLLM-Free: Import failed; models not reloaded.";
+  if (!refresh?.ok) return "🔴 LiteLLM-Free: Import valid; client model reload failed.";
   const lines = ["🟢 LiteLLM-Free: Update valid, models reloaded."];
   for (const [key, marker] of [["added", "➕"], ["removed", "➖"]]) {
     const rows = event.diff[key];
@@ -191,8 +194,20 @@ async function processEvent(api, event) {
   // A successful second hook confirms that clients have actually reloaded,
   // including when another importer already applied the announced changes.
   if (event.event === "import_succeeded" && (!receipt.refresh || !receipt.refresh.ok)) {
-    receipt.refresh = await run(config.refreshScript, [], config.refreshTimeoutSeconds);
-    save(receiptPath, receipt);
+    // Reload readiness/config-watch races are retriable, not invalid imports.
+    // Keep all attempts and notify only after bounded retries have completed.
+    const deadline = Date.now() + config.refreshTimeoutSeconds * 1000;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const remaining = Math.floor((deadline - Date.now()) / 1000);
+      if (remaining < 1) break;
+      receipt.refresh = await run(config.refreshScript, [], remaining);
+      receipt.refreshHistory = [...(receipt.refreshHistory ?? []),
+        { ...receipt.refresh, at: new Date().toISOString() }].slice(-12);
+      save(receiptPath, receipt);
+      if (receipt.refresh.ok) break;
+      api.logger.warn?.(`[litellm-free-hook] model reload attempt ${attempt + 1} failed, exit=${receipt.refresh.exitCode ?? "unknown"}`);
+      if (attempt < 2) await new Promise(resolve => setTimeout(resolve, (attempt + 1) * 1000));
+    }
   }
   const args = [config.notifyScript, "--route", config.notifyRoute, "--text", message(event, receipt.refresh),
     "--timeout", String(config.notifyTimeoutSeconds)];

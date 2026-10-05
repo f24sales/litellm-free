@@ -78,6 +78,10 @@ python3 -m pytest -q tests
 The [OpenClaw plugin](litellm-free-hook/) receives LiteLLM-Free update webhooks.
 It refreshes the model catalogs in OpenCode, Hermes, and OpenClaw.
 It sends update notifications and model changes to Telegram.
+Transient client reload failures are retried up to three times within the
+configured timeout before reporting a result. A valid import with a failed
+reload is reported as such, not as an invalid update. Receipts retain the last
+twelve reload attempts for diagnosis; successful event IDs are deduplicated.
 
 ## Runtime model refresh
 
@@ -86,6 +90,10 @@ Hermes and OpenCode, including removals, without regenerating unrelated Voice,
 MCP or agent settings. Reload failures retain retry state; OpenCode is checked
 through its authenticated API and Hermes through its native model catalog.
 The gateway watches its config and is not restarted from inside its own hook.
+OpenCode reloads through its authenticated `/global/dispose` API, keeping the
+listening socket and same-port Tailscale Serve route intact.
+Hermes' model picker reads the updated configuration on each invocation; its
+gateway and dashboard are not restarted merely to update model lists.
 
 The image runtime schedules `litellm-free-refresh.service` twice daily through
 cron. It downloads `IMPORT_SOURCE_URL` (default

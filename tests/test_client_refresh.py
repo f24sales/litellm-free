@@ -44,6 +44,9 @@ class RefreshTests(unittest.TestCase):
         native = patch.object(refresh, "verify_hermes")
         self.hermes_verifier = native.start()
         self.addCleanup(native.stop)
+        api_reload = patch.object(refresh, "reload_opencode")
+        self.opencode_reload = api_reload.start()
+        self.addCleanup(api_reload.stop)
 
     def test_add_remove_idempotence_and_unrelated_settings(self):
         for kind, original in configs().items():
@@ -115,7 +118,8 @@ class RefreshTests(unittest.TestCase):
                  patch.object(refresh, "command") as command:
                 result = refresh.refresh(env, status)
                 self.assertEqual(result["status"], "ok")
-                self.assertEqual(command.call_count, 2)
+                command.assert_not_called()
+                self.opencode_reload.assert_called_once_with(env)
                 verify.assert_called_once()
                 for path in refresh.paths(env).values():
                     self.assertEqual(path.stat().st_mode & 0o777, 0o600)
@@ -132,7 +136,7 @@ class RefreshTests(unittest.TestCase):
             with patch.object(refresh, "discover", return_value=CATALOG), \
                  patch.object(refresh, "running", return_value=True), \
                  patch.object(refresh, "verify_opencode"), \
-                 patch.object(refresh, "command", side_effect=refresh.RefreshError("failed")):
+                 patch.object(refresh, "reload_opencode", side_effect=refresh.RefreshError("failed")):
                 with self.assertRaises(refresh.RefreshError):
                     refresh.refresh(env, status)
             self.assertEqual(set(json.loads(status.read_text())["pending_services"]), {"hermes", "opencode"})
@@ -142,7 +146,7 @@ class RefreshTests(unittest.TestCase):
                  patch.object(refresh, "command") as command:
                 result = refresh.refresh(env, status)
                 self.assertEqual(result["status"], "ok")
-                self.assertEqual(command.call_count, 2)
+                command.assert_not_called()
 
     def test_api_mismatch_cannot_report_success(self):
         with tempfile.TemporaryDirectory() as raw:
