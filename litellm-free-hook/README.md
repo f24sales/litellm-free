@@ -16,6 +16,11 @@ Other Gateway routes retain their existing authentication and proxy checks.
 Scan results send one fixed status line. Every successful import event runs the
 fixed refresh script before confirming that models have reloaded, including an
 already-current import. Unchanged scans still do not schedule an import.
+The refresh changes model lists only, preserving runtime Voice/MCP settings.
+It verifies OpenCode's running API and Hermes' native provider catalog, and
+retries previously failed reloads even when the downloaded catalog is unchanged.
+When no local `config.json` exists, the receiver uses `config.json_example`;
+an explicit plugin `configPath` still selects the instance configuration.
 Successful updates list added and removed models as one CSV-style line per model:
 `➕ Kilo, Liquid, lfm-2.5-2.6b:free` or
 `➖ OpenRouter, Poolside, laguna-s-2.1:free-think`. They can also attach the

@@ -1,4 +1,5 @@
 # Non-secret settings. Copy to config.conf; .env holds credentials.
+#default-preset: https://www.f24-sales.com/litellm-config.yaml
 IMPORT_SOURCE_URL=https://www.f24-sales.com/litellm-config.yaml
 IMPORT_SOURCE_UDS=
 IMPORT_SOURCE_CA_FILE=
@@ -20,3 +21,7 @@ IMPORT_PRUNE=false
 # JSON argv, without a shell: ["/absolute/path/script", "--argument"]
 IMPORT_PRE_SUCCESS_COMMAND_JSON=
 IMPORT_PRE_SUCCESS_TIMEOUT_SECONDS=180
+
+# Existing OPENAI_V1_* provider used by the twice-daily client refresh.
+#default-preset: litellm-free
+LITELLM_FREE_PROVIDER=litellm-free

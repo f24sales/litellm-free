@@ -1,0 +1,14 @@
+[Unit]
+Description=Pull published LiteLLM-Free catalog and refresh all AI clients
+After=network-online.target openclaw.service hermes.service opencode.service
+Requisite=openclaw.service hermes.service opencode.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/safrano9999/litellm-free
+Environment=HOME=/root
+StateDirectory=litellm-free
+StateDirectoryMode=0700
+UMask=0077
+ExecStart=/usr/bin/python3 /opt/safrano9999/litellm-free/ops/pull_and_refresh.py
+TimeoutStartSec=10min

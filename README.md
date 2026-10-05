@@ -78,3 +78,16 @@ python3 -m pytest -q tests
 The [OpenClaw plugin](litellm-free-hook/) receives LiteLLM-Free update webhooks.
 It refreshes the model catalogs in OpenCode, Hermes, and OpenClaw.
 It sends update notifications and model changes to Telegram.
+
+## Runtime model refresh
+
+`ops/refresh-models.sh` reconciles the live provider's model list in OpenClaw,
+Hermes and OpenCode, including removals, without regenerating unrelated Voice,
+MCP or agent settings. Reload failures retain retry state; OpenCode is checked
+through its authenticated API and Hermes through its native model catalog.
+The gateway watches its config and is not restarted from inside its own hook.
+
+The image runtime schedules `litellm-free-refresh.service` twice daily through
+cron. It downloads `IMPORT_SOURCE_URL` (default
+`https://www.f24-sales.com/litellm-config.yaml`) and reconciles the existing
+`LITELLM_FREE_PROVIDER` OPENAI_V1 group. No new provider key is needed.

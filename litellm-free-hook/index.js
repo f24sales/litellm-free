@@ -122,7 +122,8 @@ function run(command, args, timeoutSeconds) {
 }
 
 function configuration(api) {
-  const file = api.pluginConfig?.configPath ?? path.join(root, "config.json");
+  const file = api.pluginConfig?.configPath ?? (fs.existsSync(path.join(root, "config.json"))
+    ? path.join(root, "config.json") : path.join(root, "config.json_example"));
   const config = JSON.parse(fs.readFileSync(file, "utf8"));
   for (const key of ["notifyRoute", "notifyScript", "refreshScript"]) {
     if (typeof config[key] !== "string" || !config[key]) throw new Error("missing_" + key);
