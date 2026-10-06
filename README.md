@@ -54,7 +54,7 @@ Write into a running LiteLLM:
 ## What it won't do
 
 - Won't touch models owned by anyone other than this importer.
-- Won't delete anything unless you pass `--prune`.
+- Won't delete anything unless you pass `--prune` or set `IMPORT_PRUNE=1`.
 - Won't invent a context window. If the gateway doesn't report a limit, the field stays empty.
 - Won't add input and output limits together — they're kept separate, the way the clients expect them.
 - Won't change your configured defaults or fallbacks. If one of them disappears upstream, the status report tells you.
