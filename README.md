@@ -1,112 +1,102 @@
 # litellm-free
 
-Download the curated model catalog from **[www.f24-sales.com](https://www.f24-sales.com/)** and import it into your own LiteLLM installation. Model information is preserved when importing through files, the API or SQL.
+Free LLM routes come and go. I run a couple of LiteLLM proxies and got tired of hand-editing configs every time Groq, OpenRouter or Kilo changed their free tier. So I built a scanner that checks which free routes actually answer, publishes the result on **[f24-sales.com](https://www.f24-sales.com/)**, and this repo pulls that list into your own LiteLLM. Maybe it saves you the same chore.
 
-OpenAI-compatible `/v1/models` services can be integrated. As of September 2026, Groq, Kilo, Nous Portal, NVIDIA, OpenCode Zen and OpenRouter are preconfigured. The importer validates routes against explicit endpoint and credential presets.
+Currently covered: Groq, Kilo, Nous Portal, NVIDIA, OpenCode Zen and OpenRouter. Any OpenAI-compatible `/v1/models` endpoint can be added.
 
 **[LiteLLM YAML](https://www.f24-sales.com/litellm-config.yaml)** · **[.env template](env.example)** · **[Import guide](IMPORT.md)**
 
-## Setup
+## Quickstart
 
-```sh
-git clone https://github.com/f24sales/litellm-free.git "$HOME/litellm-free"
-cd "$HOME/litellm-free"
-python3 -m pip install --target "$HOME/.local/share/litellm-free/python" -r requirements-import.txt
-export PYTHONPATH="$HOME/.local/share/litellm-free/python${PYTHONPATH:+:$PYTHONPATH}"
-cp env.example .env
-cp config.conf_example config.conf
-chmod 600 .env config.conf
-# Enter your gateway keys and LiteLLM address/bearer token.
+```bash
+git clone https://github.com/f24sales/litellm-free.git ~/litellm-free
+cd ~/litellm-free
+python3 -m pip install --target ~/.local/share/litellm-free/python -r requirements-import.txt
+export PYTHONPATH=~/.local/share/litellm-free/python${PYTHONPATH:+:$PYTHONPATH}
+cp env.example .env && cp config.conf_example config.conf && chmod 600 .env config.conf
 ```
 
-Store your keys in `.env`; `config.conf` contains the source, target address and configurable delay before online downloads (`IMPORT_DELAY_SECONDS=10`). The shared `python_header.py` loads these files; injected process environment variables take precedence. Both files stay local. The LiteLLM bearer token needs model-management permissions; an ordinary chat key is insufficient.
+Put your gateway keys and your LiteLLM URL + bearer token into `.env`. The bearer needs model-management rights; a plain chat key won't do.
 
-## Catalog and configuration
+Then see what would happen:
 
-```sh
-# Native LiteLLM YAML; downloading requires no keys.
+```bash
+python3 import_litellm.py api --env-file .env --dry-run
+```
+
+Happy with the diff? Drop `--dry-run`.
+
+## What you can do with it
+
+Just want the YAML? No keys needed:
+
+```bash
 python3 import_litellm.py pull --output config.yaml --force
-# Select routes using locally available gateway keys:
+```
+
+Only the routes you actually have keys for:
+
+```bash
 python3 import_litellm.py file --format yaml --output config.yaml --force
 ```
 
-The fixed filename is a symlink to the latest `config_DATETIME.yaml`. Set `LITELLM_FREE_ARCHIVE=1` in `config.conf` to retain earlier versions under `archiv/`; the default is `0`. Repeating the operation with identical content does not create another version. Downloads, local configurations and the archive are excluded from Git.
+Write into a running LiteLLM:
 
-| Target | Command with `python3 import_litellm.py` |
+| Goal | Command |
 | --- | --- |
-| HTTPS API → LiteLLM database | `api --env-file .env` |
-| Adopt matching existing free-sync routes | `api --env-file .env --adopt-managed-by free-sync` |
-| Add model information to existing routes only | `api --env-file .env --patch-managed-by free-sync` |
-| Direct SQL inside the existing LiteLLM container | `sql --env-file .env --container litellm-database` |
+| Push via HTTPS API into LiteLLM's database | `python3 import_litellm.py api --env-file .env` |
+| Take over routes an earlier free-sync created | `… api --env-file .env --adopt-managed-by free-sync` |
+| Only update metadata on existing routes | `… api --env-file .env --patch-managed-by free-sync` |
+| Write straight into the Postgres inside the LiteLLM container | `… sql --env-file .env --container litellm-database` |
 
-Before writing to the database, check the same command with `--dry-run`. Metadata mode preserves existing IDs, ownership, routes and keys. Explicit adoption with `--adopt-managed-by` also preserves existing IDs and checks the previous route identity. Without these options, models managed by other owners remain unchanged. `--prune` removes obsolete routes owned by this importer after a successful import; it is disabled by default. Use `--input catalog.json` or `--input config.yaml` to read a local file.
+`config.yaml` is a symlink to the newest `config_DATETIME.yaml`. Set `LITELLM_FREE_ARCHIVE=1` in `config.conf` if you want old versions kept under `archiv/`. Identical content doesn't create a new file.
 
-## Container and systemd
+## What it won't do
 
-```sh
+- Won't touch models owned by anyone other than this importer.
+- Won't delete anything unless you pass `--prune`.
+- Won't invent a context window. If the gateway doesn't report a limit, the field stays empty.
+- Won't add input and output limits together — they're kept separate, the way the clients expect them.
+- Won't change your configured defaults or fallbacks. If one of them disappears upstream, the status report tells you.
+
+## Running it on a schedule
+
+Container (Podman shown, Docker works the same):
+
+```bash
 podman build -f Containerfile -t localhost/litellm-free-import:latest .
 podman run --rm --read-only --cap-drop=ALL --security-opt=no-new-privileges \
   --env-file config.conf --env-file .env localhost/litellm-free-import:latest api --dry-run
 ```
 
-The image contains the importer and its libraries. Your LiteLLM URL must be reachable from the container. Docker can replace Podman.
+systemd user timer, twice a day at 00:10 and 12:10 UTC:
 
-```sh
-install -d -m 700 "$HOME/.config/litellm-free"
-install -m 600 .env config.conf "$HOME/.config/litellm-free/"
-install -d "$HOME/.config/systemd/user"
-cp deploy/litellm-free-import.service deploy/litellm-free-import.timer "$HOME/.config/systemd/user/"
+```bash
+install -d -m 700 ~/.config/litellm-free
+install -m 600 .env config.conf ~/.config/litellm-free/
+install -d ~/.config/systemd/user
+cp deploy/litellm-free-import.service deploy/litellm-free-import.timer ~/.config/systemd/user/
 systemctl --user daemon-reload
-systemctl --user start litellm-free-import.service
-# Optional: twice daily at 00:10 and 12:10 UTC:
 systemctl --user enable --now litellm-free-import.timer
 ```
 
-The unit expects the checkout at `~/litellm-free` and the libraries installed above in the separate Python package directory. No virtual environment is needed. [deploy/container.conf](deploy/container.conf) is the optional drop-in for container operation. See [IMPORT.md](IMPORT.md) for details.
+The unit expects the checkout at `~/litellm-free` and the packages in the directory from the quickstart. No venv needed. Details and the container drop-in are in [IMPORT.md](IMPORT.md).
 
-When `IMPORT_HOOK_URL` and `IMPORT_HOOK_BEARER` are set in the local `.env`,
-the importer posts the final result to that OpenClaw-compatible endpoint with
-`curl`. It sends `import_succeeded` only after LiteLLM readback succeeds and
-`import_failed` when the import or readback fails. The body contains the
-credential-free model diff; the bearer is sent only as an HTTP header.
+## Telling other tools about changes
 
-```sh
-python3 -m pip install --target "$HOME/.local/share/litellm-free/python" pytest
+If `IMPORT_HOOK_URL` and `IMPORT_HOOK_BEARER` are set, the importer posts the result to that endpoint after LiteLLM has confirmed the new state — `import_succeeded` or `import_failed`, with the model diff in the body and no credentials in it.
+
+The [OpenClaw plugin](litellm-free-hook) on the receiving side refreshes the model lists in OpenCode, Hermes and OpenClaw and sends a Telegram note about what changed. `ops/refresh-models.sh` does the same reconciliation by hand. How that reload works internally is documented in [ops/](ops/).
+
+## Tests
+
+```bash
+python3 -m pip install --target ~/.local/share/litellm-free/python pytest
 python3 -m pytest -q tests
 ```
 
-The [OpenClaw plugin](litellm-free-hook/) receives LiteLLM-Free update webhooks.
-It refreshes the model catalogs in OpenCode, Hermes, and OpenClaw.
-It sends update notifications and model changes to Telegram.
-Transient client reload failures are retried up to three times within the
-configured timeout before reporting a result. A valid import with a failed
-reload is reported as such, not as an invalid update. Receipts retain the last
-twelve reload attempts for diagnosis; successful event IDs are deduplicated.
+## Honest caveats
 
-## Runtime model refresh
+The SQL path has only been exercised against my own LiteLLM/Postgres setup. The API path is what I use daily. Free tiers are promotional by nature — expect routes to vanish between scans; that's the whole reason this thing exists.
 
-`ops/refresh-models.sh` reconciles the live provider's model list in OpenClaw,
-Hermes and OpenCode, including removals, without regenerating unrelated Voice,
-MCP or agent settings. Reload failures retain retry state; OpenCode is checked
-through its authenticated API and Hermes through its native model catalog.
-The gateway watches its config and is not restarted from inside its own hook.
-OpenCode reloads through its authenticated `/global/dispose` API, keeping the
-listening socket and same-port Tailscale Serve route intact.
-Hermes' model picker reads the updated configuration on each invocation; its
-gateway and dashboard are not restarted merely to update model lists.
-
-Context and output limits come from the authenticated `/v1/models` response,
-including updates to already-known models. Input and output limits are not
-added together. Unknown limits are left unspecified, not replaced with a
-fictional large context window. OpenClaw receives `contextWindow`/`maxTokens`,
-Hermes `context_length`/`max_completion_tokens`, and OpenCode
-`limit.context`/`limit.output`. Metadata-only changes also trigger a reload.
-The metadata reader is bundled here; the refresh does not require patched
-client bootstrap packages. Configured defaults and fallbacks stay untouched;
-unavailable OpenClaw defaults/fallbacks are reported in the refresh status.
-The separate direct ChatGPT/OpenAI discovery call is not changed by this flow.
-
-The image runtime schedules `litellm-free-refresh.service` twice daily through
-cron. It downloads `IMPORT_SOURCE_URL` (default
-`https://www.f24-sales.com/litellm-config.yaml`) and reconciles the existing
-`LITELLM_FREE_PROVIDER` OPENAI_V1 group. No new provider key is needed.
+Issues and PRs welcome.
