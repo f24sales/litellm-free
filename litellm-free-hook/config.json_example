@@ -4,5 +4,6 @@
   "refreshScript": "/opt/safrano9999/litellm-free/ops/refresh-models.sh",
   "refreshTimeoutSeconds": 360,
   "notifyTimeoutSeconds": 90,
-  "attachDiff": true
+  "attachDiff": true,
+  "attachReport": true
 }

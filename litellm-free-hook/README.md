@@ -27,6 +27,14 @@ Successful updates list added and removed models as one CSV-style line per model
 sanitized diff. Import, prerequisite and refresh failures send only the failure
 line.
 
+Every valid scan also carries a timestamped PDF report. The receiver validates
+the PDF, stores it below `worker/reports/`, and sends it to Telegram as the
+attachment for the first scan notification. The report is grouped by
+aggregator and contains the complete catalog, deterministic exclusions, and
+direct probe results; failed free routes include the provider's redacted error
+body. The sender creates the source PDF in the WebUI repository's `log/`
+directory.
+
 Telegram status text is fixed:
 
 - `🟢 LiteLLM-Free: Scan valid. No model changes.`
@@ -45,8 +53,9 @@ Run IDs and delivery receipts remain internal. Notifications contain no test
 prefixes, route counts or diagnostic text.
 
 Configuration is read for every event. Persistent runtime data is grouped under
-`worker/receipts/` (processing and delivery records) and `worker/diffs/` (sanitized
-JSON attachments). These directories and the live configuration are excluded
+`worker/receipts/` (processing and delivery records), `worker/diffs/` (sanitized
+JSON attachments), and `worker/reports/` (validated PDF attachments). These
+directories and the live configuration are excluded
 from Git. A repeated successful event does not rerun a recorded refresh;
 failed refreshes and failed delivery can be retried. A crash between an external side effect and its
 receipt can still repeat that step, so the refresh script must stay idempotent.

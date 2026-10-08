@@ -8,7 +8,8 @@ const root = path.dirname(fileURLToPath(import.meta.url));
 const worker = path.join(root, "worker");
 const manifest = JSON.parse(fs.readFileSync(path.join(root, "openclaw.plugin.json"), "utf8"));
 const endpoint = "/plugins/litellm-free";
-const MAX_BODY = 2 * 1024 * 1024;
+const MAX_BODY = 10 * 1024 * 1024;
+const REPORT_NAME = /^scan-report-\d{8}T\d{6}Z\.pdf$/;
 let queue = Promise.resolve();
 
 function reply(res, code, body) {
@@ -28,6 +29,13 @@ function save(file, value) {
   fs.mkdirSync(path.dirname(file), { recursive: true, mode: 0o700 });
   const temporary = file + ".tmp";
   fs.writeFileSync(temporary, JSON.stringify(value, null, 2) + "\n", { mode: 0o600 });
+  fs.renameSync(temporary, file);
+}
+
+function saveBinary(file, value) {
+  fs.mkdirSync(path.dirname(file), { recursive: true, mode: 0o700 });
+  const temporary = file + ".tmp";
+  fs.writeFileSync(temporary, value, { mode: 0o600 });
   fs.renameSync(temporary, file);
 }
 
@@ -95,6 +103,22 @@ function validate(event) {
   if (!allowed[event.source]?.includes(event.event)) throw new Error("invalid_source_or_event");
   if (event.event === "scan_valid" && !["ok_changed", "ok_unchanged"].includes(event.scan_state)) {
     throw new Error("invalid_scan_state");
+  }
+  if (event.event === "scan_valid") {
+    if (!object(event.report) || typeof event.report.filename !== "string"
+      || !REPORT_NAME.test(event.report.filename)
+      || event.report.content_type !== "application/pdf"
+      || typeof event.report.sha256 !== "string"
+      || !/^[a-f0-9]{64}$/.test(event.report.sha256)
+      || typeof event.report.content_base64 !== "string") {
+      throw new Error("invalid_scan_report");
+    }
+    const report = Buffer.from(event.report.content_base64, "base64");
+    if (report.length < 5 || report.length > 6 * 1024 * 1024
+      || report.subarray(0, 5).toString() !== "%PDF-"
+      || createHash("sha256").update(report).digest("hex") !== event.report.sha256) {
+      throw new Error("invalid_scan_report");
+    }
   }
   if (event.event === "import_succeeded") {
     if (!object(event.diff) || !["added", "removed", "updated"].every(k => Array.isArray(event.diff[k]))) {
@@ -211,7 +235,11 @@ async function processEvent(api, event) {
   }
   const args = [config.notifyScript, "--route", config.notifyRoute, "--text", message(event, receipt.refresh),
     "--timeout", String(config.notifyTimeoutSeconds)];
-  if (event.event === "import_succeeded" && receipt.refresh?.ok && event.diff.changed && config.attachDiff !== false) {
+  if (event.event === "scan_valid" && config.attachReport !== false) {
+    const attachment = path.join(worker, "reports", id, event.report.filename);
+    saveBinary(attachment, Buffer.from(event.report.content_base64, "base64"));
+    args.push("--attachment", attachment);
+  } else if (event.event === "import_succeeded" && receipt.refresh?.ok && event.diff.changed && config.attachDiff !== false) {
     const attachment = path.join(worker, "diffs", id, "litellm-free-diff.json");
     save(attachment, diffAttachment(event.diff));
     args.push("--attachment", attachment);
