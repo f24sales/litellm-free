@@ -30,3 +30,5 @@ config.conf
 archiv/
 /output/
 *.log
+/opencode_usa_sot.py
+/.opencode_usa_models.json

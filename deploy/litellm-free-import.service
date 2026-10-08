@@ -6,7 +6,6 @@ After=network-online.target
 [Service]
 Type=oneshot
 WorkingDirectory=%h/litellm-free
-Environment=PYTHONPATH=%h/.local/share/litellm-free/python
 ExecStart=/usr/bin/python3 %h/litellm-free/import_litellm.py api --config %h/.config/litellm-free/config.conf --env-file %h/.config/litellm-free/.env
 TimeoutStartSec=30min
 UMask=0077

@@ -2,7 +2,7 @@
 
 Free LLM routes come and go. I run a couple of LiteLLM proxies and got tired of hand-editing configs every time Groq, OpenRouter or Kilo changed their free tier. So I built a scanner that checks which free routes actually answer, publishes the result on **[f24-sales.com](https://www.f24-sales.com/)**, and this repo pulls that list into your own LiteLLM. Maybe it saves you the same chore.
 
-Currently covered: Groq, Kilo, Nous Portal, NVIDIA, OpenCode Zen and OpenRouter. Any OpenAI-compatible `/v1/models` endpoint can be added.
+Currently covered: Cline, Groq, Infron, Kilo, Nous Portal, NVIDIA, OpenCode Zen and OpenRouter. Any OpenAI-compatible `/v1/models` endpoint can be added.
 
 **[LiteLLM YAML](https://www.f24-sales.com/litellm-config.yaml)** · **[.env template](env.example)** · **[Import guide](IMPORT.md)**
 

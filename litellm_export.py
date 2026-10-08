@@ -16,6 +16,8 @@ PROVIDERS = {
     "nous": ("https://inference-api.nousresearch.com/v1", "NOUS_API_KEY"),
     "opencode": ("https://opencode.ai/zen/v1", "OPENCODE_API_KEY"),
     "nvidia": ("https://integrate.api.nvidia.com/v1", "NVIDIA_API_KEY"),
+    "cline": ("https://api.cline.bot/api/v1", "CLINE_API_KEY"),
+    "infron": ("https://api.infron.ai/v1", "INFRON_API_KEY"),
 }
 GROQ_EFFORTS = {
     "openai/gpt-oss-20b": ("high", "low"), "openai/gpt-oss-120b": ("high", "low"),
@@ -38,6 +40,15 @@ def route_params(provider, upstream, variant):
         raise ValueError("Unsupported route preset in export")
     if provider == "nous":
         params["extra_body"] = {"tags": ["user=free-sync"]}
+    if provider == "infron" and upstream == "sao10k/l3.1-70b-hanami-x1":
+        # Infron lists this route as text-only without function calling. Open
+        # WebUI may still send optional tool fields; LiteLLM must drop them
+        # explicitly because the generic OpenAI adapter otherwise considers
+        # tool_choice supported and forwards it upstream.
+        params["drop_params"] = True
+        params["additional_drop_params"] = [
+            "tools", "tool_choice", "functions", "function_call", "parallel_tool_calls",
+        ]
     return params
 
 
