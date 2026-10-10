@@ -1,10 +1,12 @@
 """Model-only refresh contract: all clients, removals, retries and preservation."""
 from copy import deepcopy
 import importlib.util
+from importlib.machinery import SourceFileLoader
 from io import BytesIO
 import json
 from pathlib import Path
 import sys
+import subprocess
 import tempfile
 from types import SimpleNamespace
 import unittest
@@ -13,9 +15,18 @@ from urllib.request import Request
 
 import yaml
 
-spec = importlib.util.spec_from_file_location("refresh_models", Path(__file__).resolve().parents[1] / "ops/refresh_models.py")
-refresh = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(refresh)
+OPS = Path(__file__).resolve().parents[1] / "ops"
+sys.path.insert(0, str(OPS))
+import refresh_common as refresh
+import refresh_models as orchestrator
+
+
+def load_client(kind):
+    loader = SourceFileLoader("refresh_client_" + kind, str(OPS / orchestrator.CLIENT_SCRIPTS[kind]))
+    spec = importlib.util.spec_from_loader(loader.name, loader)
+    client = importlib.util.module_from_spec(spec)
+    loader.exec_module(client)
+    return client
 
 CATALOG = {"id": "litellm-free", "base_url": "https://proxy.test:2001/v1",
            "key_env": "OPENAI_V1_KEY_3", "models": ["keep", "new"],
@@ -52,6 +63,17 @@ class RefreshTests(unittest.TestCase):
         api_reload = patch.object(refresh, "reload_opencode")
         self.opencode_reload = api_reload.start()
         self.addCleanup(api_reload.stop)
+        cli = patch.object(refresh, "command", return_value="")
+        self.openclaw_cli = cli.start()
+        self.addCleanup(cli.stop)
+        self.clients = {kind: load_client(kind) for kind in orchestrator.CLIENT_SCRIPTS}
+        children = patch.object(orchestrator, "run_client", side_effect=self.run_client)
+        self.child_runner = children.start()
+        self.addCleanup(children.stop)
+
+    def run_client(self, kind, env, catalog, reload_required):
+        return refresh.run_single(kind, env, catalog, self.clients[kind].update_runtime,
+                                  force_reload=reload_required)
 
     def test_add_remove_idempotence_and_unrelated_settings(self):
         for kind, original in configs().items():
@@ -114,9 +136,9 @@ class RefreshTests(unittest.TestCase):
             with patch.object(refresh, "discover", side_effect=[CATALOG, changed, changed]), \
                  patch.object(refresh, "running", return_value=True), \
                  patch.object(refresh, "verify_opencode"):
-                first = refresh.refresh(env, status)
-                second = refresh.refresh(env, status)
-                third = refresh.refresh(env, status)
+                first = orchestrator.refresh(env, status)
+                second = orchestrator.refresh(env, status)
+                third = orchestrator.refresh(env, status)
             self.assertNotEqual(first["catalog_sha256"], second["catalog_sha256"])
             self.assertEqual(second["catalog_sha256"], third["catalog_sha256"])
             self.assertTrue(all(row["changed"] for row in second["clients"].values()))
@@ -160,7 +182,7 @@ class RefreshTests(unittest.TestCase):
         self.assertEqual(after["provider"]["litellm"], original["provider"]["litellm"])
 
     def setup_files(self, root):
-        env = {"HOME": str(root)}
+        env = {"HOME": str(root), "REFRESH_RUNTIME_DIR": str(root / "runtime")}
         for kind, path in refresh.paths(env).items():
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(yaml.safe_dump(configs()[kind]) if kind == "hermes" else json.dumps(configs()[kind]))
@@ -194,17 +216,19 @@ class RefreshTests(unittest.TestCase):
                  patch.object(refresh, "running", return_value=True), \
                  patch.object(refresh, "verify_opencode") as verify, \
                  patch.object(refresh, "command") as command:
-                result = refresh.refresh(env, status)
+                result = orchestrator.refresh(env, status)
                 self.assertEqual(result["status"], "ok")
-                command.assert_not_called()
+                command.assert_called_once_with(
+                    ["openclaw", "models", "list", "--provider", "litellm-free", "--refresh"], timeout=150)
                 self.opencode_reload.assert_called_once_with(env)
                 verify.assert_called_once()
                 for path in refresh.paths(env).values():
                     self.assertEqual(path.stat().st_mode & 0o777, 0o600)
                 command.reset_mock()
-                result = refresh.refresh(env, status)
+                result = orchestrator.refresh(env, status)
                 self.assertEqual(result["status"], "ok")
-                command.assert_not_called()
+                command.assert_called_once_with(
+                    ["openclaw", "models", "list", "--provider", "litellm-free", "--refresh"], timeout=150)
                 self.assertTrue(all(not c["changed"] for c in result["clients"].values()))
 
     def test_failed_reload_is_retried_with_identical_catalog(self):
@@ -216,15 +240,16 @@ class RefreshTests(unittest.TestCase):
                  patch.object(refresh, "verify_opencode"), \
                  patch.object(refresh, "reload_opencode", side_effect=refresh.RefreshError("failed")):
                 with self.assertRaises(refresh.RefreshError):
-                    refresh.refresh(env, status)
-            self.assertEqual(set(json.loads(status.read_text())["pending_services"]), {"hermes", "opencode"})
+                    orchestrator.refresh(env, status)
+            self.assertEqual(set(json.loads(status.read_text())["pending_services"]), {"opencode"})
             with patch.object(refresh, "discover", return_value=CATALOG), \
                  patch.object(refresh, "running", return_value=True), \
                  patch.object(refresh, "verify_opencode"), \
                  patch.object(refresh, "command") as command:
-                result = refresh.refresh(env, status)
+                result = orchestrator.refresh(env, status)
                 self.assertEqual(result["status"], "ok")
-                command.assert_not_called()
+                command.assert_called_once_with(
+                    ["openclaw", "models", "list", "--provider", "litellm-free", "--refresh"], timeout=150)
 
     def test_api_mismatch_cannot_report_success(self):
         with tempfile.TemporaryDirectory() as raw:
@@ -235,7 +260,7 @@ class RefreshTests(unittest.TestCase):
                  patch.object(refresh, "command"), \
                  patch.object(refresh, "verify_opencode", side_effect=refresh.RefreshError("stale API")):
                 with self.assertRaisesRegex(refresh.RefreshError, "stale API"):
-                    refresh.refresh(env, status)
+                    orchestrator.refresh(env, status)
             self.assertNotEqual(json.loads(status.read_text())["status"], "ok")
 
     def test_failed_discovery_retains_all_configs(self):
@@ -244,9 +269,66 @@ class RefreshTests(unittest.TestCase):
             before = {p: p.read_bytes() for p in refresh.paths(env).values()}
             with patch.object(refresh, "discover", side_effect=refresh.RefreshError("offline")):
                 with self.assertRaises(refresh.RefreshError):
-                    refresh.refresh(env, Path(raw) / "status.json")
+                    orchestrator.refresh(env, Path(raw) / "status.json")
             for path, content in before.items():
                 self.assertEqual(path.read_bytes(), content)
+
+    def test_standalone_scripts_update_only_their_client_without_other_configs(self):
+        for kind, script in self.clients.items():
+            with self.subTest(client=kind), tempfile.TemporaryDirectory() as raw:
+                root = Path(raw)
+                env = {"HOME": raw, "REFRESH_RUNTIME_DIR": str(root / "runtime")}
+                target = refresh.paths(env)[kind]
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text(yaml.safe_dump(configs()[kind]) if kind == "hermes" else json.dumps(configs()[kind]))
+                with patch.object(refresh, "running", side_effect=lambda service: service == kind + ".service"), \
+                     patch.object(refresh, "verify_opencode"):
+                    report = refresh.run_single(kind, env, CATALOG, script.update_runtime)
+                self.assertEqual(report["status"], "ok")
+                for other, path in refresh.paths(env).items():
+                    if other != kind:
+                        self.assertFalse(path.exists())
+                updated = yaml.safe_load(target.read_text())
+                block = (updated["models"]["providers"]["litellm-free"] if kind == "openclaw" else
+                         updated["providers" if kind == "hermes" else "provider"]["litellm-free"])
+                models = {row["id"] for row in block["models"]} if kind == "openclaw" else set(block["models"])
+                self.assertEqual(models, set(CATALOG["models"]))
+
+    def test_failed_openclaw_does_not_prevent_other_client_updates(self):
+        with tempfile.TemporaryDirectory() as raw:
+            env = self.setup_files(Path(raw))
+            status = Path(raw) / "status.json"
+            with patch.object(refresh, "discover", return_value=CATALOG), \
+                 patch.object(refresh, "running", return_value=True), \
+                 patch.object(refresh, "verify_opencode"), \
+                 patch.object(refresh, "command", side_effect=refresh.RefreshError("openclaw refresh failed")):
+                with self.assertRaisesRegex(refresh.RefreshError, "openclaw refresh failed"):
+                    orchestrator.refresh(env, status)
+            report = json.loads(status.read_text())
+            self.assertEqual(report["pending_services"], ["openclaw"])
+            self.assertEqual(report["clients"]["opencode"]["runtime"], "api_verified")
+            self.assertEqual(report["clients"]["hermes"]["runtime"], "native_catalog_verified")
+
+    def test_scripts_are_executable_and_have_standalone_help(self):
+        for name in orchestrator.CLIENT_SCRIPTS.values():
+            path = OPS / name
+            self.assertTrue(path.stat().st_mode & 0o111)
+            result = subprocess.run([str(path), "--help"], capture_output=True, text=True, timeout=10)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("--catalog-stdin", result.stdout)
+
+
+class ScriptLaunchTests(unittest.TestCase):
+    def test_orchestrator_starts_the_three_sibling_scripts_with_the_same_snapshot(self):
+        for kind, name in orchestrator.CLIENT_SCRIPTS.items():
+            with self.subTest(client=kind), patch.object(orchestrator.subprocess, "run") as run:
+                run.return_value = SimpleNamespace(returncode=0, stdout=json.dumps(
+                    {"status": "ok", "client": kind, "runtime": "updated"}))
+                orchestrator.run_client(kind, {"TASK_SETTING": "retained"}, CATALOG, True)
+                argv = run.call_args.args[0]
+                self.assertEqual(argv, [sys.executable, str(OPS / name), "--catalog-stdin", "--reload"])
+                self.assertEqual(json.loads(run.call_args.kwargs["input"]), CATALOG)
+                self.assertEqual(run.call_args.kwargs["env"]["TASK_SETTING"], "retained")
 
 
 if __name__ == "__main__":

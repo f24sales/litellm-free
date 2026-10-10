@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+"""Refresh only Hermes Agent's litellm-free catalog."""
+import refresh_common as common
+
+
+def update_runtime(environ, catalog, needs_reload):
+    # The updated config is reread by Hermes' next /model invocation.
+    # Do not restart its gateway/dashboard or alter defaults, Voice or MCP.
+    common.verify_hermes(catalog)
+    return "native_catalog_verified"
+
+
+if __name__ == "__main__":
+    raise SystemExit(common.client_main("hermes", update_runtime))

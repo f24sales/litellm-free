@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+"""Refresh only OpenCode's litellm-free catalog and running API instances."""
+import refresh_common as common
+
+
+def update_runtime(environ, catalog, needs_reload):
+    if needs_reload:
+        common.reload_opencode(environ)
+    common.verify_opencode(environ, catalog)
+    return "api_verified"
+
+
+if __name__ == "__main__":
+    raise SystemExit(common.client_main("opencode", update_runtime))

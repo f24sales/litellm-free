@@ -2,7 +2,7 @@ import copy
 import unittest
 
 from llm_model_metadata import merge_catalog, normalize, parse_catalog, render_model
-from ops.refresh_models import RefreshError, update_catalog
+from ops.refresh_common import RefreshError, update_catalog
 
 
 class MetadataTests(unittest.TestCase):

@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+"""Refresh only OpenClaw's litellm-free catalog."""
+import refresh_common as common
+
+
+def update_runtime(environ, catalog, needs_reload):
+    # openclaw models list --provider litellm-free --refresh
+    common.command(["openclaw", "models", "list", "--provider", "litellm-free", "--refresh"], timeout=150)
+    return "cli_refresh"
+
+
+if __name__ == "__main__":
+    raise SystemExit(common.client_main("openclaw", update_runtime))

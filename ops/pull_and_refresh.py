@@ -11,7 +11,8 @@ from urllib.request import Request, build_opener
 from dotenv import dotenv_values
 import yaml
 
-from refresh_models import NoRedirect, RefreshError, atomic_write, main as refresh_main
+from refresh_common import NoRedirect, RefreshError, atomic_write
+from refresh_models import main as refresh_main
 
 
 def pull(environ, destination, *, opener=None):
