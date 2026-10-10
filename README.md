@@ -53,7 +53,7 @@ Write into a running LiteLLM:
 
 ## What it won't do
 
-- Won't touch models owned by anyone other than this importer.
+- Won't touch models owned by another manager unless you explicitly select that legacy manager with `--adopt-managed-by`.
 - Won't delete anything unless you pass `--prune` or set `IMPORT_PRUNE=1`.
 - Won't invent a context window. If the gateway doesn't report a limit, the field stays empty.
 - Won't add input and output limits together — they're kept separate, the way the clients expect them.
@@ -85,6 +85,8 @@ The unit expects the checkout at `~/litellm-free` and the packages in the direct
 ## Telling other tools about changes
 
 If `IMPORT_HOOK_URL` and `IMPORT_HOOK_BEARER` are set, the importer posts the result to that endpoint after LiteLLM has confirmed the new state — `import_succeeded` or `import_failed`, with the model diff in the body and no credentials in it.
+
+The published YAML is the import source of truth on every run. With `IMPORT_PRUNE=true` and `IMPORT_ADOPT_MANAGED_BY=free-sync`, obsolete legacy routes in the `litellm-free` group are reconciled too, even when the incoming YAML is unchanged. The pre-success access-sync command receives the exact imported model names in `IMPORT_MODEL_NAMES_JSON`, so it cannot reintroduce software-only routes from the raw scan before the final catalog-refresh hook.
 
 The [OpenClaw plugin](litellm-free-hook) on the receiving side refreshes the model lists in OpenCode, Hermes and OpenClaw and sends a Telegram note about what changed. `ops/refresh-models.sh` does the same reconciliation by hand. How that reload works internally is documented in [ops/](ops/).
 

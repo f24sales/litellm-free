@@ -204,6 +204,15 @@ def routing_model(model):
     return result
 
 
+def deployment_matches(row, model, fingerprint):
+    """A cached import hash alone cannot detect drift in the live deployment."""
+    info, params = row.get("model_info") or {}, row.get("litellm_params") or {}
+    return (info.get("f24_import_hash") == fingerprint
+            and all(info.get(key) == value for key, value in model["model_info"].items() if key != "id")
+            and all(params.get(key) == value for key, value in model["litellm_params"].items()
+                    if key != "api_key"))  # LiteLLM may redact the persisted key.
+
+
 def owned_routing_rows(rows):
     """Return only successful routes owned by this importer for diffs."""
     result = []
@@ -229,7 +238,7 @@ def verify_readback(client, changed):
             raise ValueError("LiteLLM did not preserve imported model information; readback failed")
 
 
-def prune_owned(client, rows, models, env, dry_run):
+def prune_owned(client, rows, models, env, dry_run, adopt_managed_by=None):
     active_names = {model["model_name"] for model in models}
     providers = {provider for provider, (_, key) in PROVIDERS.items() if env.get(key, "").strip()}
     providers.update(model["model_info"]["f24_provider"] for model in models
@@ -238,9 +247,16 @@ def prune_owned(client, rows, models, env, dry_run):
     deleted = []
     for row in rows:
         info = row.get("model_info") or {}
-        provider, upstream, variant = info.get("f24_provider"), info.get("f24_upstream_id"), info.get("f24_variant")
-        if (info.get("managed_by") != OWNER or info.get("source") != CONFIG_URL
-                or info.get("access_groups") != ["litellm-free"] or provider not in providers
+        if info.get("managed_by") == OWNER and info.get("source") == CONFIG_URL:
+            provider, upstream, variant = info.get("f24_provider"), info.get("f24_upstream_id"), info.get("f24_variant")
+        elif adopt_managed_by and adopt_managed_by != OWNER and info.get("managed_by") == adopt_managed_by:
+            # Adoption must also reconcile obsolete routes from the explicitly
+            # selected legacy manager, not just names present in today's YAML.
+            provider, upstream, variant = (info.get("free_sync_provider"),
+                                           info.get("free_sync_model_id"), info.get("free_sync_variant"))
+        else:
+            continue
+        if (info.get("access_groups") != ["litellm-free"] or provider not in providers
                 or row.get("model_name") in active_names or not isinstance(upstream, str) or not upstream
                 or any(ord(c) < 32 for c in upstream) or variant not in {"base", "think", "fast"}):
             continue
@@ -327,6 +343,8 @@ def import_api(models, env, dry_run=False, patch_managed_by=None, adopt_managed_
                         raise ValueError("Existing model identity differs from the requested adoption")
                     adopted = True
                 else:
+                    if prune:
+                        raise ValueError("Published route belongs to another manager; exact reconciliation refused")
                     counts["skipped_existing"] += 1
                     continue
                 ident = info.get("id")
@@ -337,7 +355,7 @@ def import_api(models, env, dry_run=False, patch_managed_by=None, adopt_managed_
             elif occupied:
                 raise ValueError("Published model ID belongs to a different route name")
             digest = source_hash(model)
-            if old and not adopted and old["model_info"].get("f24_import_hash") == digest:
+            if old and not adopted and deployment_matches(old, model, digest):
                 counts["unchanged"] += 1
                 continue
             body = deepcopy(model)
@@ -355,7 +373,7 @@ def import_api(models, env, dry_run=False, patch_managed_by=None, adopt_managed_
         if changed:
             verify_readback(client, changed)
         if prune:
-            counts["pruned"] = prune_owned(client, rows, models, env, dry_run)
+            counts["pruned"] = prune_owned(client, rows, models, env, dry_run, adopt_managed_by)
         if capture_diff:
             counts["diff"] = model_diff(before_owned, owned_routing_rows(read_api_models(client)))
     return counts
@@ -409,9 +427,13 @@ def run_pre_success_command(status, env):
     except (TypeError, ValueError):
         return {"ok": False, "error": "Invalid pre-success command configuration"}
     try:
+        settings = {**os.environ, **env}
+        if "model_names" in status:
+            # Pass the exact imported snapshot, never a subsequently changed scan.
+            settings["IMPORT_MODEL_NAMES_JSON"] = json.dumps(status["model_names"])
         result = subprocess.run(command, input=json.dumps(status), text=True,
                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                                timeout=timeout, check=False, env={**os.environ, **env})
+                                timeout=timeout, check=False, env=settings)
     except subprocess.TimeoutExpired:
         return {"ok": False, "error": "Pre-success command timed out"}
     except OSError:
@@ -477,7 +499,7 @@ def main(argv=None):
             owner_options = p.add_mutually_exclusive_group()
             owner_options.add_argument("--patch-managed-by", help="Only add descriptive f24_* metadata to existing routes owned by this exact manager")
             owner_options.add_argument("--adopt-managed-by", help="Adopt exact-name, matching free-sync routes from this manager, preserving existing IDs")
-            p.add_argument("--prune", action="store_true", help="Remove obsolete f24-sales-import routes for locally configured providers after successful import")
+            p.add_argument("--prune", action="store_true", help="Remove obsolete imported routes and explicitly adopted legacy routes after successful import")
         if mode == "sql":
             p.add_argument("--container", help="Existing LiteLLM container, e.g. litellm-database")
             p.add_argument("--engine", choices=["podman", "docker"], default="podman")
@@ -530,6 +552,7 @@ def main(argv=None):
                 import_options["capture_diff"] = True
             status = import_api(models, env, args.dry_run, **import_options)
             status["fingerprint"] = model_config_fingerprint(document)
+            status["model_names"] = sorted(model["model_name"] for model in models)
         else:
             status = import_sql(models, env, args.container, args.engine, args.dry_run)
         if args.mode in {"api", "sql"} and not args.dry_run:

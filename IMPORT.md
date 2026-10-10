@@ -63,9 +63,11 @@ python3 import_litellm.py api --env-file .env --adopt-managed-by free-sync --dry
 python3 import_litellm.py api --env-file .env --adopt-managed-by free-sync
 ```
 
-Alternatively, set `IMPORT_ADOPT_MANAGED_BY=free-sync`. The exact name, previous owner, provider, upstream ID and variant must match. Existing IDs and metadata are preserved; the new owner is `f24-sales-import`. New routes receive a stable import ID. Later updates use the name and verified identity to find adopted routes with their original IDs. A stored `f24_import_hash` detects identical incoming parameters/model information and avoids repeated writes. The two owner modes are mutually exclusive.
+Alternatively, set `IMPORT_ADOPT_MANAGED_BY=free-sync`. The exact name, previous owner, provider, upstream ID and variant must match. Existing IDs and metadata are preserved; the new owner is `f24-sales-import`. New routes receive a stable import ID. Later updates use the name and verified identity to find adopted routes with their original IDs. A stored `f24_import_hash` and the live routing/identity fields detect identical deployments and avoid repeated writes; a matching hash does not hide live routing drift. The two owner modes are mutually exclusive.
 
-Optionally, `--prune` or `IMPORT_PRUNE=true` removes obsolete routes owned by this importer. Checks cover the owner, fixed source, access group, route identity and local provider configuration. Obsolete owned routes are deleted only after successful writes and readback. Routes managed by other owners remain unchanged. An empty model selection aborts the operation. The generic default is `IMPORT_PRUNE=false`.
+Optionally, `--prune` or `IMPORT_PRUNE=true` removes obsolete routes owned by this importer. Combined with `IMPORT_ADOPT_MANAGED_BY=free-sync`, it also removes obsolete routes from that explicitly selected legacy manager. Checks cover the owner, fixed source for imported routes, exact `litellm-free` access group, route identity and local provider configuration. Deletion happens only after successful writes and readback, and removed IDs are checked again. Other owners, other groups and providers without local keys remain unchanged. Foreign deployments conflicting with a requested YAML name abort exact reconciliation. An empty model selection aborts the operation. The generic default is `IMPORT_PRUNE=false`.
+
+Every online invocation fetches the current published YAML. An unchanged source does not skip legacy cleanup or the configured pre-success command. The raw scan is never the import catalog.
 
 Remote targets require HTTPS. Set `LITELLM_ALLOW_HTTP=true` for an explicitly configured internal container endpoint such as `http://litellm-database:4000`. Downloaded data does not control this setting.
 
@@ -141,8 +143,11 @@ IMPORT_PRE_SUCCESS_TIMEOUT_SECONDS=180
 ```
 
 The command runs directly without a shell and receives the import status JSON on
-stdin. Use it, for example, to update model access before a receiver refreshes
-client catalogs. A nonzero exit or timeout sets `post_import.ok=false` and emits
+stdin. API-import status includes `model_names`; the same exact imported snapshot
+is supplied as `IMPORT_MODEL_NAMES_JSON` in the command environment. Use this
+snapshot to update existing virtual-key model permissions before a receiver
+refreshes client catalogs, rather than expanding them from green raw-scan results.
+A nonzero exit or timeout sets `post_import.ok=false` and emits
 `import_failed` with `phase="post_import"` and `import_ok=true`; it does not undo
 the confirmed LiteLLM import. No success event is sent in that case. The command
 is never run during dry runs or file exports. Its output is not forwarded.

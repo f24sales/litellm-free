@@ -35,6 +35,8 @@ def test_confirmed_import_runs_prerequisite_before_notification(config, tmp_path
         order.append("prerequisite")
         assert argv == ["/local/prerequisite", "$literal"]
         assert json.loads(kwargs["input"])["unchanged"] == 3
+        names = sorted(row["model_name"] for row in config["model_list"] if row["model_info"]["f24_provider"] == "groq")
+        assert json.loads(kwargs["env"]["IMPORT_MODEL_NAMES_JSON"]) == names
         return SimpleNamespace(returncode=command_exit)
 
     def notify(event, payload, env):
@@ -565,3 +567,117 @@ def test_downloadable_templates_match_generic_sot():
     assert 'LITELLM_BASE_URL=' not in env_template()
     assert 'LITELLM_CA_FILE=' not in env_template()
     assert 'LITELLM_BASE_URL=' in config_template()
+
+
+def test_prune_adopted_legacy_routes_matches_yaml_and_is_idempotent(config, monkeypatch):
+    current, stale = deepcopy(config['model_list'][:2])
+    current = importer.routing_model(current)
+    model = deepcopy(current)
+    current['model_info']['f24_import_hash'] = importer.source_hash(current)
+    info = stale['model_info']
+    legacy = {'model_name': stale['model_name'], 'model_info': {
+        'id': 'legacy-stale', 'managed_by': 'free-sync', 'access_groups': ['litellm-free'],
+        'free_sync_provider': info['f24_provider'], 'free_sync_model_id': info['f24_upstream_id'],
+        'free_sync_variant': info['f24_variant']}}
+    guards = []
+    for field, value in [('managed_by', 'other-manager'), ('access_groups', ['other']),
+                         ('access_groups', ['litellm-free', 'other']), ('free_sync_provider', 'unknown'),
+                         ('free_sync_variant', 'invalid')]:
+        guarded = deepcopy(legacy)
+        guarded['model_info'].update({field: value, 'id': 'guard-' + str(len(guards))})
+        guards.append(guarded)
+    mismatched = deepcopy(legacy)
+    mismatched['model_info']['id'] = 'guard-name'
+    mismatched['model_name'] = 'opencode/not-this-route'
+    guards.append(mismatched)
+    rows, requests = [current, legacy, *guards], []
+
+    def handler(request):
+        requests.append(request)
+        if request.method == 'POST':
+            assert request.url.path == '/model/delete'
+            assert json.loads(request.content) == {'id': 'legacy-stale'}
+            rows.remove(legacy)
+        return httpx.Response(200, json={'data': rows})
+
+    real = httpx.Client
+    monkeypatch.setattr(importer.httpx, 'Client', lambda **kw: real(transport=httpx.MockTransport(handler), **kw))
+    env = {'LITELLM_BASE_URL': 'http://localhost', 'LITELLM_ADMIN_KEY': 'test', 'GROQ_API_KEY': 'test'}
+    assert importer.import_api([model], env, prune=True, adopt_managed_by='free-sync')['pruned'] == 1
+    assert [r.method for r in requests] == ['GET', 'POST', 'GET']
+    assert all(row in rows for row in guards)
+    requests.clear()
+    assert importer.import_api([model], env, prune=True, adopt_managed_by='free-sync')['pruned'] == 0
+    assert [r.method for r in requests] == ['GET']
+
+
+def test_legacy_prune_dry_run_requires_explicit_adoption(config, monkeypatch):
+    current, stale = deepcopy(config['model_list'][:2])
+    info = stale['model_info']
+    stale['model_info'] = {'id': 'legacy', 'managed_by': 'free-sync', 'access_groups': ['litellm-free'],
+                           'free_sync_provider': info['f24_provider'], 'free_sync_model_id': info['f24_upstream_id'],
+                           'free_sync_variant': info['f24_variant']}
+    requests = []
+    real = httpx.Client
+
+    def handler(request):
+        requests.append(request)
+        return httpx.Response(200, json={'data': [current, stale]})
+
+    monkeypatch.setattr(importer.httpx, 'Client', lambda **kw: real(transport=httpx.MockTransport(handler), **kw))
+    env = {'LITELLM_BASE_URL': 'http://localhost', 'LITELLM_ADMIN_KEY': 'test', 'GROQ_API_KEY': 'test'}
+    assert importer.import_api([current], env, prune=True, dry_run=True)['pruned'] == 0
+    assert importer.import_api([current], env, prune=True, dry_run=True, adopt_managed_by='free-sync')['pruned'] == 1
+    assert all(request.method == 'GET' for request in requests)
+
+
+def test_prune_readback_failure_is_not_a_success(config, monkeypatch):
+    current, stale = deepcopy(config['model_list'][:2])
+    current = importer.routing_model(current)
+    model = deepcopy(current)
+    current['model_info']['f24_import_hash'] = importer.source_hash(current)
+    real = httpx.Client
+    monkeypatch.setattr(importer.httpx, 'Client', lambda **kw: real(transport=httpx.MockTransport(
+        lambda request: httpx.Response(200, json={'data': [current, stale]})), **kw))
+    env = {'LITELLM_BASE_URL': 'http://localhost', 'LITELLM_ADMIN_KEY': 'test', 'GROQ_API_KEY': 'test'}
+    with pytest.raises(ValueError, match='removed route'):
+        importer.import_api([model], env, prune=True)
+
+
+def test_unchanged_source_hash_does_not_hide_live_routing_drift(config, monkeypatch):
+    model = importer.routing_model(config['model_list'][0])
+    row = deepcopy(model)
+    row['model_info']['f24_import_hash'] = importer.source_hash(model)
+    row['litellm_params']['api_base'] = 'https://wrong.example'
+    requests = []
+
+    def handler(request):
+        requests.append(request)
+        if request.method == 'PATCH':
+            row.update(json.loads(request.content))
+        return httpx.Response(200, json={'data': [row]})
+
+    real = httpx.Client
+    monkeypatch.setattr(importer.httpx, 'Client', lambda **kw: real(transport=httpx.MockTransport(handler), **kw))
+    env = {'LITELLM_BASE_URL': 'http://localhost', 'LITELLM_ADMIN_KEY': 'test'}
+    assert importer.import_api([model], env)['updated'] == 1
+    requests.clear()
+    assert importer.import_api([model], env)['unchanged'] == 1
+    assert [r.method for r in requests] == ['GET']
+
+
+def test_exact_reconciliation_refuses_foreign_name_without_deleting(config, monkeypatch):
+    model = deepcopy(config['model_list'][0])
+    foreign = deepcopy(model)
+    foreign['model_info'].update(id='foreign', managed_by='other-manager')
+    requests = []
+    real = httpx.Client
+
+    def handler(request):
+        requests.append(request)
+        return httpx.Response(200, json={'data': [foreign]})
+
+    monkeypatch.setattr(importer.httpx, 'Client', lambda **kw: real(transport=httpx.MockTransport(handler), **kw))
+    with pytest.raises(ValueError, match='exact reconciliation'):
+        importer.import_api([model], {'LITELLM_BASE_URL': 'http://localhost', 'LITELLM_ADMIN_KEY': 'test'}, prune=True)
+    assert [r.method for r in requests] == ['GET']
