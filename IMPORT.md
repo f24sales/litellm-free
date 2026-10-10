@@ -6,7 +6,7 @@ The published source is directly importable **[LiteLLM YAML](https://www.f24-sal
 
 Follow the [README setup instructions](README.md#setup). Copy [env.example](env.example) to `.env` and [config.conf_example](config.conf_example) to `config.conf`. The shared `python_header.py` loads the project configuration and additional `*.env` files; `.env` is loaded last. Local configuration and credential files are excluded from version control. `.env.example` and `import.env.example` point to the same environment template.
 
-- `.env`: your own `OPENROUTER_API_KEY`, `GROQ_API_KEY`, `KILO_API_KEY`, `NOUS_API_KEY`, `OPENCODE_API_KEY`, `NVIDIA_API_KEY`, `CLINE_API_KEY`, `INFRON_API_KEY` and LiteLLM bearer token. These gateways are preconfigured as of September 2026; OpenAI-compatible `/v1/models` services can be integrated through explicit validated presets.
+- `.env`: your own `OPENROUTER_API_KEY`, `GROQ_API_KEY`, `KILO_API_KEY`, `NOUS_API_KEY`, `OPENCODE_API_KEY`, `NVIDIA_API_KEY`, `CLINE_API_KEY`, `INFRON_API_KEY`, `GMI_API_KEY`, `EXPLABS_API_KEY`, `TOKENHARBOR_API_KEY` and LiteLLM bearer token. These gateways are preconfigured as of September 2026; OpenAI-compatible `/v1/models` services can be integrated through explicit validated presets.
 - `config.conf`: `IMPORT_SOURCE_URL`, `LITELLM_BASE_URL`, optional ports/CA paths, `IMPORT_DELAY_SECONDS=10` and optional `IMPORT_PATCH_MANAGED_BY`, `IMPORT_ADOPT_MANAGED_BY` and `IMPORT_PRUNE`.
 
 `LITELLM_ADMIN_KEY` can be the existing master key or an admin virtual key with model-management permissions. `LITELLM_VIRTUAL_KEY` is the fallback when `LITELLM_ADMIN_KEY` is empty. This does not grant additional permissions to an ordinary chat bearer token.

@@ -18,6 +18,9 @@ PROVIDERS = {
     "nvidia": ("https://integrate.api.nvidia.com/v1", "NVIDIA_API_KEY"),
     "cline": ("https://api.cline.bot/api/v1", "CLINE_API_KEY"),
     "infron": ("https://api.infron.ai/v1", "INFRON_API_KEY"),
+    "gmi": ("https://api.gmi-serving.com/v1", "GMI_API_KEY"),
+    "experiential": ("https://api.experientiallabs.ai/v1", "EXPLABS_API_KEY"),
+    "tokenharbor": ("https://tokenharbor.ai/v1", "TOKENHARBOR_API_KEY"),
 }
 GROQ_EFFORTS = {
     "openai/gpt-oss-20b": ("high", "low"), "openai/gpt-oss-120b": ("high", "low"),

@@ -43,6 +43,18 @@ def load_env(paths, use_header_defaults=False):
         values.update({k: v for k, v in dotenv_values(path, interpolate=False).items() if v and v.strip().lower() != "blank"})
     values.update({key: value for key, value in os.environ.items() if value and value.strip().lower() != "blank"
                    and (header is None or key in header._process_env or key not in header.env or value != header.env[key])})
+    for name, file_name in list(values.items()):
+        if not name.endswith("_API_KEY_FILE") or not file_name.strip():
+            continue
+        key_name = name[:-5]
+        if values.get(key_name, "").strip():
+            continue
+        secret_path = Path(file_name.strip()).expanduser()
+        if not secret_path.is_absolute() or not secret_path.is_file() or secret_path.is_symlink():
+            raise ValueError(f"Invalid secret file for {key_name}")
+        secret = secret_path.read_text().strip()
+        if secret:
+            values[key_name] = secret
     return values
 
 
