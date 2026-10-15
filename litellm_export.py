@@ -22,6 +22,7 @@ PROVIDERS = {
     "experiential": ("https://api.experientiallabs.ai/v1", "EXPLABS_API_KEY"),
     "tokenharbor": ("https://tokenharbor.ai/v1", "TOKENHARBOR_API_KEY"),
     "river": ("https://api.river.ai/v1", "RIVER_API_KEY"),
+    "intern": ("https://discovery-api.intern-ai.org.cn/v1", "INTERN_API_KEY"),
 }
 GROQ_EFFORTS = {
     "openai/gpt-oss-20b": ("high", "low"), "openai/gpt-oss-120b": ("high", "low"),
