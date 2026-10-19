@@ -67,6 +67,9 @@ class RefreshTests(unittest.TestCase):
         self.openclaw_cli = cli.start()
         self.addCleanup(cli.stop)
         self.clients = {kind: load_client(kind) for kind in orchestrator.CLIENT_SCRIPTS}
+        gateway = patch.object(self.clients["openclaw"], "update_runtime", return_value="gateway_catalog_verified")
+        self.gateway_verifier = gateway.start()
+        self.addCleanup(gateway.stop)
         children = patch.object(orchestrator, "run_client", side_effect=self.run_client)
         self.child_runner = children.start()
         self.addCleanup(children.stop)
@@ -215,11 +218,11 @@ class RefreshTests(unittest.TestCase):
             with patch.object(refresh, "discover", return_value=CATALOG), \
                  patch.object(refresh, "running", return_value=True), \
                  patch.object(refresh, "verify_opencode") as verify, \
-                 patch.object(refresh, "command") as command:
+                 patch.object(self.clients["openclaw"], "update_runtime", return_value="gateway_catalog_verified") as command:
                 result = orchestrator.refresh(env, status)
                 self.assertEqual(result["status"], "ok")
-                command.assert_called_once_with(
-                    ["openclaw", "models", "list", "--provider", "litellm-free", "--refresh"], timeout=150)
+                command.assert_called_once()
+                self.assertEqual(command.call_args.args[1], CATALOG)
                 self.opencode_reload.assert_called_once_with(env)
                 verify.assert_called_once()
                 for path in refresh.paths(env).values():
@@ -227,8 +230,8 @@ class RefreshTests(unittest.TestCase):
                 command.reset_mock()
                 result = orchestrator.refresh(env, status)
                 self.assertEqual(result["status"], "ok")
-                command.assert_called_once_with(
-                    ["openclaw", "models", "list", "--provider", "litellm-free", "--refresh"], timeout=150)
+                command.assert_called_once()
+                self.assertEqual(command.call_args.args[1], CATALOG)
                 self.assertTrue(all(not c["changed"] for c in result["clients"].values()))
 
     def test_failed_reload_is_retried_with_identical_catalog(self):
@@ -245,11 +248,11 @@ class RefreshTests(unittest.TestCase):
             with patch.object(refresh, "discover", return_value=CATALOG), \
                  patch.object(refresh, "running", return_value=True), \
                  patch.object(refresh, "verify_opencode"), \
-                 patch.object(refresh, "command") as command:
+                 patch.object(self.clients["openclaw"], "update_runtime", return_value="gateway_catalog_verified") as command:
                 result = orchestrator.refresh(env, status)
                 self.assertEqual(result["status"], "ok")
-                command.assert_called_once_with(
-                    ["openclaw", "models", "list", "--provider", "litellm-free", "--refresh"], timeout=150)
+                command.assert_called_once()
+                self.assertEqual(command.call_args.args[1], CATALOG)
 
     def test_api_mismatch_cannot_report_success(self):
         with tempfile.TemporaryDirectory() as raw:
@@ -301,7 +304,7 @@ class RefreshTests(unittest.TestCase):
             with patch.object(refresh, "discover", return_value=CATALOG), \
                  patch.object(refresh, "running", return_value=True), \
                  patch.object(refresh, "verify_opencode"), \
-                 patch.object(refresh, "command", side_effect=refresh.RefreshError("openclaw refresh failed")):
+                 patch.object(self.clients["openclaw"], "update_runtime", side_effect=refresh.RefreshError("openclaw refresh failed")):
                 with self.assertRaisesRegex(refresh.RefreshError, "openclaw refresh failed"):
                     orchestrator.refresh(env, status)
             report = json.loads(status.read_text())
@@ -330,6 +333,63 @@ class ScriptLaunchTests(unittest.TestCase):
                 self.assertEqual(json.loads(run.call_args.kwargs["input"]), CATALOG)
                 self.assertEqual(run.call_args.kwargs["env"]["TASK_SETTING"], "retained")
 
+
+
+class OpenClawGatewayTests(unittest.TestCase):
+    def setUp(self):
+        self.client = load_client("openclaw")
+        self.payload = {"count": 2, "models": [
+            {"key": "litellm-free/" + model, "contextWindow": CATALOG["metadata"][model]["context"],
+             "tags": ["configured"]} for model in CATALOG["models"]]}
+
+    def response(self, payload=None, stderr="", code=0):
+        return SimpleNamespace(returncode=code, stdout=json.dumps(self.payload if payload is None else payload), stderr=stderr)
+
+    def test_verifies_gateway_without_global_discovery(self):
+        with patch.object(self.client.subprocess, "run", return_value=self.response()) as run:
+            self.assertEqual(self.client.update_runtime({}, CATALOG, True), "gateway_catalog_verified")
+        argv = run.call_args.args[0]
+        self.assertEqual(argv, ["openclaw", "models", "list", "--provider", "litellm-free", "--json"])
+        self.assertEqual(run.call_args.kwargs["timeout"], 45)
+
+    def test_waits_for_hot_reload_after_handshake_error_and_stale_catalog(self):
+        stale = deepcopy(self.payload)
+        stale["models"][0]["contextWindow"] = 1
+        with patch.object(self.client.subprocess, "run", side_effect=[
+                self.response(stderr="Opening handshake has timed out", code=1),
+                self.response(stale), self.response()]) as run, patch.object(self.client.time, "sleep"):
+            self.assertEqual(self.client.update_runtime({}, CATALOG, True), "gateway_catalog_verified")
+            self.assertEqual(run.call_count, 3)
+
+    def test_models_without_published_context_do_not_invent_a_limit(self):
+        catalog = deepcopy(CATALOG)
+        catalog["metadata"] = {}
+        self.assertTrue(self.client.catalog_matches(self.payload, catalog))
+
+    def test_missing_extra_duplicate_and_wrong_context_models_fail(self):
+        for change in ("missing", "extra", "duplicate", "context", "placeholder"):
+            payload = deepcopy(self.payload)
+            if change == "missing": payload["models"].pop()
+            if change == "extra": payload["models"].append({"key": "litellm-free/obsolete"})
+            if change == "duplicate": payload["models"][1] = payload["models"][0]
+            if change == "context": payload["models"][0]["contextWindow"] = 1
+            if change == "placeholder": payload["models"][0]["tags"] = ["missing"]
+            with self.subTest(change=change):
+                self.assertFalse(self.client.catalog_matches(payload, CATALOG))
+
+    def test_local_fallback_and_invalid_output_do_not_report_success(self):
+        for response in (self.response(stderr="Gateway is not running. Showing the local cached model catalog."),
+                         SimpleNamespace(returncode=0, stdout="invalid", stderr=""), self.response(code=1)):
+            with patch.object(self.client.subprocess, "run", return_value=response), patch.object(self.client.time, "sleep"):
+                with self.assertRaisesRegex(refresh.RefreshError, "did not confirm"):
+                    self.client.update_runtime({}, CATALOG, False)
+
+    def test_timeout_is_bounded_and_does_not_expose_output(self):
+        with patch.object(self.client.subprocess, "run", side_effect=subprocess.TimeoutExpired("openclaw", 45)) as run, \
+             patch.object(self.client.time, "sleep"):
+            with self.assertRaisesRegex(refresh.RefreshError, "did not confirm"):
+                self.client.update_runtime({}, CATALOG, True)
+            self.assertEqual(run.call_count, 3)
 
 if __name__ == "__main__":
     unittest.main()
