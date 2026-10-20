@@ -4,6 +4,11 @@ Free LLM routes come and go. I run a couple of LiteLLM proxies and got tired of 
 
 Currently covered: Cline, Groq, Infron, Kilo, Nous Portal, NVIDIA, OpenCode Zen and OpenRouter. Any OpenAI-compatible `/v1/models` endpoint can be added.
 
+Google Gemini imports are also supported through Google's OpenAI-compatible
+endpoint with `GEMINI_API_KEY`. Use a Free-tier project without billing enabled.
+Support in the importer does not imply a tested route is already published:
+Google routes become available only when they appear in the scanned catalog.
+
 **[LiteLLM YAML](https://www.f24-sales.com/litellm-config.yaml)** · **[.env template](env.example)** · **[Import guide](IMPORT.md)**
 
 ## Quickstart
