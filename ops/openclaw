@@ -14,14 +14,25 @@ def catalog_matches(payload, catalog):
     rows = payload["models"]
     expected = {catalog["id"] + "/" + model: common.render_model(
         "openclaw", model, catalog["metadata"].get(model, {})) for model in catalog["models"]}
-    if payload.get("count") != len(expected) or len(rows) != len(expected):
+    if payload.get("count") != len(rows):
         return False
     actual = {}
+    seen = set()
     for row in rows:
         if not isinstance(row, dict) or not isinstance(row.get("key"), str):
             return False
         key = row["key"]
-        if key not in expected or key in actual or "missing" in (row.get("tags") or []):
+        if key in seen:
+            return False
+        seen.add(key)
+        tags = row.get("tags") or []
+        # The CLI also includes discovered routes outside the configured set.
+        # Their presence does not mean that importing the current set failed.
+        if key not in expected:
+            if "configured" in tags:
+                return False
+            continue
+        if "missing" in tags:
             return False
         if ("contextWindow" in expected[key]
                 and row.get("contextWindow") != expected[key]["contextWindow"]):

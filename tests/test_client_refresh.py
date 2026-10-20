@@ -370,12 +370,22 @@ class OpenClawGatewayTests(unittest.TestCase):
         for change in ("missing", "extra", "duplicate", "context", "placeholder"):
             payload = deepcopy(self.payload)
             if change == "missing": payload["models"].pop()
-            if change == "extra": payload["models"].append({"key": "litellm-free/obsolete"})
+            if change == "extra":
+                payload["models"].append({"key": "litellm-free/obsolete", "tags": ["configured"]})
+                payload["count"] += 1
             if change == "duplicate": payload["models"][1] = payload["models"][0]
             if change == "context": payload["models"][0]["contextWindow"] = 1
             if change == "placeholder": payload["models"][0]["tags"] = ["missing"]
             with self.subTest(change=change):
                 self.assertFalse(self.client.catalog_matches(payload, CATALOG))
+
+    def test_unconfigured_discovery_entries_do_not_fail_a_complete_import(self):
+        self.payload["models"].append({"key": "litellm-free/discovered", "tags": []})
+        self.payload["count"] += 1
+        self.assertTrue(self.client.catalog_matches(self.payload, CATALOG))
+        self.payload["models"].pop(0)
+        self.payload["count"] -= 1
+        self.assertFalse(self.client.catalog_matches(self.payload, CATALOG))
 
     def test_local_fallback_and_invalid_output_do_not_report_success(self):
         for response in (self.response(stderr="Gateway is not running. Showing the local cached model catalog."),
