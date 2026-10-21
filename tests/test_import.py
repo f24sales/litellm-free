@@ -529,6 +529,7 @@ def test_prune_removes_only_obsolete_owned_routes_after_readback(config, monkeyp
 
 
 def test_prune_never_runs_after_failed_upsert_readback(config, monkeypatch):
+    monkeypatch.setattr(importer.time, "sleep", lambda _: None)
     current, stale = deepcopy(config['model_list'][:2])
     requests = []
     def handler(request):
@@ -539,7 +540,7 @@ def test_prune_never_runs_after_failed_upsert_readback(config, monkeypatch):
     env = {'LITELLM_BASE_URL': 'http://localhost', 'LITELLM_ADMIN_KEY': 'test', 'GROQ_API_KEY': 'test-only'}
     with pytest.raises(ValueError, match='readback'):
         importer.import_api([current], env, prune=True)
-    assert [request.method for request in requests] == ['GET', 'PATCH', 'GET']
+    assert [request.method for request in requests] == ['GET', 'PATCH'] + ['GET'] * 6
     with pytest.raises(ValueError, match='nonempty'):
         importer.import_api([], env, prune=True)
 
@@ -632,6 +633,7 @@ def test_legacy_prune_dry_run_requires_explicit_adoption(config, monkeypatch):
 
 
 def test_prune_readback_failure_is_not_a_success(config, monkeypatch):
+    monkeypatch.setattr(importer.time, "sleep", lambda _: None)
     current, stale = deepcopy(config['model_list'][:2])
     current = importer.routing_model(current)
     model = deepcopy(current)
@@ -681,3 +683,14 @@ def test_exact_reconciliation_refuses_foreign_name_without_deleting(config, monk
     with pytest.raises(ValueError, match='exact reconciliation'):
         importer.import_api([model], {'LITELLM_BASE_URL': 'http://localhost', 'LITELLM_ADMIN_KEY': 'test'}, prune=True)
     assert [r.method for r in requests] == ['GET']
+
+
+def test_readback_waits_for_cache_without_repeating_writes(monkeypatch):
+    expected = {"id": "route-id", "managed_by": "test"}
+    row = {"model_name": "test/model", "model_info": expected}
+    responses = iter([[], [{**row, "model_info": {"id": "route-id"}}], [row]])
+    monkeypatch.setattr(importer, "read_api_models", lambda client: next(responses))
+    delays = []
+    monkeypatch.setattr(importer.time, "sleep", delays.append)
+    importer.verify_readback(object(), [("route-id", "test/model", expected)])
+    assert delays == [1, 2]

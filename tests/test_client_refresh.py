@@ -78,6 +78,15 @@ class RefreshTests(unittest.TestCase):
         return refresh.run_single(kind, env, catalog, self.clients[kind].update_runtime,
                                   force_reload=reload_required)
 
+    def test_hermes_native_catalog_refresh_does_not_require_gateway(self):
+        with tempfile.TemporaryDirectory() as raw:
+            env = self.setup_files(Path(raw))
+            with patch.object(refresh, "running", return_value=False):
+                result = refresh.run_single("hermes", env, CATALOG,
+                                            self.clients["hermes"].update_runtime)
+            self.assertEqual(result["runtime"], "native_catalog_verified")
+            self.hermes_verifier.assert_called_once_with(CATALOG)
+
     def test_add_remove_idempotence_and_unrelated_settings(self):
         for kind, original in configs().items():
             before = deepcopy(original)

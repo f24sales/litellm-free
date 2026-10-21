@@ -229,13 +229,30 @@ def owned_routing_rows(rows):
     return result
 
 
+class ReadbackError(ValueError):
+    """The proxy has not exposed the acknowledged writes within the deadline."""
+
+
+def confirm_readback(client, matches, message):
+    # /model/info can lag successful writes while the proxy updates its cache.
+    # Retry reads only: never repeat writes or prune before confirmation.
+    for attempt in range(6):
+        if matches(read_api_models(client)):
+            return
+        if attempt < 5:
+            time.sleep(2 ** attempt)
+    raise ReadbackError(message)
+
+
 def verify_readback(client, changed):
-    rows = read_api_models(client)
-    for ident, name, info in changed:
-        matches = [row for row in rows if row.get("model_name") == name
-                   and (row.get("model_info") or {}).get("id") == ident]
-        if len(matches) != 1 or any(matches[0]["model_info"].get(key) != value for key, value in info.items()):
-            raise ValueError("LiteLLM did not preserve imported model information; readback failed")
+    def matches(rows):
+        for ident, name, info in changed:
+            found = [row for row in rows if row.get("model_name") == name
+                     and (row.get("model_info") or {}).get("id") == ident]
+            if len(found) != 1 or any(found[0]["model_info"].get(key) != value for key, value in info.items()):
+                return False
+        return True
+    confirm_readback(client, matches, "LiteLLM did not preserve imported model information; readback failed")
 
 
 def prune_owned(client, rows, models, env, dry_run, adopt_managed_by=None):
@@ -275,9 +292,9 @@ def prune_owned(client, rows, models, env, dry_run, adopt_managed_by=None):
             response.raise_for_status()
         deleted.append(ident)
     if deleted and not dry_run:
-        remaining = {(row.get("model_info") or {}).get("id") for row in read_api_models(client)}
-        if any(ident in remaining for ident in deleted):
-            raise ValueError("LiteLLM still lists a removed route; readback failed")
+        confirm_readback(client, lambda current: not set(deleted).intersection(
+            (row.get("model_info") or {}).get("id") for row in current),
+            "LiteLLM still lists a removed route; readback failed")
     return len(deleted)
 
 
@@ -571,7 +588,7 @@ def main(argv=None):
         if args.mode in {"api", "sql"} and not getattr(args, "dry_run", False) and env:
             fire_import_error_hook(args.mode, exc, env)
         message = "Invalid JSON config or API response" if isinstance(exc, json.JSONDecodeError) else str(exc)
-        print(json.dumps({"ok": False, "error": message}))
+        print(json.dumps({"ok": False, "error": message, "type": type(exc).__name__}))
     except Exception as exc:
         if args.mode in {"api", "sql"} and not getattr(args, "dry_run", False) and env:
             fire_import_error_hook(args.mode, exc, env)

@@ -108,7 +108,9 @@ def render_model(kind, name, metadata, previous=None):
             limits["context"] = context
         if output:
             limits["output"] = output
-        if limits:
+        # OpenCode requires both fields whenever a limit object is supplied.
+        # Omit partial limits instead of inventing an unreported context size.
+        if context and output:
             result["limit"] = limits
         result.pop("reasoning", None)
         if "reasoning" in metadata:

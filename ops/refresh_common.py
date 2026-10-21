@@ -242,7 +242,8 @@ def verify_opencode(environ, catalog):
                 raise RefreshError("OpenCode response exceeds limit")
             rows = json.loads(payload)["all"]
             actual = next(row["models"] for row in rows if row["id"] == catalog["id"])
-            expected = catalog["metadata"]
+            expected = {model: render_model("opencode", model, catalog["metadata"].get(model, {})).get("limit", {})
+                        for model in catalog["models"]}
             if set(actual) == set(catalog["models"]) and all(
                     all(actual[model].get("limit", {}).get(key) == value
                         for key, value in expected.get(model, {}).items() if key in ("context", "output"))
@@ -265,7 +266,7 @@ def verify_hermes(catalog):
         "print(json.dumps(next(row['models'] for row in rows "
         "if row.get('provider_key')==sys.argv[1])))"
     )
-    actual = json.loads(command(["/usr/local/lib/hermes-agent/venv/bin/python", "-c", code, catalog["id"]]))
+    actual = json.loads(command([sys.executable, "-c", code, catalog["id"]]))
     if sorted(actual) != sorted(catalog["models"]) or any(
             any(actual[model].get(key) != value for key, value in render_model(
                 "hermes", model, catalog["metadata"].get(model, {})).items())
@@ -302,7 +303,9 @@ def run_single(kind, environ, catalog, update_runtime, *, force_reload=False):
                       "catalog_sha256": digest, **clients[kind]}
             atomic_write(status, (json.dumps(report) + "\n").encode())
             commit_plans(plans)
-            if not running(kind + ".service"):
+            # Hermes reads this catalog on the next /model request; its native
+            # config loader is verifiable without a running messaging gateway.
+            if kind != "hermes" and not running(kind + ".service"):
                 raise RefreshError(f"{kind}: service is not running")
             report["runtime"] = update_runtime(environ, catalog, needs_reload)
             for path, _, after in plans:

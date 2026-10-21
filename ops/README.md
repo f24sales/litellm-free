@@ -32,3 +32,8 @@ gateway catalog, not merely a successful configuration write or CLI exit.
 Individual status/lock files and the aggregate status are stored under
 `REFRESH_RUNTIME_DIR` (default `/var/lib/litellm-free`). Failed client updates
 remain pending for a retry; the other client scripts still run.
+
+Hermes verification uses the installed system Python and its native provider loader.
+It confirms the catalog even when the messaging gateway is stopped; this is not a
+gateway health check. OpenCode receives a limit block only when both context and
+output are reported, because its schema rejects partial limits.

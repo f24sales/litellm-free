@@ -24,6 +24,13 @@ class MetadataTests(unittest.TestCase):
             result = render_model(kind, "m", {})
             self.assertFalse(set(result) & {"contextWindow", "maxTokens", "limit", "context_length", "reasoning"})
 
+    def test_opencode_partial_limits_do_not_create_invalid_config(self):
+        for metadata in ({"output": 8192}, {"context": 65536}):
+            result = render_model("opencode", "m", metadata,
+                                  {"name": "Keep", "limit": {"context": 1, "output": 1}})
+            self.assertNotIn("limit", result)
+            self.assertEqual(result["name"], "Keep")
+
     def test_error_payload_is_not_a_catalog(self):
         for payload in ({"error": {"message": "not authorized"}}, None, {"data": {}}, []):
             self.assertFalse(parse_catalog(payload))
