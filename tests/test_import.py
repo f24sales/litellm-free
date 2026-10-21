@@ -694,3 +694,19 @@ def test_readback_waits_for_cache_without_repeating_writes(monkeypatch):
     monkeypatch.setattr(importer.time, "sleep", delays.append)
     importer.verify_readback(object(), [("route-id", "test/model", expected)])
     assert delays == [1, 2]
+
+
+def test_readback_ignores_recomputed_proxy_fields_but_preserves_custom_metadata(config, monkeypatch):
+    model = importer.routing_model(deepcopy(config['model_list'][0]))
+    row = deepcopy(model)
+    row['model_info'].update(direct_access=False, custom='preserved')
+    def handler(request):
+        if request.method == 'PATCH':
+            row.update(json.loads(request.content))
+            assert row['model_info']['custom'] == 'preserved'
+            row['model_info']['direct_access'] = True
+        return httpx.Response(200, json={'data': [row]})
+    real = httpx.Client
+    monkeypatch.setattr(importer.httpx, 'Client', lambda **kw: real(transport=httpx.MockTransport(handler), **kw))
+    result = importer.import_api([model], {'LITELLM_BASE_URL': 'http://localhost', 'LITELLM_ADMIN_KEY': 'test'})
+    assert result['updated'] == 1

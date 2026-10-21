@@ -385,7 +385,10 @@ def import_api(models, env, dry_run=False, patch_managed_by=None, adopt_managed_
                 response = (client.patch(f"/model/{ident}/update", json=body) if old
                             else client.post("/model/new", json=body))
                 response.raise_for_status()
-                changed.append((ident, name, body["model_info"]))
+                # /model/info also contains proxy-derived capability and access
+                # fields. Confirm our input, not that computed response snapshot.
+                changed.append((ident, name, {**model["model_info"], "id": ident,
+                                             "managed_by": OWNER, "f24_import_hash": digest}))
             counts[action] += 1
         if changed:
             verify_readback(client, changed)
