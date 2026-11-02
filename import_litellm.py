@@ -566,7 +566,7 @@ def main(argv=None):
             status = {"output": str(args.output), "models": len(models), "dry_run": args.dry_run}
         elif args.mode == "api":
             prune = args.prune or env.get("IMPORT_PRUNE", "").strip().lower() in {"true", "yes", "1", "on"}
-            capture_diff = bool(env.get("IMPORT_HOOK_URL") and env.get("IMPORT_HOOK_BEARER") and not args.dry_run)
+            capture_diff = bool(env.get("IMPORT_HOOK_URL") and not args.dry_run)
             import_options = {"patch_managed_by": patch_owner, "adopt_managed_by": adopt_owner, "prune": prune}
             if capture_diff:
                 import_options["capture_diff"] = True

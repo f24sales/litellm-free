@@ -1,0 +1,7 @@
+{
+  "description": "Process LiteLLM-Free scan/import events, refresh client catalogs and deliver model changes or scan reports through OpenClaw defaults.",
+  "timeoutSeconds": 420,
+  "refreshTimeoutSeconds": 300,
+  "attachReport": true,
+  "attachDiff": true
+}

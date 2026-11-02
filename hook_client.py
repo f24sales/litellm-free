@@ -52,7 +52,7 @@ def post_hook(event: str, payload: dict, env: dict[str, str], *, source: str = "
     """Send an optional event, retrying transient failures with the same event ID."""
     url = hook_url(env.get("IMPORT_HOOK_URL"))
     bearer = (env.get("IMPORT_HOOK_BEARER") or "").strip()
-    if not url or not bearer:
+    if not url:
         return None
     body = {**payload, "schema_version": 1, "source": source, "event": event,
             "event_id": str(uuid4())}
@@ -61,12 +61,12 @@ def post_hook(event: str, payload: dict, env: dict[str, str], *, source: str = "
         root = Path(directory)
         body_path = root / "payload.json"
         config_path = root / "curl.conf"
-        body_path.write_text(json.dumps(body, ensure_ascii=False, allow_nan=False, separators=(",", ":")) + "\n")
+        body_path.write_text(json.dumps({"tool": "litellm-free", "payload": body}, ensure_ascii=False, allow_nan=False, separators=(",", ":")) + "\n")
         body_path.chmod(0o600)
         config_path.write_text("\n".join([
             f"url = {_curl_quote(url)}",
             "request = POST",
-            f"header = {_curl_quote('Authorization: Bearer ' + bearer)}",
+            *([f"header = {_curl_quote('Authorization: Bearer ' + bearer)}"] if bearer else []),
             'header = "Content-Type: application/json"',
             'header = "Accept: application/json"',
             'header = "User-Agent: litellm-free/1"',

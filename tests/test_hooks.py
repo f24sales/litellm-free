@@ -26,7 +26,9 @@ def test_delivery_retries_only_transient_errors_with_same_event(codes, expected_
     assert result["attempts"] == expected_attempts
     assert result["sent"] is (codes[-1] == 200)
     assert all(body == bodies[0] for body in bodies)
-    assert bodies[0]["event_id"] and bodies[0]["run_id"] == "scan-1"
+    assert set(bodies[0]) == {"tool", "payload"}
+    assert bodies[0]["tool"] == "litellm-free"
+    assert bodies[0]["payload"]["event_id"] and bodies[0]["payload"]["run_id"] == "scan-1"
     assert "test-bearer" not in json.dumps(bodies)
 
 

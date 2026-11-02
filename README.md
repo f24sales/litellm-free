@@ -93,7 +93,7 @@ If `IMPORT_HOOK_URL` and `IMPORT_HOOK_BEARER` are set, the importer posts the re
 
 The published YAML is the import source of truth on every run. With `IMPORT_PRUNE=true` and `IMPORT_ADOPT_MANAGED_BY=free-sync`, obsolete legacy routes in the `litellm-free` group are reconciled too, even when the incoming YAML is unchanged. The pre-success access-sync command receives the exact imported model names in `IMPORT_MODEL_NAMES_JSON`, so it cannot reintroduce software-only routes from the raw scan before the final catalog-refresh hook.
 
-The [OpenClaw plugin](litellm-free-hook) on the receiving side refreshes the model lists in OpenCode, Hermes and OpenClaw and sends a Telegram note about what changed. `ops/refresh-models.sh` does the same reconciliation by hand. How that reload works internally is documented in [ops/](ops/).
+The [LiteLLM-Free handler](mcp/litellm-free) is bundled into the OpenClaw MCP bridge. It refreshes OpenCode, Hermes and OpenClaw, then sends the report through the default agent’s configured channel binding. Set IMPORT_HOOK_URL to the bridge /mcp/direct endpoint; no agent or channel selector is sent. `ops/refresh-models.sh` does the same reconciliation by hand. How that reload works internally is documented in [ops/](ops/).
 
 ## Tests
 
