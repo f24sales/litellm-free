@@ -22,6 +22,7 @@ PROVIDERS = {
     "experiential": ("https://api.experientiallabs.ai/v1", "EXPLABS_API_KEY"),
     "tokenharbor": ("https://tokenharbor.ai/v1", "TOKENHARBOR_API_KEY"),
     "river": ("https://api.river.ai/v1", "RIVER_API_KEY"),
+    "llm7": ("https://api.llm7.io/v1", "LLM7_API_KEY"),
     "intern": ("https://discovery-api.intern-ai.org.cn/v1", "INTERN_API_KEY"),
     "google": ("https://generativelanguage.googleapis.com/v1beta/openai", "GEMINI_API_KEY"),
     "larprouter": ("https://larprouter.com/v1", "LARPROUTER_API_KEY"),
