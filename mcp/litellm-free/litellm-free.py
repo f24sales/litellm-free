@@ -144,7 +144,7 @@ def handle(request, refresh_runner=refresh):
         file.write_bytes(base64.b64decode(event["report"]["content_base64"]))
         file.chmod(0o600)
         attachments.append(str(file))
-    elif event["event"] == "import_succeeded" and result.get("ok") and event["diff"]["changed"] and config.get("attachDiff", True):
+    elif event["event"] == "import_succeeded" and event["diff"]["changed"] and config.get("attachDiff", True):
         file = state / "diffs" / key / "litellm-free-diff.json"
         save(file, scrub(event["diff"]))
         attachments.append(str(file))

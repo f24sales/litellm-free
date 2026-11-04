@@ -62,7 +62,7 @@ def test_refresh_failure_is_reported_separately(tmp_path,monkeypatch):
     assert result["ok"] is True
     assert result["refresh"]["ok"] is False
     assert "reload failed" in result["text"]
-    assert result["attachments"]==[]
+    assert len(result["attachments"]) == 1
 
 def test_diff_attachment_keeps_all_model_rows(tmp_path):
     payload = event()
