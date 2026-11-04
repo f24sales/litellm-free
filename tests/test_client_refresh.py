@@ -4,6 +4,7 @@ import importlib.util
 from importlib.machinery import SourceFileLoader
 from io import BytesIO
 import json
+import os
 from pathlib import Path
 import sys
 import subprocess
@@ -86,6 +87,14 @@ class RefreshTests(unittest.TestCase):
                                             self.clients["hermes"].update_runtime)
             self.assertEqual(result["runtime"], "native_catalog_verified")
             self.hermes_verifier.assert_called_once_with(CATALOG)
+
+    def test_hermes_python_prefers_hermes_runtime(self):
+        with tempfile.TemporaryDirectory() as raw:
+            interpreter = Path(raw) / "hermes-python"
+            interpreter.write_text("#!/bin/sh\n")
+            interpreter.chmod(0o700)
+            with patch.dict(os.environ, {"HERMES_PYTHON": str(interpreter)}):
+                self.assertEqual(refresh.hermes_python(), str(interpreter))
 
     def test_add_remove_idempotence_and_unrelated_settings(self):
         for kind, original in configs().items():

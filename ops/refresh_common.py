@@ -256,9 +256,23 @@ def verify_opencode(environ, catalog):
     raise RefreshError("Running OpenCode API did not load the current catalog")
 
 
+def hermes_python():
+    """Return Hermes' isolated interpreter, never the system Python by default."""
+    candidates = [
+        os.environ.get("HERMES_PYTHON"),
+        "/usr/local/lib/hermes-agent/.venv/bin/python",
+        "/usr/local/lib/hermes-runtime/hermes-agent/.venv/bin/python",
+    ]
+    for candidate in candidates:
+        if candidate and Path(candidate).is_file() and os.access(candidate, os.X_OK):
+            return candidate
+    return sys.executable
+
+
 def verify_hermes(catalog):
     # Use Hermes' own provider normalization (the model picker's input), not
-    # merely the YAML shape. No provider credentials leave that subprocess.
+    # merely the YAML shape. Hermes' dependencies live in its uv-managed venv;
+    # invoking the system Python makes imports such as ruamel.yaml disappear.
     code = (
         "import sys,json; sys.path.insert(0,'/usr/local/lib/hermes-agent'); "
         "from hermes_cli.config_providers import get_compatible_custom_providers; "
@@ -266,7 +280,7 @@ def verify_hermes(catalog):
         "print(json.dumps(next(row['models'] for row in rows "
         "if row.get('provider_key')==sys.argv[1])))"
     )
-    actual = json.loads(command([sys.executable, "-c", code, catalog["id"]]))
+    actual = json.loads(command([hermes_python(), "-c", code, catalog["id"]]))
     if sorted(actual) != sorted(catalog["models"]) or any(
             any(actual[model].get(key) != value for key, value in render_model(
                 "hermes", model, catalog["metadata"].get(model, {})).items())
