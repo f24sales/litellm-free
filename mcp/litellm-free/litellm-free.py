@@ -151,7 +151,11 @@ def handle(request, refresh_runner=refresh):
     receipt["delivery_attempted"] = True
     receipt.pop("delivery", None)
     save(path, receipt)
-    return {"ok": result.get("ok", False), "text": text(event, result), "attachments": attachments,
+    # Handler preparation and notification delivery are separate from the
+    # client refresh result.  A reload failure must produce a red default-route
+    # notification, but it must not turn the already completed import hook into
+    # HTTP 503 and make the importer retry or fail the whole run.
+    return {"ok": True, "text": text(event, result), "attachments": attachments,
             "refresh": result, "receipt_id": key}
 
 if __name__ == "__main__":

@@ -59,9 +59,19 @@ def test_event_id_cannot_be_reused_for_changed_payload(tmp_path):
 def test_refresh_failure_is_reported_separately(tmp_path,monkeypatch):
     monkeypatch.setattr(handler.time,"sleep",lambda _:None)
     result=prepare(tmp_path,event(),lambda *_:{"ok":False,"exitCode":1})
-    assert result["ok"] is False
+    assert result["ok"] is True
+    assert result["refresh"]["ok"] is False
     assert "reload failed" in result["text"]
     assert result["attachments"]==[]
+
+def test_diff_attachment_keeps_all_model_rows(tmp_path):
+    payload = event()
+    payload["diff"]["added"] = [{"model_name": f"model-{i}", "provider": "test"} for i in range(20)]
+    result = prepare(tmp_path, payload)
+    attachment = Path(result["attachments"][0])
+    saved = json.loads(attachment.read_text())
+    assert len(saved["added"]) == 20
+    assert [row["model_name"] for row in saved["added"]] == [f"model-{i}" for i in range(20)]
 
 def test_scan_pdf_is_verified_and_stored_beneath_handler_state(tmp_path):
     data=b"%PDF-1.4\\nfixture"
