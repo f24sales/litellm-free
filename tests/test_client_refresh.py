@@ -384,6 +384,43 @@ class OpenClawGatewayTests(unittest.TestCase):
         catalog["metadata"] = {}
         self.assertTrue(self.client.catalog_matches(self.payload, catalog))
 
+    def test_gateway_google_alias_can_collapse_two_configured_routes(self):
+        stable = "google/gemini-3.1-flash-lite"
+        preview = stable + "-preview"
+        catalog = {**CATALOG, "models": [stable, preview], "metadata": {}}
+        payload = {"count": 1, "models": [
+            {"key": "litellm-free/" + stable, "tags": ["configured"]}]}
+        self.assertTrue(self.client.catalog_matches(payload, catalog))
+        self.assertEqual(catalog["models"], [stable, preview])
+        for models in ([preview], [preview, stable]):
+            with self.subTest(models=models):
+                self.assertTrue(self.client.catalog_matches(payload, {**catalog, "models": models}))
+
+    def test_google_alias_preserves_missing_and_metadata_checks(self):
+        stable = "google/gemini-3.1-flash-lite"
+        preview = stable + "-preview"
+        catalog = {**CATALOG, "models": [stable, preview],
+                   "metadata": {stable: {"context": 16384}, preview: {"context": 32768}}}
+        payload = {"count": 1, "models": [
+            {"key": "litellm-free/" + stable, "contextWindow": 16384, "tags": ["configured"]}]}
+        for models in ([stable, preview], [preview, stable]):
+            self.assertFalse(self.client.catalog_matches(payload, {**catalog, "models": models}))
+        catalog["metadata"] = {}
+        self.assertFalse(self.client.catalog_matches({"count": 0, "models": []}, catalog))
+        payload["models"][0]["tags"] = ["missing"]
+        self.assertFalse(self.client.catalog_matches(payload, catalog))
+
+    def test_alias_does_not_hide_other_preview_models_or_literal_routes(self):
+        stable = "google/gemini-3.1-flash-lite"
+        preview = stable + "-preview"
+        catalog = {**CATALOG, "models": [stable, preview], "metadata": {}}
+        payload = {"count": 2, "models": [
+            {"key": "litellm-free/" + model, "tags": ["configured"]}
+            for model in catalog["models"]]}
+        self.assertTrue(self.client.catalog_matches(payload, catalog))
+        catalog["models"].append("google/some-other-model-preview")
+        self.assertFalse(self.client.catalog_matches(payload, catalog))
+
     def test_missing_extra_duplicate_and_wrong_context_models_fail(self):
         for change in ("missing", "extra", "duplicate", "context", "placeholder"):
             payload = deepcopy(self.payload)

@@ -8,12 +8,30 @@ import time
 import refresh_common as common
 
 
+# OpenClaw's normalizeConfiguredProviderCatalogModelRef folds this Google
+# preview ID into the released ID, including inside custom-provider catalogs.
+# This changes only readback comparison; upstream routes keep their exact IDs.
+CATALOG_ALIASES = {
+    "google/gemini-3.1-flash-lite-preview": "google/gemini-3.1-flash-lite",
+}
+
+
 def catalog_matches(payload, catalog):
     if not isinstance(payload, dict) or not isinstance(payload.get("models"), list):
         return False
     rows = payload["models"]
-    expected = {catalog["id"] + "/" + model: common.render_model(
-        "openclaw", model, catalog["metadata"].get(model, {})) for model in catalog["models"]}
+    live_keys = {row.get("key") for row in rows
+                 if isinstance(row, dict) and isinstance(row.get("key"), str)}
+    expected = {}
+    for model in catalog["models"]:
+        key = catalog["id"] + "/" + model
+        alias = CATALOG_ALIASES.get(model)
+        if key not in live_keys and alias:
+            canonical = catalog["id"] + "/" + alias
+            if canonical in live_keys:
+                key = canonical
+        expected.setdefault(key, []).append(common.render_model(
+            "openclaw", model, catalog["metadata"].get(model, {})))
     if payload.get("count") != len(rows):
         return False
     actual = {}
@@ -34,8 +52,9 @@ def catalog_matches(payload, catalog):
             continue
         if "missing" in tags:
             return False
-        if ("contextWindow" in expected[key]
-                and row.get("contextWindow") != expected[key]["contextWindow"]):
+        if any("contextWindow" in model
+               and row.get("contextWindow") != model["contextWindow"]
+               for model in expected[key]):
             return False
         actual[key] = row
     return set(actual) == set(expected)
