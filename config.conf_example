@@ -1,6 +1,6 @@
 # Non-secret settings. Copy to config.conf; .env holds credentials.
-#default-preset: https://www.f24-sales.com/litellm-config.yaml
-IMPORT_SOURCE_URL=https://www.f24-sales.com/litellm-config.yaml
+#default-preset: https://www.f24-sales.com/litellm-free.yaml
+IMPORT_SOURCE_URL=https://www.f24-sales.com/litellm-free.yaml
 IMPORT_SOURCE_UDS=
 IMPORT_SOURCE_CA_FILE=
 IMPORT_DELAY_SECONDS=10

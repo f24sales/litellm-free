@@ -9,7 +9,7 @@ endpoint with `GEMINI_API_KEY`. Use a Free-tier project without billing enabled.
 Support in the importer does not imply a tested route is already published:
 Google routes become available only when they appear in the scanned catalog.
 
-**[LiteLLM YAML](https://www.f24-sales.com/litellm-config.yaml)** · **[.env template](env.example)** · **[Import guide](IMPORT.md)**
+**[LiteLLM YAML](https://www.f24-sales.com/litellm-free.yaml)** · **[.env template](env.example)** · **[Import guide](IMPORT.md)**
 
 ## Quickstart
 

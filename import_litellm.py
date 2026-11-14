@@ -502,7 +502,7 @@ def main(argv=None):
         p.add_argument("--config", type=Path, help="Optional config.conf settings; python_header loads the project defaults")
         p.add_argument("--env-file", type=Path, action="append", help="Repeat for layered .env files; process environment wins")
         p.add_argument("--input", type=Path, help="Use an already downloaded YAML or JSON document")
-        p.add_argument("--source-url", help="Configuration source; default: IMPORT_SOURCE_URL or www.f24-sales.com/litellm-config.yaml")
+        p.add_argument("--source-url", help="Configuration source; default: IMPORT_SOURCE_URL or www.f24-sales.com/litellm-free.yaml")
         p.add_argument("--delay-seconds", type=float, help="Pause before an actual online pull; default: IMPORT_DELAY_SECONDS or 10")
         p.add_argument("--dry-run", action="store_true")
         if mode == "pull":

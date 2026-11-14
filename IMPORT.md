@@ -1,6 +1,6 @@
 # Import the LiteLLM catalog
 
-The published source is directly importable **[LiteLLM YAML](https://www.f24-sales.com/litellm-config.yaml)** containing `model_list`. It carries compact routing, stable model identity, provider and aggregator fields only. The full researched JSON catalog remains in the private backend; the public importer downloads only the compact YAML.
+The published source is directly importable **[LiteLLM YAML](https://www.f24-sales.com/litellm-free.yaml)** containing `model_list`. It carries compact routing, stable model identity, provider and aggregator fields only. The full researched JSON catalog remains in the private backend; the public importer downloads only the compact YAML.
 
 ## Local files and credentials
 
@@ -33,7 +33,7 @@ litellm --config /path/to/config.yaml
 
 Every output has a fixed filename, atomically updated as a symlink to a dated file alongside it. The default is `LITELLM_FREE_ARCHIVE=0`: the previous version created by the importer is removed after the switch. With `LITELLM_FREE_ARCHIVE=1` in `config.conf` or the injected environment, older versions move to `./archiv/`; an existing regular file is also archived. External symlink targets and existing archive history are preserved. Without `--force`, an existing output is not replaced. Identical content retains its existing version.
 
-`--input config.yaml` or an explicitly selected JSON file works offline. `--source-url` overrides `IMPORT_SOURCE_URL`; remote sources require HTTPS, and HTTP is allowed only for localhost/loopback. For a local web service, set `IMPORT_SOURCE_UDS=/run/user/1000/litellm-free/litellm-free.sock` together with `IMPORT_SOURCE_URL=http://localhost/litellm-config.yaml`. `IMPORT_SOURCE_CA_FILE` adds trusted certificates when needed; otherwise, `LITELLM_CA_FILE` is respected. Redirects are not followed, and downloads include no provider or LiteLLM keys.
+`--input config.yaml` or an explicitly selected JSON file works offline. `--source-url` overrides `IMPORT_SOURCE_URL`; remote sources require HTTPS, and HTTP is allowed only for localhost/loopback. For a local web service, set `IMPORT_SOURCE_UDS=/run/user/1000/litellm-free/litellm-free.sock` together with `IMPORT_SOURCE_URL=http://localhost/litellm-free.yaml`. `IMPORT_SOURCE_CA_FILE` adds trusted certificates when needed; otherwise, `LITELLM_CA_FILE` is respected. Redirects are not followed, and downloads include no provider or LiteLLM keys.
 
 Before actual online runs, the importer waits ten seconds by default. `IMPORT_DELAY_SECONDS` or `--delay-seconds` changes this delay; offline files and `--dry-run` do not wait. Use `--delay-seconds 0` to disable the delay.
 

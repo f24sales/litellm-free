@@ -7,7 +7,7 @@ import math
 import uuid
 
 CONFIG_URL = "https://www.f24-sales.com/litellm-config.json"
-CATALOG_URL = "https://www.f24-sales.com/litellm-config.yaml"
+CATALOG_URL = "https://www.f24-sales.com/litellm-free.yaml"
 OWNER = "f24-sales-import"
 PROVIDERS = {
     "openrouter": ("https://openrouter.ai/api/v1", "OPENROUTER_API_KEY"),
