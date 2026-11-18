@@ -85,6 +85,7 @@ def merge_catalog(primary, extra=(), *, prepend=False):
 def render_model(kind, name, metadata, previous=None):
     """Replace owned discovery fields, preserving unrelated per-model settings."""
     result = deepcopy(previous or {})
+    caps = metadata.get("llm7") if name.startswith("llm7/") else None
     context, output = metadata.get("context"), metadata.get("output")
     if kind == "openclaw":
         for key in ("contextWindow", "maxTokens", "reasoning", "input"):
@@ -100,7 +101,15 @@ def render_model(kind, name, metadata, previous=None):
         inputs = [v for v in metadata.get("input", []) if v in ("text", "image")]
         if inputs:
             result["input"] = inputs
+        if caps is not None:
+            result["input"] = ["text", "image"] if caps["vision"] else ["text"]
     elif kind == "opencode":
+        if caps is not None:
+            result["tool_call"] = caps["tools"]
+            result["attachment"] = caps["vision"]
+            result["modalities"] = {**result.get("modalities", {}),
+                                    "input": ["text", "image"] if caps["vision"] else ["text"],
+                                    "output": result.get("modalities", {}).get("output", ["text"])}
         limits = result.pop("limit", {}).copy()
         for key in ("context", "output"):
             limits.pop(key, None)
@@ -122,6 +131,8 @@ def render_model(kind, name, metadata, previous=None):
             result["context_length"] = context
         if output:
             result["max_completion_tokens"] = output
+        if caps is not None:
+            result["supports_vision"] = caps["vision"]
     else:
         raise ValueError("Unknown client")
     return result

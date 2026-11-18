@@ -37,8 +37,9 @@ def run_client(kind, environ, catalog, reload_required):
 
 
 def refresh(environ, status_path):
-    catalog = common.discover(environ)
+    catalog = common.llm7_policy.enrich_catalog(common.discover(environ))
     plans, clients = common.plan_configs(environ, catalog)
+    common.install_hermes_policy(environ, catalog)
     digest = common.catalog_digest(catalog)
     previous = json.loads(status_path.read_text()) if status_path.is_file() else {}
     pending = set(previous.get("pending_services", []))

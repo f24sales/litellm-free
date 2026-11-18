@@ -24,6 +24,7 @@ import yaml
 # Use the bundled helper when invoked directly from the baked repository.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from llm_model_metadata import parse_catalog, render_model
+import llm7_policy
 
 
 class RefreshError(RuntimeError):
@@ -117,6 +118,18 @@ def update_catalog(kind, original, catalog):
                            for model in ids}
         if kind == "hermes" and config.get("model", {}).get("provider") == provider:
             config["model"]["available"] = list(ids)
+        if kind == "hermes":
+            policies = {name: catalog["metadata"].get(name, {}).get("llm7") for name in ids
+                        if name.startswith("llm7/")}
+            if any(policies.values()):
+                overrides = config.setdefault("model_overrides", {}).setdefault("custom:" + provider, {})
+                for name, caps in policies.items():
+                    if caps is not None:
+                        overrides.setdefault(name, {}).update(supports_tools=caps["tools"], supports_vision=caps["vision"])
+                plugins = config.setdefault("plugins", {})
+                enabled = plugins.setdefault("enabled", [])
+                if "litellm-free-llm7" not in enabled and "litellm-free-llm7" not in (plugins.get("disabled") or []):
+                    enabled.append("litellm-free-llm7")
     return config
 
 
@@ -170,6 +183,9 @@ def plan_configs(environ, catalog, kinds=None):
                 document = codec.load(before)
                 provider = catalog["id"]
                 document["providers"][provider]["models"] = updated["providers"][provider]["models"]
+                for key in ("model_overrides", "plugins"):
+                    if updated.get(key) != original.get(key):
+                        document[key] = updated[key]
                 if updated.get("model") != original.get("model"):
                     document["model"]["available"] = updated["model"]["available"]
                 output = StringIO()
@@ -191,6 +207,19 @@ def plan_configs(environ, catalog, kinds=None):
             if missing:
                 results[kind]["unavailable_selections_retained"] = missing
     return plans, results
+
+
+def install_hermes_policy(environ, catalog):
+    if not any(row.get("llm7") for row in catalog["metadata"].values()):
+        return
+    home = Path(environ.get("HERMES_HOME") or paths(environ)["hermes"].parent)
+    directory = home / "plugins/litellm-free-llm7"
+    source = Path(llm7_policy.__file__).parent
+    for name in ("__init__.py", "plugin.yaml"):
+        target = directory / name
+        data = (source / name).read_bytes()
+        if not target.is_file() or target.read_bytes() != data:
+            atomic_write(target, data)
 
 
 def commit_plans(plans):
@@ -328,7 +357,7 @@ def catalog_digest(catalog):
 
 def run_single(kind, environ, catalog, update_runtime, *, force_reload=False):
     """Update only this client's config and runtime; other clients are not required."""
-    catalog = catalog if catalog is not None else discover(environ)
+    catalog = llm7_policy.enrich_catalog(catalog if catalog is not None else discover(environ))
     runtime = Path(environ.get("REFRESH_RUNTIME_DIR") or "/var/lib/litellm-free")
     runtime.mkdir(parents=True, exist_ok=True, mode=0o700)
     status = runtime / (kind + ".status.json")
@@ -340,6 +369,8 @@ def run_single(kind, environ, catalog, update_runtime, *, force_reload=False):
         report = {}
         try:
             plans, clients = plan_configs(environ, catalog, kinds=(kind,))
+            if kind == "hermes":
+                install_hermes_policy(environ, catalog)
             previous = json.loads(status.read_text()) if status.is_file() else {}
             digest = catalog_digest(catalog)
             needs_reload = (force_reload or clients[kind]["changed"]

@@ -44,3 +44,17 @@ provider loader. It confirms the catalog even when the messaging gateway is
 stopped; this is not a gateway health check. OpenCode receives a limit block only
 when both context and output are reported, because its schema rejects partial
 limits.
+
+### LLM7
+
+The importer and client refresh read LLM7's public model capabilities for managed
+`llm7/` routes. They reuse the last complete snapshot if the catalog is temporarily
+unavailable. The public snapshot defaults to `~/.local/state/litellm-free/llm7/capabilities.json`
+(`LITELLM_FREE_LLM7_CACHE` overrides it). Hermes receives per-model settings and
+a request middleware during refresh. An already running gateway can load the
+middleware with `hermes plugins enable litellm-free-llm7`.
+
+The proxy callback reads the same snapshot and filters incompatible function
+schemas before dispatch. The Oracle Compose service extends `llm7-policy` from
+`deploy/llm7-oracle.compose.yml`. If the proxy already has a LiteLLM config,
+keep it and append `llm7_policy.proxy_hook.handler` to its callbacks instead.

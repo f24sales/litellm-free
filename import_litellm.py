@@ -559,6 +559,9 @@ def main(argv=None):
             raise ValueError("Metadata patch and manager adoption are mutually exclusive")
         models, skipped = select_models(document, env, include_all=bool(patch_owner) or getattr(args, "all_providers", False),
                                         resolve=args.mode in {"api", "sql"} and not patch_owner)
+        if not patch_owner and any(row["model_info"]["f24_provider"] == "llm7" for row in models):
+            from llm7_policy import update_deployments
+            update_deployments(models)
         if args.mode == "file":
             args.output = args.output or Path("litellm-free.yaml" if args.format == "yaml" else "litellm-free.json")
             if not args.dry_run:

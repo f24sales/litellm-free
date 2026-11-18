@@ -124,9 +124,19 @@ def validate_config(document):
                 or any(ord(c) < 32 for c in upstream) or not isinstance(variant, str) or variant not in {"base", "think", "fast"}):
             raise ValueError("Unknown provider, upstream model or preset")
         expected_name = provider + "/" + upstream + ("-" + variant if variant != "base" else "")
-        if row["model_name"] != expected_name or row["litellm_params"] != route_params(provider, upstream, variant):
+        expected_params = route_params(provider, upstream, variant)
+        capability_fields = set()
+        if provider == "llm7" and "supports_function_calling" in info:
+            from llm7_policy import TOOL_FIELDS
+            capability_fields = {"supports_vision", "supports_function_calling"}
+            if any(type(info.get(key)) is not bool for key in capability_fields):
+                raise ValueError("Invalid LLM7 capability flags")
+            if not info["supports_function_calling"]:
+                expected_params["additional_drop_params"] = list(TOOL_FIELDS)
+        if row["model_name"] != expected_name or row["litellm_params"] != expected_params:
             raise ValueError("Model name, API endpoint, key reference or preset differs from the supported export")
         required_info = {"id", "managed_by", "f24_provider", "f24_upstream_id", "f24_variant", "source", "checked_at", "access_groups"}
+        required_info.update(capability_fields)
         if (info.get("managed_by") != OWNER or info.get("source") != CONFIG_URL
                 or info.get("id") != model_id(provider, upstream, variant)
                 or info.get("access_groups") != ["litellm-free"]

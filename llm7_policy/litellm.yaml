@@ -1,0 +1,2 @@
+litellm_settings:
+  callbacks: [llm7_policy.proxy_hook.handler]

@@ -1,0 +1,10 @@
+# Extend only the existing Oracle LiteLLM service. Model storage stays in its database.
+services:
+  llm7-policy:
+    command: ["--port", "4000", "--config", "/opt/litellm-free/llm7_policy/litellm.yaml"]
+    environment:
+      PYTHONPATH: /opt/litellm-free
+      LITELLM_FREE_LLM7_CACHE: /run/llm7-policy/capabilities.json
+    volumes:
+      - ${HOME}/safrano9999/litellm-free/llm7_policy:/opt/litellm-free/llm7_policy:ro
+      - ${HOME}/.local/state/litellm-free/llm7:/run/llm7-policy:ro
