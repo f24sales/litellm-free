@@ -1,0 +1,17 @@
+# Acknowledge the import receipt and refresh client model catalogs.
+[Unit]
+Description=Reconcile LiteLLM virtual bearers and ucore clients
+After=litellm-free-import.service
+
+[Service]
+Environment=PYTHONSAFEPATH=1
+Environment=PYTHONPATH=%h/litellm-free/update/scan
+Type=oneshot
+WorkingDirectory=%h/litellm-free/update/scan
+Environment="PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin"
+ExecStart="/usr/bin/python3" "%h/litellm-free/update/scan/post_import.py" "--root" "%h/litellm-free/update/scan" "--ack-only"
+ExecStartPost="/usr/bin/python3" "%h/litellm-free/update/scan/reconcile_ucore.py" --container fedora45-ai-safrano9999-ucore
+TimeoutStartSec=30min
+UMask=0077
+NoNewPrivileges=false
+PrivateTmp=false

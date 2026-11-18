@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh recent visitor feed every ten seconds
+
+[Timer]
+OnBootSec=5s
+OnUnitActiveSec=10s
+AccuracySec=1s
+Unit=litellm-free-recent-visitors.service
+
+[Install]
+WantedBy=timers.target

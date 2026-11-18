@@ -1,0 +1,19 @@
+[Unit]
+After=litellm-free-scan.service
+OnSuccess=litellm-free-post-import.service
+ConditionPathExists=%h/litellm-free/update/scan/import_pending.json
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+Restart=no
+WorkingDirectory=%h/litellm-free/update/scan
+Environment="PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin"
+Environment=PYTHONUNBUFFERED=1
+ExecStart="/usr/bin/python3" -m import_published "--root" "%h/litellm-free/update/scan" "--public-root" "%h/litellm-free/update" "--config" "%h/litellm-free/update/config.conf" "--env-file" "%h/litellm-free/update/.env"
+StandardOutput=journal
+StandardError=journal
+TimeoutStartSec=2h
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true

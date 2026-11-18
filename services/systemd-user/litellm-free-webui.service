@@ -1,0 +1,21 @@
+[Unit]
+Description=LiteLLM Free WebUI (F24 SALES)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/litellm-free/update/scan
+RuntimeDirectory=litellm-free
+RuntimeDirectoryMode=0750
+ExecStart=/usr/bin/python3 -m uvicorn web:app --uds %t/litellm-free/litellm-free.sock --no-access-log --no-server-header
+Restart=on-failure
+RestartSec=3
+Environment=PYTHONUNBUFFERED=1
+Environment=FREE_WEB_PUBLISHED_FILE=published_catalog.json
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,10 @@
+[Unit]
+Description=Pull the last 24h of configured Cloudflare logs into GoAccess
+Requires=litellm-free-goaccess.service
+After=litellm-free-goaccess.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/podman exec litellm-free-goaccess goaccess-pull
+TimeoutStartSec=10min
+UMask=0077

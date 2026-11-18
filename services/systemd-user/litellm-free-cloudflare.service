@@ -1,0 +1,13 @@
+[Unit]
+Description=Publish the reviewed F24 SALES snapshot to Cloudflare www
+Wants=network-online.target litellm-free-cloudflare-logs.service
+After=network-online.target litellm-free-scan.service
+
+[Service]
+Type=oneshot
+Environment=FREE_WEB_FIRE_ENABLED=0
+WorkingDirectory=%h/litellm-free/cloudflare
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/usr/bin/python3 %h/litellm-free/cloudflare/deploy.py --root %h/litellm-free
+TimeoutStartSec=10min
+UMask=0077

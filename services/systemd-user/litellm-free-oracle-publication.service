@@ -1,0 +1,10 @@
+[Unit]
+Description=Publish the tested model catalog to Oracle LiteLLM
+After=network-online.target litellm-free-scan.service
+ConditionPathExists=!%h/litellm-free/oracle/state/paused
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash %h/litellm-free/oracle/sync-publication.sh --oci-only
+TimeoutStartSec=25min
+UMask=0077

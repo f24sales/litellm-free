@@ -1,0 +1,11 @@
+[Unit]
+Description=Build recent visitor feed for the private LiteLLM GoAccess dashboard
+After=litellm-free-goaccess.service
+
+[Service]
+Environment=F24_WEB_PUBLICATION_DIR=%h/litellm-free/update/publication
+Environment=F24_WEB_STATE_DIR=%h/litellm-free/update/web-state
+Environment=F24_IGNORED_VISITOR_IPS_FILE=%h/litellm-free/update/host-config/ignored-visitor-ips.txt
+Type=oneshot
+EnvironmentFile=-%h/litellm-free/update/host-config/recent-visitors.env
+ExecStart=/usr/bin/python3 %h/litellm-free/update/scan/deploy/recent_visitors.py

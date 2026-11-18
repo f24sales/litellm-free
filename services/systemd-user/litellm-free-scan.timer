@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh free LiteLLM models every 12 hours
+
+[Timer]
+OnCalendar=*-*-* 00,12:00:00 UTC
+Persistent=true
+AccuracySec=1min
+Unit=litellm-free-scan.service
+
+[Install]
+WantedBy=timers.target

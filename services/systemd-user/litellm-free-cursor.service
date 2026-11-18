@@ -1,0 +1,10 @@
+[Unit]
+Description=Manually notify Cursor with the published YAML URL and scan timestamp
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/litellm-free/oracle/notify_cursor.py
+TimeoutStartSec=70s
+UMask=0077

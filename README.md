@@ -66,6 +66,9 @@ Write into a running LiteLLM:
 
 ## Running it on a schedule
 
+The [UCORE host services](services/) run the scan, post-import client refresh
+and publication jobs.
+
 Container (Podman shown, Docker works the same):
 
 ```bash

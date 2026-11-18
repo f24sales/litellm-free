@@ -1,0 +1,21 @@
+[Unit]
+OnSuccess=litellm-free-import.service litellm-free-oracle-publication.service litellm-free-cloudflare.service
+Description=Scan, research and publish free LiteLLM models
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+Environment=FREE_SCAN_IMPORT_SYSTEMD=true
+Environment=CATALOG_AUDIT_ENABLED=1
+Environment=FREE_CATALOG_DATA_DIR=%h/litellm-free/data
+Environment=FREE_WEB_PUBLICATION_DIR=%h/litellm-free/update/publication
+Environment=PYTHONSAFEPATH=1
+Environment=PYTHONPATH=%h/litellm-free/update/scan
+WorkingDirectory=%h/litellm-free/update/scan
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/python3 %h/litellm-free/update/scan/scan_cycle.py
+TimeoutStartSec=2h
+UMask=0077
+KillMode=control-group
