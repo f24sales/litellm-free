@@ -48,6 +48,11 @@ def scrub(value):
 def validate(event):
     if not isinstance(event, dict) or event.get("schema_version") != 1 or event.get("event") not in ALLOWED.get(event.get("source"), set()):
         raise ValueError("invalid_event")
+    if "audit_markdown" in event:
+        summary = event["audit_markdown"]
+        if (event["event"] not in {"scan_valid", "scan_failed"} or not isinstance(summary, str)
+                or not summary.strip() or len(summary.encode("utf-8")) > 65536):
+            raise ValueError("invalid_event")
     if event["event"] == "scan_valid":
         report = event.get("report", {})
         if event.get("scan_state") not in {"ok_changed", "ok_unchanged"} or not isinstance(report, dict):
@@ -138,6 +143,12 @@ def handle(request, refresh_runner=refresh):
                 time.sleep(attempt + 1)
     result = receipt.get("refresh", {"ok": True, "skipped": True})
     attachments = []
+    if "audit_markdown" in event:
+        summary = state / "reports" / key / "katalogpruefung.md"
+        summary.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+        summary.write_text(event["audit_markdown"], encoding="utf-8")
+        summary.chmod(0o600)
+        attachments.append(str(summary))
     if event["event"] == "scan_valid" and config.get("attachReport", True):
         file = state / "reports" / key / event["report"]["filename"]
         file.parent.mkdir(parents=True, exist_ok=True, mode=0o700)

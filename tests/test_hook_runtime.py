@@ -80,6 +80,10 @@ def test_scan_pdf_is_verified_and_stored_beneath_handler_state(tmp_path):
                        "content_base64":base64.b64encode(data).decode(),"sha256":hashlib.sha256(data).hexdigest()}}
     result=prepare(tmp_path,payload)
     assert Path(result["attachments"][0]).read_bytes()==data
+    with_audit = {**payload, "audit_markdown": "# Katalogprüfung\n"}
+    files = [Path(name) for name in prepare(tmp_path, with_audit)["attachments"]]
+    assert [f.suffix for f in files] == [".md", ".pdf"]
+    assert files[0].read_text() == with_audit["audit_markdown"]
     payload["report"]["sha256"]="0"*64
     with pytest.raises(ValueError,match="invalid_event"):
         prepare(tmp_path,payload)
