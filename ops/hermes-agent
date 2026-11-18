@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 """Refresh only Hermes Agent's litellm-free catalog."""
+import hashlib
+from pathlib import Path
+
 import refresh_common as common
 
 
@@ -7,6 +10,19 @@ def update_runtime(environ, catalog, needs_reload):
     # The updated config is reread by Hermes' next /model invocation.
     # Do not restart its gateway/dashboard or alter defaults, Voice or MCP.
     common.verify_hermes(catalog)
+    home = Path(environ.get("HERMES_HOME") or common.paths(environ)["hermes"].parent)
+    plugin = home / "plugins/litellm-free-llm7"
+    if any(row.get("llm7") for row in catalog["metadata"].values()) and plugin.is_dir():
+        signature = hashlib.sha256((plugin / "__init__.py").read_bytes() + (plugin / "plugin.yaml").read_bytes()).hexdigest()
+        stamp = plugin / ".activation"
+        if not stamp.is_file() or stamp.read_text() != signature:
+            common.command([common.hermes_python(), "-c",
+                            "import sys; from pathlib import Path; "
+                            "sys.path[:0]=[p for p in ('/usr/local/lib/hermes-agent','/opt/hermes') "
+                            "if (Path(p)/'hermes_cli').is_dir()]; "
+                            "from hermes_cli.plugins_activation import activate_plugin_now; "
+                            "activate_plugin_now('litellm-free-llm7', in_process=False)"])
+            common.atomic_write(stamp, signature.encode())
     return "native_catalog_verified"
 
 

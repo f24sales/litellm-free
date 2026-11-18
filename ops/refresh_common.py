@@ -101,6 +101,19 @@ def update_catalog(kind, original, catalog):
         rows = {row["id"]: row for row in block.get("models", [])}
         block["models"] = [render_model(kind, model, catalog["metadata"].get(model, {}), rows.get(model))
                            for model in ids]
+        for name in ids:
+            caps = catalog["metadata"].get(name, {}).get("llm7") if name.startswith("llm7/") else None
+            if caps is None:
+                continue
+            key = provider + "/" + name
+            policies = config.get("tools", {}).get("byProvider", {})
+            managed_deny = ["image", "vision_analyze"]
+            if not caps["vision"]:
+                policies = config.setdefault("tools", {}).setdefault("byProvider", {})
+                deny = policies.setdefault(key, {}).setdefault("deny", [])
+                deny.extend(tool for tool in managed_deny if tool not in deny)
+            elif policies.get(key) == {"deny": managed_deny}:
+                policies.pop(key)
         agents = config.get("agents", {})
         for agent in [agents.get("defaults", {}), *agents.get("entries", {}).values()]:
             if isinstance(agent.get("models"), dict):

@@ -103,6 +103,7 @@ def render_model(kind, name, metadata, previous=None):
             result["input"] = inputs
         if caps is not None:
             result["input"] = ["text", "image"] if caps["vision"] else ["text"]
+            result["compat"] = {**result.get("compat", {}), "supportsTools": caps["tools"]}
     elif kind == "opencode":
         if caps is not None:
             result["tool_call"] = caps["tools"]

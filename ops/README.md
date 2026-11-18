@@ -51,8 +51,8 @@ The importer and client refresh read LLM7's public model capabilities for manage
 `llm7/` routes. They reuse the last complete snapshot if the catalog is temporarily
 unavailable. The public snapshot defaults to `~/.local/state/litellm-free/llm7/capabilities.json`
 (`LITELLM_FREE_LLM7_CACHE` overrides it). Hermes receives per-model settings and
-a request middleware during refresh. An already running gateway can load the
-middleware with `hermes plugins enable litellm-free-llm7`.
+a request middleware during refresh. On first install and code updates the refresh
+uses Hermes' native plugin activation to notify a running gateway.
 
 The proxy callback reads the same snapshot and filters incompatible function
 schemas before dispatch. The Oracle Compose service extends `llm7-policy` from

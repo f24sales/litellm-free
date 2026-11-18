@@ -70,6 +70,8 @@ def update_deployments(models):
         row["model_info"].update(supports_vision=caps["vision"], supports_function_calling=caps["tools"])
         if not caps["tools"]:
             row["litellm_params"]["additional_drop_params"] = list(TOOL_FIELDS)
+        else:
+            row["litellm_params"].pop("additional_drop_params", None)
 
 
 def enrich_catalog(catalog):
