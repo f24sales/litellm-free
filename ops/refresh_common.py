@@ -8,6 +8,7 @@ from copy import deepcopy
 import fcntl
 import hashlib
 from io import BytesIO
+from io import StringIO
 import json
 import os
 from pathlib import Path
@@ -157,9 +158,28 @@ def plan_configs(environ, catalog, kinds=None):
         original = yaml.safe_load(before) if kind == "hermes" else json.loads(before)
         updated = update_catalog(kind, original, catalog)
         changed = updated != original
-        content = (yaml.safe_dump(updated, sort_keys=False, allow_unicode=True) if kind == "hermes"
-                   else json.dumps(updated, indent=2, ensure_ascii=False) + "\n")
-        plans.append((path, before, content.encode() if changed else before))
+        after = before
+        if changed and kind == "hermes":
+            try:
+                from ruamel.yaml import YAML
+            except ImportError:
+                after = yaml.safe_dump(updated, sort_keys=False, allow_unicode=True).encode()
+            else:
+                codec = YAML()
+                codec.preserve_quotes = True
+                document = codec.load(before)
+                provider = catalog["id"]
+                document["providers"][provider]["models"] = updated["providers"][provider]["models"]
+                if updated.get("model") != original.get("model"):
+                    document["model"]["available"] = updated["model"]["available"]
+                output = StringIO()
+                codec.dump(document, output)
+                after = output.getvalue().encode()
+                if yaml.safe_load(after) != updated:
+                    raise RefreshError("Hermes YAML round trip changed other settings")
+        elif changed:
+            after = (json.dumps(updated, indent=2, ensure_ascii=False) + "\n").encode()
+        plans.append((path, before, after))
         results[kind] = {"models": len(catalog["models"]), "changed": changed}
         if kind == "openclaw":
             selection = original.get("agents", {}).get("defaults", {}).get("model", {})
@@ -266,6 +286,16 @@ def hermes_python():
     for candidate in candidates:
         if candidate and Path(candidate).is_file() and os.access(candidate, os.X_OK):
             return candidate
+    # Hermes records its active bare-metal venv when it installs or upgrades.
+    home = Path(os.environ.get("HERMES_HOME") or Path.home() / ".hermes")
+    installs = list((home / "installs").glob("*/facts.json"))
+    if len(installs) == 1:
+        facts = json.loads(installs[0].read_text())
+        environment = facts.get("packages", {}).get("venv", {}).get("environment")
+        if environment:
+            python = Path(environment) / "bin/python"
+            if python.is_file() and os.access(python, os.X_OK):
+                return str(python)
     return sys.executable
 
 
@@ -274,7 +304,9 @@ def verify_hermes(catalog):
     # merely the YAML shape. Hermes' dependencies live in its uv-managed venv;
     # invoking the system Python makes imports such as ruamel.yaml disappear.
     code = (
-        "import sys,json; sys.path.insert(0,'/usr/local/lib/hermes-agent'); "
+        "import sys,json; from pathlib import Path; "
+        "sys.path[:0]=[p for p in ('/usr/local/lib/hermes-agent','/opt/hermes') "
+        "if (Path(p)/'hermes_cli').is_dir()]; "
         "from hermes_cli.config_providers import get_compatible_custom_providers; "
         "rows=get_compatible_custom_providers(); "
         "print(json.dumps(next(row['models'] for row in rows "

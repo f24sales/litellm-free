@@ -27,6 +27,12 @@ with its existing provider environment. Keep `refresh_common.py` beside them and
 the repository's `llm_model_metadata.py` in the parent directory. Invoke scripts
 by their path; do not put this directory ahead of the actual client CLIs in PATH.
 
+On a bare-metal Hermes host, the post-import service can invoke
+`python3 ops/hermes-agent --catalog-stdin` directly. Pass the verified provider
+snapshot as JSON (`id`, `base_url`, `models`, `metadata`). Set `HERMES_HOME` to
+the running Hermes profile and `REFRESH_RUNTIME_DIR` to a writable state directory.
+This path uses the existing Hermes provider and needs no OpenClaw installation.
+
 No script restarts a gateway or container. OpenClaw success confirms the running
 gateway catalog, not merely a successful configuration write or CLI exit.
 Individual status/lock files and the aggregate status are stored under
