@@ -26,7 +26,6 @@ PROVIDERS = {
     "kenari": ("https://kenari.id/v1", "KENARI_API_KEY"),
     "intern": ("https://discovery-api.intern-ai.org.cn/v1", "INTERN_API_KEY"),
     "google": ("https://generativelanguage.googleapis.com/v1beta/openai", "GEMINI_API_KEY"),
-    "larprouter": ("https://larprouter.com/v1", "LARPROUTER_API_KEY"),
 }
 GROQ_EFFORTS = {
     "openai/gpt-oss-20b": ("high", "low"), "openai/gpt-oss-120b": ("high", "low"),
