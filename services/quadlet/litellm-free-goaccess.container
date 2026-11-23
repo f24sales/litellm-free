@@ -16,7 +16,7 @@ EnvironmentFile=%h/safrano9999/goaccess-safrano9999/.env
 Volume=goaccess-safrano9999.volume:/data:z
 Volume=%h/.local/share/litellm-free-goaccess/logs:/legacy/f24/logs:ro,z
 Volume=%h/.local/share/litellm-free-goaccess/report:/legacy/f24/report:ro,z
-Volume=%h/.local/share/litellm-free-goaccess/geoip:/geoip:ro,z
+Volume=%h/safrano9999/goaccess-safrano9999/geoip:/geoip:ro,z
 StopSignal=SIGTERM
 
 [Service]
